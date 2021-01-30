@@ -1,0 +1,128 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>io.github.pengjianqiang</groupId>
+	<artifactId>weibo-openapi-4java</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>微博开放平台API-JAVA SDK</name>
+	<description>基于微博开放平台官网的weibo4j-oauth2-beta3.1.1包及新版接口做二次开发</description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+		<skipTests>true</skipTests>
+
+		<!-- 这里定义的版本号可以覆盖传递依赖中有的版本号 -->
+		<lombok.version>1.18.16</lombok.version>
+		<apache.commons.lang3.version>3.11</apache.commons.lang3.version>
+		<apache.commons.collection4.version>4.4</apache.commons.collection4.version>
+		<apache.commons.beanutils.version>1.9.4</apache.commons.beanutils.version>
+		<apache.commons.codec.version>1.15</apache.commons.codec.version>
+		<apache.commons.logging.version>1.2</apache.commons.logging.version>
+		<apache.tika.version>2.0.0-ALPHA</apache.tika.version>
+		<alibaba.json.version>1.2.75</alibaba.json.version>
+		<guava.version>30.1-jre</guava.version>
+		<slf4j.version>2.0.0-alpha1</slf4j.version>
+		<okhttp.version>4.10.0-RC1</okhttp.version>
+		<okio.version>2.9.0</okio.version>
+		<kotlin.stdlib.version>1.4.10</kotlin.stdlib.version>
+		<java.wsrs.api.version>2.1.1</java.wsrs.api.version>
+	</properties>
+
+	<dependencies>
+		<!-- lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>${lombok.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- apache commons工具包 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${apache.commons.lang3.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-collections4</artifactId>
+			<version>${apache.commons.collection4.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>${apache.commons.beanutils.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>${apache.commons.codec.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>${apache.commons.logging.version}</version>
+		</dependency>
+
+		<!-- apache tika -->
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-core</artifactId>
+			<version>${apache.tika.version}</version>
+		</dependency>
+
+		<!-- 阿里json包 -->
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>${alibaba.json.version}</version>
+		</dependency>
+
+		<!-- 添加google工具包 -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${guava.version}</version>
+		</dependency>
+
+		<!-- 日志相关包 -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<!-- 有log4j等具体的日志实现时，排除引入slf4j-simple -->
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<!-- <scope>test</scope> -->
+		</dependency>
+
+		<!-- okhttp相关包 -->
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>${okhttp.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.okio</groupId>
+			<artifactId>okio</artifactId>
+			<version>${okio.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-stdlib</artifactId>
+			<version>${kotlin.stdlib.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+			<version>${java.wsrs.api.version}</version>
+		</dependency>
+	</dependencies>
+</project>
