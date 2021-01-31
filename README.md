@@ -1,11 +1,11 @@
 ﻿使用方法
 
-1、在微博开放平台https://open.weibo.com/申请账号并新建应用  
+1、在微博开放平台申请账号并新建应用  
+	地址：https://open.weibo.com/
 
 2、填写相关配置：在weibo-openapi-config.properties文件，按所新建应用时获取的配置值进行配置  
 
 3、测试过的接口都在pjq.weibo.openapi.exxamplesnew包下(由于没有高级接口的权限，目前只测试完一般常用的开发平台接口，其它没测试过的类可以尝试根据旧版的example去调用对应接口)  
-
 	旧版地址：https://github.com/sunxiaowei2014/weibo4j-oauth2-beta3.1.1
 
 4、每个接口的通用参数有accessToken、clientId，一般通过Weibo.of方法初始化对象  
