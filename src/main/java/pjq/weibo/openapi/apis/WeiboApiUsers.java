@@ -2,8 +2,6 @@ package pjq.weibo.openapi.apis;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -64,7 +62,7 @@ public class WeiboApiUsers extends Weibo<WeiboApiUsers> {
         if (CheckUtils.isEmpty(val)) {
             throw WeiboException.ofParamCanNotNull(uidOrScreenName);
         }
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter(MoreUseParamNames.CLIENT_ID_USE_SOURCE, clientId));
         paramList.add(new PostParameter(uidOrScreenName, val));
         return new User(
@@ -83,7 +81,7 @@ public class WeiboApiUsers extends Weibo<WeiboApiUsers> {
         if (CheckUtils.isEmpty(domain)) {
             throw WeiboException.ofParamCanNotNull("domain");
         }
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter(MoreUseParamNames.CLIENT_ID_USE_SOURCE, clientId));
         paramList.add(new PostParameter("domain", domain));
         return new User(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.USERS_DOMAIN_SHOW), paramListToArray(paramList),
@@ -102,7 +100,7 @@ public class WeiboApiUsers extends Weibo<WeiboApiUsers> {
         if (CheckUtils.isEmpty(uids)) {
             throw WeiboException.ofParamCanNotNull("uids");
         }
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter("uids", joinArrayParam(uids)));
         return WeiboResponse.buildList(
             client.get(WeiboConfigs.getApiUrl(WeiboConfigs.USERS_COUNTS), paramListToArray(paramList), accessToken),
@@ -122,7 +120,7 @@ public class WeiboApiUsers extends Weibo<WeiboApiUsers> {
         if (CheckUtils.isEmpty(uid)) {
             throw WeiboException.ofParamCanNotNull(MoreUseParamNames.UID);
         }
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter(MoreUseParamNames.UID, uid));
         return new UserRank(
             client.get(WeiboConfigs.getApiUrl(WeiboConfigs.USERS_SHOW_RANK), paramListToArray(paramList), accessToken));

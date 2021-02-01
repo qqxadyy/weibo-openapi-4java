@@ -18,12 +18,12 @@ import pjq.weibo.openapi.utils.CheckUtils;
 public final class OKHttpSender4Async extends OKHttpSenderBase {
     private SimpleAsyncCallback callback;
 
-    private static class InstanceHoler {
+    private static class InstanceHolder {
         private static OKHttpSender4Async INSTANCE = new OKHttpSender4Async();
     }
 
     public static OKHttpSender4Async getInstance() {
-        return InstanceHoler.INSTANCE;
+        return InstanceHolder.INSTANCE;
     }
 
     /**

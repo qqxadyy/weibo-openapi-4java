@@ -2,12 +2,10 @@ package pjq.weibo.openapi.apis;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -283,7 +281,7 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
         if (CheckUtils.isEmpty(statusId)) {
             throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ID);
         }
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter(MoreUseParamNames.ID, statusId));
         return new Status(
             client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_SHOW), paramListToArray(paramList), accessToken));
@@ -301,7 +299,7 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
         if (CheckUtils.isEmpty(statusIds)) {
             throw WeiboException.ofParamCanNotNull("ids");
         }
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter("ids", joinArrayParam(statusIds)));
         return WeiboResponse.buildList(
             client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_COUNT), paramListToArray(paramList), accessToken),
@@ -343,7 +341,7 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
         if (CheckUtils.isEmpty(statusId)) {
             throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ID);
         }
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter(MoreUseParamNames.UID, uid));
         paramList.add(new PostParameter(MoreUseParamNames.ID, statusId));
         if (useClientId) {
@@ -403,7 +401,7 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
         }
         String apiName = !queryId ? WeiboConfigs.STATUSES_QUERY_MID : WeiboConfigs.STATUSES_QUERY_ID;
 
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter(idParamName, joinArrayParam(ids)));
         paramList.add(new PostParameter(MoreUseParamNames.TYPE, queryIdType.value()));
         paramList.add(new PostParameter("is_batch", StatusType.VALID.value())); // 默认使用批量模式
@@ -421,7 +419,7 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
         JSONArray ja =
             client.get(WeiboConfigs.getApiUrl(apiName), paramListToArray(paramList), accessToken).asJSONArray();
 
-        Map<String, String> midMap = Maps.newHashMap();
+        Map<String, String> midMap = new HashMap<String, String>();
         if (CheckUtils.isNull(ja)) {
             return midMap;
         }
@@ -452,7 +450,7 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
         if (CheckUtils.isEmpty(statusId)) {
             throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ID);
         }
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter(MoreUseParamNames.ID, statusId));
         if (CheckUtils.isNotEmpty(repostText)) {
             paramList.add(new PostParameter("status", checkPostTextAndReturn(repostText[0])));
@@ -485,7 +483,7 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
      * @return
      */
     private List<PostParameter> timelineCommonParam() {
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         if (CheckUtils.isNotNull(baseApp)) {
             paramList.add(new PostParameter("base_app", baseApp.value()));
         }
@@ -504,7 +502,7 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
      * @return
      */
     private List<PostParameter> filterCommonParam() {
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         if (CheckUtils.isNotNull(filterByAuthor)) {
             paramList.add(new PostParameter("filter_by_author", filterByAuthor.value()));
         }
@@ -555,7 +553,7 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
         checkIfHasSafeLink(statusText);
         boolean needUploadPic = checkIfPicFileValid(picPath);
 
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter("status", statusText));
         if (CheckUtils.isNotEmpty(rip)) {
             paramList.add(new PostParameter(MoreUseParamNames.REAL_IP, rip));
@@ -605,13 +603,13 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
         File file = new File(picPath);
         String imageType = ImageTypeJudger.getImageType(file);
         if (ImageTypeJudger.NOT_IMAGE.equals(imageType)) {
-            throw new WeiboException(picPath + "不是图片类型");
+            throw new WeiboException("文件不是图片类型[" + picPath + "]");
         } else if ("bmp".equals(imageType)) {
-            throw new WeiboException(picPath + "是bmp类型，暂不支持");
+            throw new WeiboException("暂不支持bmp类型[" + picPath + "]");
         }
         BigDecimal fileSizeMB = new BigDecimal(file.length() + "").divide(new BigDecimal(String.valueOf(1024 * 1024)));
         if (fileSizeMB.compareTo(new BigDecimal("5")) >= 0) {
-            throw new WeiboException(picPath + "大小超过5MB，不能上传");
+            throw new WeiboException("大小超过5MB，不能上传[" + picPath + "]");
         }
         return true;
     }

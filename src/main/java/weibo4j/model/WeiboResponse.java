@@ -60,7 +60,8 @@ import weibo4j.org.json.JSONObject;
 /**
  * 2021-01-25：改造<br/>
  * 实现类至少实现{@link Response}和{@link JSONObject}这两个构造方法，且方法实现为super(param)即可，可参考{@link User}<br/>
- * 如果是返回对象中的嵌套对象(非{@link User}、{@link Status}等顶层返回对象)，则一般只需要实现{@link JSONObject}方法即可
+ * 如果是返回对象中的嵌套对象(非{@link User}、{@link Status}等顶层返回对象)，则一般只需要实现{@link JSONObject}方法即可<br/>
+ * 都必须显式定义无参构造方法，因为从缓存中获取该对象时是用alibaba的json做转换，而该组件会调用类的构造方法，没有空参数构造方法的话会调用其它构造方法并导致报错
  * 
  * @see weibo4j.DirectMessage
  * @see weibo4j.model.Status

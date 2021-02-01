@@ -12,9 +12,9 @@ import weibo4j.org.json.JSONObject;
  * @author SinaWeibo
  * 
  */
-@NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
+@NoArgsConstructor
 @WeiboJsonName
 @SuppressWarnings("serial")
 public class Emotion extends WeiboResponse {

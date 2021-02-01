@@ -16,9 +16,9 @@ import weibo4j.org.json.JSONObject;
  * @author pengjianqiang
  * @date 2021年1月25日
  */
-@NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
+@NoArgsConstructor
 @WeiboJsonName
 @SuppressWarnings("serial")
 public class Status extends WeiboResponse {
@@ -60,7 +60,7 @@ public class Status extends WeiboResponse {
     private @WeiboJsonName(value = "reward_scheme", isNewAndNoDesc = true) String rewardScheme;
     private @WeiboJsonName(value = "hide_flag", isNewAndNoDesc = true) Integer hideFlag;
     private Integer mlevel;
-    private Visible visible;
+    private StatusVisible statusVisible;
     private @WeiboJsonName(value = "biz_feature", isNewAndNoDesc = true) Integer bizFeature;
     private @WeiboJsonName(isNewAndNoDesc = true) Integer hasActionTypeCard;
     private @WeiboJsonName(value = "darwin_tags", isNewAndNoDesc = true) List<JSONObject> darwinTags;
@@ -103,9 +103,5 @@ public class Status extends WeiboResponse {
 
     public Status(JSONObject json) {
         super(json);
-    }
-
-    public Status(String str) {
-        super(str);
     }
 }

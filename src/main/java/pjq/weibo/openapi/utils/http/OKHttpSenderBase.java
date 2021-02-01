@@ -66,7 +66,7 @@ public abstract class OKHttpSenderBase {
         XML, JSON, RAW, KEY_VALUE_STR, KEY_VALUE_MAP;
     }
 
-    private static class InstanceHoler {
+    private static class InstanceHolder {
         private static OkHttpClient HTTP_INSTANCE;
         private static OkHttpClient HTTPS_INSTANCE;
 
@@ -88,15 +88,15 @@ public abstract class OKHttpSenderBase {
     }
 
     private static OkHttpClient getClient() {
-        return InstanceHoler.HTTP_INSTANCE;
+        return InstanceHolder.HTTP_INSTANCE;
     }
 
     private static OkHttpClient getHttpsClient(String... sslProtocol) {
         if (CheckUtils.isEmpty(sslProtocol)) {
-            return InstanceHoler.HTTPS_INSTANCE;
+            return InstanceHolder.HTTPS_INSTANCE;
         } else {
             try {
-                return InstanceHoler.HTTPS_INSTANCE.newBuilder()
+                return InstanceHolder.HTTPS_INSTANCE.newBuilder()
                     .sslSocketFactory(getSSLContext(sslProtocol).getSocketFactory(), new AnyTrustManager()).build();
             } catch (Exception e) {
                 throw new RuntimeException();

@@ -66,9 +66,9 @@ public final class ImageTypeJudger {
     public static String getImageType(File file) {
         String filePath = file.getAbsolutePath();
         if (!file.exists()) {
-            throw new RuntimeException(filePath + "不存在");
+            throw new RuntimeException("文件不存在[" + filePath + "]");
         } else if (file.isDirectory()) {
-            throw new RuntimeException(filePath + "不是文件");
+            throw new RuntimeException("路径不是文件[" + filePath + "]");
         }
 
         try (FileInputStream fis = new FileInputStream(file)) {
@@ -87,9 +87,9 @@ public final class ImageTypeJudger {
                 return NOT_IMAGE;
             }
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(filePath + "不存在");
+            throw new RuntimeException("文件不存在[" + filePath + "]");
         } catch (IOException e) {
-            throw new RuntimeException(filePath + "读取失败");
+            throw new RuntimeException("文件读取失败[" + filePath + "]");
         }
     }
 

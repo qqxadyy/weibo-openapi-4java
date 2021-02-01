@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.support.WeiboJsonName;
 import weibo4j.http.Response;
@@ -17,11 +18,12 @@ import weibo4j.org.json.JSONObject;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
+@NoArgsConstructor
 @WeiboJsonName
 @SuppressWarnings("serial")
 public class AccessToken extends WeiboResponse implements Serializable {
     private @WeiboJsonName(MoreUseParamNames.ACCESS_TOKEN) String accessToken;
-    private @WeiboJsonName("expires_in") String expiresIn;
+    private @WeiboJsonName("expires_in") String expiresIn; // token有效期，单位秒
     private @WeiboJsonName(value = "refresh_token", isDeleted = true) String refreshToken; // 新版接口中已不返回
     private String uid;
     private @WeiboJsonName("remind_in") String remindIn; // 官网说明该参数即将废弃，用expires_in
@@ -33,9 +35,5 @@ public class AccessToken extends WeiboResponse implements Serializable {
 
     public AccessToken(JSONObject json) {
         super(json);
-    }
-
-    public AccessToken(String res) {
-        super(res);
     }
 }

@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import pjq.weibo.openapi.support.WeiboJsonName;
 import weibo4j.http.Response;
 import weibo4j.org.json.JSONObject;
@@ -16,6 +17,7 @@ import weibo4j.org.json.JSONObject;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
+@NoArgsConstructor
 @WeiboJsonName
 @SuppressWarnings("serial")
 public class AccessTokenInfo extends WeiboResponse implements Serializable {
@@ -31,9 +33,5 @@ public class AccessTokenInfo extends WeiboResponse implements Serializable {
 
     public AccessTokenInfo(JSONObject json) {
         super(json);
-    }
-
-    public AccessTokenInfo(String res) {
-        super(res);
     }
 }

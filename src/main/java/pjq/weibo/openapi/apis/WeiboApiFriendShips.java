@@ -2,8 +2,6 @@ package pjq.weibo.openapi.apis;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -214,7 +212,7 @@ public class WeiboApiFriendShips extends Weibo<WeiboApiFriendShips> {
         if (CheckUtils.isEmpty(targetVal)) {
             throw WeiboException.ofParamCanNotNull(targetUidOrScreenName);
         }
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter(sourceUidOrScreenName, sourceVal));
         paramList.add(new PostParameter(targetUidOrScreenName, targetVal));
         return client
@@ -241,7 +239,7 @@ public class WeiboApiFriendShips extends Weibo<WeiboApiFriendShips> {
     }
 
     private List<PostParameter> commonParam() {
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         if (CheckUtils.isNotNull(count) && count >= 0) {
             paramList.add(new PostParameter("count", count));
         }
@@ -288,7 +286,7 @@ public class WeiboApiFriendShips extends Weibo<WeiboApiFriendShips> {
         if (CheckUtils.isEmpty(val)) {
             throw WeiboException.ofParamCanNotNull(uidOrScreenName);
         }
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter(uidOrScreenName, val));
         if (CheckUtils.isNotEmpty(rip)) {
             paramList.add(new PostParameter(MoreUseParamNames.REAL_IP, rip));
@@ -325,7 +323,7 @@ public class WeiboApiFriendShips extends Weibo<WeiboApiFriendShips> {
         if (CheckUtils.isEmpty(val)) {
             throw WeiboException.ofParamCanNotNull(uidOrScreenName);
         }
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter(uidOrScreenName, val));
         return new User(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.FRIENDSHIPS_DESTROY),
             paramListToArray(paramList), accessToken));

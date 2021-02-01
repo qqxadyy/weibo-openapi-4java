@@ -20,6 +20,7 @@ public final class ParamConstant {
      */
     public interface MoreUseParamNames {
         public static final String ACCESS_TOKEN = "access_token";
+        public static final String STATE = "state";
         public static final String REDIRECT_URI = "redirect_uri";
         public static final String CLIENT_SECRET = "client_secret";
         public static final String UID = "uid";

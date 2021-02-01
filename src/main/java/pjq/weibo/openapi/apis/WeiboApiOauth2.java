@@ -59,12 +59,6 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
      */
     private OAuth2Language language;
 
-    /**
-     * 浏览器端的授权登录成功跳转地址，display为default、mobile或wap时才生效<br/>
-     * 这个不是微博官网的接口参数
-     */
-    private String authSuccRedirectUri;
-
     @Override
     protected String checkAccessToken() {
         return null; // 该接口不用检查access_token
@@ -92,6 +86,7 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
      */
     public String apiBuildAuthorizeURL() throws WeiboException {
         String state = UUID.randomUUID().toString().replaceAll("-", "");
+        cacheHandler.cacheStateOfAuthorize(state);
 
         StringBuilder url = new StringBuilder();
         url.append(WeiboConfigs.getApiUrl(WeiboConfigs.OAUTH2_AUTHORIZE));
@@ -120,10 +115,6 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
         if (OAuth2Language.ENGLISH.equals(language)) {
             url.append("&language=").append(language.value()); // 只有指定英文时才传值
         }
-        if (CheckUtils.isNull(display) || OAuth2Display.DEFAULT.equals(display) || OAuth2Display.MOBILE.equals(display)
-            || OAuth2Display.WAP.equals(display)) {
-            // 处理authSuccRedirectUri
-        }
         return url.toString();
     }
 
@@ -132,14 +123,22 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
      * 
      * @param code
      *            授权回调后获取的code
+     * @param state
+     *            授权回调地址返回的state(该参数不是调接口需要的参数，而是用于安全验证)
      * @return
      * @throws WeiboException
      */
-    public static AccessToken apiGetAccessTokenByCode(String code) throws WeiboException {
+    public static AccessToken apiGetAccessTokenByCode(String code, String state) throws WeiboException {
         if (CheckUtils.isEmpty(code)) {
             throw WeiboException.ofParamCanNotNull("code");
         }
-        return apiOld.getAccessTokenByCode(code);
+        if (CheckUtils.isEmpty(state)) {
+            throw WeiboException.ofParamCanNotNull(MoreUseParamNames.STATE);
+        }
+        if (!cacheHandler.existsStateOfAuthorize(state)) {
+            throw new WeiboException("不存在" + MoreUseParamNames.STATE + "信息，该授权回调可能不安全");
+        }
+        return cacheHandler.cacheAccessToken(apiOld.getAccessTokenByCode(code));
     }
 
     /**
@@ -154,6 +153,7 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
         if (CheckUtils.isEmpty(accessToken)) {
             throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ACCESS_TOKEN);
         }
+        cacheHandler.checkAccessTokenExists(accessToken);
         return new AccessTokenInfo(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.OAUTH2_GET_TOKEN_INFO),
             new PostParameter[] {new PostParameter(MoreUseParamNames.ACCESS_TOKEN, accessToken)}, false, null));
     }
@@ -171,6 +171,7 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
         if (CheckUtils.isEmpty(accessToken)) {
             throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ACCESS_TOKEN);
         }
+        cacheHandler.checkAccessTokenExists(accessToken);
         return new RevokeOAuth2(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.OAUTH2_REVOKE_OAUTH2),
             new PostParameter[] {new PostParameter(MoreUseParamNames.ACCESS_TOKEN, accessToken)}, false, null));
     }

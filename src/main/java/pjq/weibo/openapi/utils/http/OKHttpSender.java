@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public final class OKHttpSender extends OKHttpSenderBase {
-    private static class InstanceHoler {
+    private static class InstanceHolder {
         private static OKHttpSender INSTANCE = new OKHttpSender();
     }
 
     public static OKHttpSender getInstance() {
-        return InstanceHoler.INSTANCE;
+        return InstanceHolder.INSTANCE;
     }
 }

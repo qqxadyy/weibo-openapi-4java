@@ -2,8 +2,6 @@ package pjq.weibo.openapi.apis;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -50,7 +48,7 @@ public class WeiboApiRemind extends Weibo<WeiboApiRemind> {
         if (CheckUtils.isEmpty(uid)) {
             throw WeiboException.ofParamCanNotNull(MoreUseParamNames.UID);
         }
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter(MoreUseParamNames.UID, uid));
         if (CheckUtils.isNotEmpty(callback)) {
             paramList.add(new PostParameter("callback", callback));

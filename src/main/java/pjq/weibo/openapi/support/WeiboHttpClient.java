@@ -11,15 +11,32 @@ import pjq.weibo.openapi.utils.http.OKHttpSenderBase.ParamDataType;
 import pjq.weibo.openapi.utils.http.SimpleAsyncCallback;
 
 /**
- * 发送微博相关请求的接口类<br/>
- * 已有用okhttp实现的默认类，如果需要自行实现发请求的部分，需要实现该接口，且实际发请求的参数编码必须为UTF-8
+ * 发送微博相关请求的父类<br/>
+ * 已有用okhttp实现的默认类，如果需要自行实现发http请求的部分，需要继承该父类，且实际发请求的参数编码必须为UTF-8
  * 
  * @author pengjianqiang
  * @date 2021年1月21日
  */
-public interface WeiboHttpClient {
+public abstract class WeiboHttpClient {
     public static enum MethodType {
         POST, GET, DELETE;
+    }
+
+    private static WeiboHttpClient customInstance;
+
+    private static class InstanceHolder {
+        private static WeiboHttpClient INSTANCE =
+            (null != customInstance ? customInstance : new DefaultWeiboHttpClient());
+    }
+
+    /**
+     * 返回微博http请求的处理实例<br/>
+     * 如果有调用{@link WeiboImplRegister#registWeiboClient(WeiboHttpClient)}方法，则返回其参数对象；否则返回SDK默认的OKHttp实现
+     * 
+     * @return
+     */
+    public static WeiboHttpClient getInstance() {
+        return InstanceHolder.INSTANCE;
     }
 
     /**
@@ -38,7 +55,7 @@ public interface WeiboHttpClient {
      * @throws Exception
      * @return
      */
-    public String httpExecute(MethodType methodType, String url, Map<String, String> paramMap,
+    public abstract String httpExecute(MethodType methodType, String url, Map<String, String> paramMap,
         Map<String, String> extraHeaders) throws HttpException, Exception;
 
     /**
@@ -59,10 +76,11 @@ public interface WeiboHttpClient {
      * @throws HttpException
      * @throws Exception
      */
-    public String httpPostMultiPartForm(String url, Map<String, String> paramMap, Map<String, String> extraHeaders,
-        String fileParamName, SimpleAsyncCallback callback, String... filePaths) throws HttpException, Exception;
+    public abstract String httpPostMultiPartForm(String url, Map<String, String> paramMap,
+        Map<String, String> extraHeaders, String fileParamName, SimpleAsyncCallback callback, String... filePaths)
+        throws HttpException, Exception;
 
-    public static class DefaultWeiboHttpClient implements WeiboHttpClient {
+    private static class DefaultWeiboHttpClient extends WeiboHttpClient {
         @Override
         public String httpExecute(MethodType methodType, String url, Map<String, String> paramMap,
             Map<String, String> extraHeaders) throws HttpException, Exception {

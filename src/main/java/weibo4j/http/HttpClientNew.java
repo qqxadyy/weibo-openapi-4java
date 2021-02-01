@@ -11,9 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.support.WeiboHttpClient;
-import pjq.weibo.openapi.support.WeiboHttpClient.DefaultWeiboHttpClient;
 import pjq.weibo.openapi.support.WeiboHttpClient.MethodType;
-import pjq.weibo.openapi.support.WeiboImplRegister;
 import pjq.weibo.openapi.utils.CheckUtils;
 import pjq.weibo.openapi.utils.http.HttpException;
 import pjq.weibo.openapi.utils.http.SimpleAsyncCallback;
@@ -57,22 +55,12 @@ public class HttpClientNew implements java.io.Serializable {
                                                        // with requests. Try again later. The search and trend methods
                                                        // use this to indicate when you are being rate limited.
 
-    private static WeiboHttpClient weiboClient = new DefaultWeiboHttpClient();
+    private static WeiboHttpClient weiboClient = WeiboHttpClient.getInstance();
 
     private String proxyHost = Configuration.getProxyHost();
     private int proxyPort = Configuration.getProxyPort();
     private String proxyAuthUser = Configuration.getProxyUser();
     private String proxyAuthPassword = Configuration.getProxyPassword();
-
-    /**
-     * 用private修饰防止被直接调用，只能通过{@link WeiboImplRegister}调用
-     * 
-     * @param newWeiboClient
-     */
-    @SuppressWarnings("unused")
-    private static void initNewWeiboClient(WeiboHttpClient newWeiboClient) {
-        weiboClient = newWeiboClient;
-    }
 
     public String getProxyHost() {
         return proxyHost;

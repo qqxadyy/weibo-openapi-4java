@@ -1,11 +1,11 @@
 package pjq.weibo.openapi.support;
 
+import java.lang.reflect.Field;
+
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import pjq.weibo.openapi.utils.reflect.MethodUtils;
-import weibo4j.http.HttpClientNew;
 import weibo4j.model.WeiboException;
 
 /**
@@ -19,14 +19,34 @@ public final class WeiboImplRegister {
     /**
      * 注册一个新的http请求实现类，替换默认的okhttp实现
      * 
-     * @param newWeiboClient
+     * @param customInstance
+     * @throws WeiboException
      */
-    public static void registWeiboClient(WeiboHttpClient newWeiboClient) throws WeiboException {
+    public static void registWeiboClient(WeiboHttpClient customInstance) throws WeiboException {
         try {
-            MethodUtils.invokeStaticOrDefault(HttpClientNew.class,
-                HttpClientNew.class.getDeclaredMethod("initNewWeiboClient", WeiboHttpClient.class), newWeiboClient);
+            setStaticValue(WeiboHttpClient.class.getDeclaredField("customInstance"), customInstance);
         } catch (Throwable e) {
             throw new WeiboException("注册新的微博HTTP请求实现时报错：" + ExceptionUtils.getRootCauseMessage(e));
         }
+    }
+
+    /**
+     * 注册一个新的缓存实现类，替换默认的本地缓存实现
+     * 
+     * @param customInstance
+     * @throws WeiboException
+     */
+    public static void registCacheHandler(WeiboCacheHandler customInstance) throws WeiboException {
+        try {
+            setStaticValue(WeiboCacheHandler.class.getDeclaredField("customInstance"), customInstance);
+        } catch (Throwable e) {
+            throw new WeiboException("注册新的微缓存实现时报错：" + ExceptionUtils.getRootCauseMessage(e));
+        }
+    }
+
+    private static void setStaticValue(Field field, Object value)
+        throws IllegalArgumentException, IllegalAccessException {
+        field.setAccessible(true);
+        field.set(null, value);
     }
 }

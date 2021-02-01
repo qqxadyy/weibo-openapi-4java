@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>io.github.pengjianqiang</groupId>
+	<groupId>com.github.pengjianqiang</groupId>
 	<artifactId>weibo-openapi-4java</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>微博开放平台API-JAVA SDK</name>
@@ -23,7 +23,7 @@
 		<apache.commons.logging.version>1.2</apache.commons.logging.version>
 		<apache.tika.version>2.0.0-ALPHA</apache.tika.version>
 		<alibaba.json.version>1.2.75</alibaba.json.version>
-		<guava.version>30.1-jre</guava.version>
+		<caffeine.version>2.8.8</caffeine.version>
 		<slf4j.version>2.0.0-alpha1</slf4j.version>
 		<okhttp.version>4.10.0-RC1</okhttp.version>
 		<okio.version>2.9.0</okio.version>
@@ -81,11 +81,11 @@
 			<version>${alibaba.json.version}</version>
 		</dependency>
 
-		<!-- 添加google工具包 -->
+		<!-- caffeine缓存 -->
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>${guava.version}</version>
+			<groupId>com.github.ben-manes.caffeine</groupId>
+			<artifactId>caffeine</artifactId>
+			<version>${caffeine.version}</version>
 		</dependency>
 
 		<!-- 日志相关包 -->

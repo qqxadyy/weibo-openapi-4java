@@ -2,8 +2,6 @@ package pjq.weibo.openapi.apis;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -122,7 +120,7 @@ public class WeiboApiCommon extends Weibo<WeiboApiCommon> {
     }
 
     private List<PostParameter> commonParam() {
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         if (CheckUtils.isNotEmpty(capital)) {
             paramList.add(new PostParameter("capital", capital));
         }

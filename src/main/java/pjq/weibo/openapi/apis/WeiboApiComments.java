@@ -2,8 +2,6 @@ package pjq.weibo.openapi.apis;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -249,7 +247,7 @@ public class WeiboApiComments extends WeiboParamPager<WeiboApiComments> {
      * @return
      */
     private List<PostParameter> readCommonParam() {
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         if (CheckUtils.isNotNull(filterByAuthor)) {
             paramList.add(new PostParameter("filter_by_author", filterByAuthor.value()));
         }
@@ -268,7 +266,7 @@ public class WeiboApiComments extends WeiboParamPager<WeiboApiComments> {
      * @return
      */
     private List<PostParameter> writeCommonParam() {
-        List<PostParameter> paramList = Lists.newArrayList();
+        List<PostParameter> paramList = newParamList();
         if (new Integer("1").equals(withoutMention)) {
             // 默认为0，所以只要当为1时传1即可
             paramList.add(new PostParameter("without_mention", withoutMention));

@@ -3,7 +3,6 @@ package pjq.weibo.openapi.examplesnew;
 import java.io.IOException;
 
 import pjq.weibo.openapi.apis.WeiboApiEmotions;
-import pjq.weibo.openapi.constant.ParamConstant.EmotionsType;
 import weibo4j.Weibo;
 import weibo4j.model.WeiboException;
 import weibo4j.org.json.JSONException;
@@ -15,7 +14,7 @@ public class WeiboApiEmotionsExample {
 
             WeiboApiEmotions apiObj = Weibo.of(WeiboApiEmotions.class, accessToken);
 
-            System.out.println(apiObj.type(EmotionsType.CARTOON).apiGetEmotions());
+            // System.out.println(apiObj.type(EmotionsType.CARTOON).apiGetEmotions());
         } catch (WeiboException e) {
             if (401 == e.getStatusCode()) {
                 System.out.println("Unable to get the access token.");

@@ -21,9 +21,12 @@ public class WeiboApiOAuth2Example {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String code = br.readLine();
         System.out.println("code: " + code);
+        BufferedReader br2 = new BufferedReader(new InputStreamReader(System.in));
+        String state = br2.readLine();
+        System.out.println("state: " + state);
         try {
             // 获取access_token
-            AccessToken token = WeiboApiOauth2.apiGetAccessTokenByCode(code);
+            AccessToken token = WeiboApiOauth2.apiGetAccessTokenByCode(code, state);
             String accessToken = token.getAccessToken();
             System.out.println("access_token:" + accessToken);
             System.out.println("uid:" + token.getUid());

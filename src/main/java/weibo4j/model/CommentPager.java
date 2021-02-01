@@ -4,6 +4,7 @@ import java.util.List;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import pjq.weibo.openapi.support.WeiboJsonName;
 import weibo4j.http.Response;
 import weibo4j.org.json.JSONObject;
@@ -17,6 +18,7 @@ import weibo4j.org.json.JSONObject;
 @SuppressWarnings("serial")
 @Data
 @EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
 @WeiboJsonName
 public class CommentPager extends WeiboResponsePager {
     private List<Comment> comments;

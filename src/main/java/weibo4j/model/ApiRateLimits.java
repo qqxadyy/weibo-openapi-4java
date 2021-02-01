@@ -2,6 +2,7 @@ package weibo4j.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import pjq.weibo.openapi.support.WeiboJsonName;
 import weibo4j.org.json.JSONObject;
 
@@ -13,6 +14,7 @@ import weibo4j.org.json.JSONObject;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
+@NoArgsConstructor
 @WeiboJsonName
 @SuppressWarnings("serial")
 public class ApiRateLimits extends WeiboResponse {

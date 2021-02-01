@@ -1,5 +1,6 @@
 package weibo4j;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.WeiboConfigs;
+import pjq.weibo.openapi.support.WeiboCacheHandler;
 import pjq.weibo.openapi.utils.CheckUtils;
 import pjq.weibo.openapi.utils.StreamUtils;
 import weibo4j.http.HttpClientNew;
@@ -29,6 +31,7 @@ import weibo4j.model.WeiboException;
 public abstract class Weibo<T> implements java.io.Serializable {
     private static final long serialVersionUID = 4282616848978535016L;
 
+    protected static WeiboCacheHandler cacheHandler = WeiboCacheHandler.getInstance();
     protected static HttpClientNew client = new HttpClientNew();
 
     // 如果希望自己设置HttpClient的各种参数，可以使用下面的构造方法
@@ -116,6 +119,10 @@ public abstract class Weibo<T> implements java.io.Serializable {
         return StreamUtils.joinString(Arrays.stream(vals), ",");
     }
 
+    protected List<PostParameter> newParamList() {
+        return new ArrayList<>();
+    }
+
     /**
      * 参数list转成array
      * 
@@ -184,6 +191,12 @@ public abstract class Weibo<T> implements java.io.Serializable {
             if (CheckUtils.isNotEmpty(checkClientIdName) && CheckUtils.isEmpty(clientId)) {
                 throw WeiboException.ofParamCanNotNull(checkClientIdName);
             }
+
+            if (CheckUtils.isNotEmpty(accessToken)) {
+                // 初始化接口对象时检查accessToken是否已失效
+                cacheHandler.checkAccessTokenExists(accessToken);
+            }
+
             obj.accessToken(accessToken);
             obj.clientId(clientId);
             obj.afterOfInit(accessToken, clientId);
@@ -192,7 +205,7 @@ public abstract class Weibo<T> implements java.io.Serializable {
             if (e instanceof WeiboException) {
                 throw (WeiboException)e;
             } else {
-                throw new WeiboException(e);
+                throw new WeiboException("初始化微博接口对象[" + apiClass.getName() + "]时报错", e);
             }
         }
     }
