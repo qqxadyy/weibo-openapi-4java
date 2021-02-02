@@ -90,8 +90,8 @@ public class WeiboApiUsers extends Weibo<WeiboApiUsers> {
         if (CheckUtils.isNotNull(trimStatus)) {
             paramList.add(new PostParameter("trim_status", trimStatus.value()));
         }
-        return localSet(new User(
-            client.get(WeiboConfigs.getApiUrl(WeiboConfigs.USERS_SHOW), paramListToArray(paramList), accessToken)));
+        return new User(
+            client.get(WeiboConfigs.getApiUrl(WeiboConfigs.USERS_SHOW), paramListToArray(paramList), accessToken));
     }
 
     /**
@@ -125,13 +125,8 @@ public class WeiboApiUsers extends Weibo<WeiboApiUsers> {
         if (CheckUtils.isNotNull(trimStatus)) {
             paramList.add(new PostParameter("trim_status", trimStatus.value()));
         }
-        return localSet(new User(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.USERS_DOMAIN_SHOW),
-            paramListToArray(paramList), accessToken)));
-    }
-
-    private User localSet(User user) {
-        user.setAccessToken(accessToken);
-        return user;
+        return new User(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.USERS_DOMAIN_SHOW), paramListToArray(paramList),
+            accessToken));
     }
 
     /**

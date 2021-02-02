@@ -160,9 +160,10 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
      * @throws WeiboException
      */
     public static User apiGetUserByCode(String code, String state) throws WeiboException {
-        AccessToken tokenInfo = apiGetAccessTokenByCode(code, state);
-        return WeiboCacher.cacheUser(
-            Weibo.of(WeiboApiUsers.class, tokenInfo.getAccessToken()).apiShowUserById(tokenInfo.getUid()), tokenInfo);
+        AccessToken accessToken = apiGetAccessTokenByCode(code, state);
+        User user = Weibo.of(WeiboApiUsers.class, accessToken.getAccessToken()).apiShowUserById(accessToken.getUid());
+        user.setAccessToken(accessToken);
+        return WeiboCacher.cacheUser(user);
     }
 
     /**
@@ -191,12 +192,39 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
      * @return
      * @throws WeiboException
      */
-    public static RevokeOAuth2 apiRevokeoauth2(String accessToken) throws WeiboException {
+    public static boolean apiRevokeOAuth2(String accessToken) throws WeiboException {
         if (CheckUtils.isEmpty(accessToken)) {
             throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ACCESS_TOKEN);
         }
         WeiboCacher.checkAccessTokenExists(accessToken);
-        return new RevokeOAuth2(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.OAUTH2_REVOKE_OAUTH2),
+        RevokeOAuth2 result = new RevokeOAuth2(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.OAUTH2_REVOKE_OAUTH2),
             new PostParameter[] {new PostParameter(MoreUseParamNames.ACCESS_TOKEN, accessToken)}, false, null));
+        if ("true".equalsIgnoreCase(result.getResult())) {
+            // 成功取消授权，则缓存中的相关信息
+            WeiboCacher.removeCachesByTokenWhenRevokeOAuth(accessToken);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 取消授权回调<br/>
+     * 这个方法必须在收到取消授权回调请求的时候才能调用
+     * 
+     * @param clientId
+     *            应用clientid/appkey
+     * @param uid
+     *            取消授权的用户
+     * @param authEnd
+     *            取消授权的时间
+     * @param verification
+     *            应该是用于验证该请求是否微博发出参数，但是在官网没找到相关说明
+     */
+    public static void apiRevokeOAuth2Callback(String clientId, String uid, String authEnd, String verification) {
+        if (!WeiboConfigs.getClientId().equals(clientId)) {
+            throw new WeiboException("clientId与配置值不一致，该取消授权回调请求不安全");
+        }
+        WeiboCacher.removeCachesByUidWhenRevokeOAuth(uid); // 收到取消授权的回调时再清除一次相关缓存，确保相关信息被移除
     }
 }

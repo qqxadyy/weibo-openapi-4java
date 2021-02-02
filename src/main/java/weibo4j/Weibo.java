@@ -11,6 +11,7 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import pjq.weibo.openapi.apis.WeiboApiOauth2;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.WeiboConfigs;
 import pjq.weibo.openapi.support.WeiboCacher;
@@ -185,7 +186,10 @@ public abstract class Weibo<T> implements java.io.Serializable {
     @SuppressWarnings("unchecked")
     public static <T extends Weibo<T>> T of(Class<T> apiClass, String accessToken) {
         try {
-            checkCanConnectToAPI();
+            if (!WeiboApiOauth2.class.equals(apiClass)) {
+                // WeiboApiOauth2不需要检查
+                checkCanConnectToAPI();
+            }
 
             // 接口实现类只有一个private的无参构造方法
             Constructor<?> privateConstructor = apiClass.getDeclaredConstructors()[0];

@@ -30,6 +30,8 @@ public class AccessToken extends WeiboResponse implements Serializable {
     private @WeiboJsonName("remind_in") String remindIn; // 官网说明该参数即将废弃，用expires_in
     private @WeiboJsonName(isNewAndNoDesc = true) String isRealName;
     private @WeiboJsonName(fromJson = false) Date createAt; // 用于记录授权时间
+    private @WeiboJsonName(fromJson = false) Date authEnd; // 用于记录取消授权时间
+    private @WeiboJsonName(fromJson = false) boolean isActive = true; // 用于记录授权是否生效
 
     public AccessToken(Response res) {
         super(res);

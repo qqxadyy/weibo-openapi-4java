@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import pjq.weibo.openapi.apis.WeiboApiOauth2;
 import pjq.weibo.openapi.constant.ParamConstant.OAuth2Scope;
 import weibo4j.Weibo;
+import weibo4j.model.AccessToken;
 import weibo4j.model.User;
 import weibo4j.model.WeiboException;
 import weibo4j.util.BareBonesBrowserLaunch;
@@ -27,12 +28,14 @@ public class WeiboApiOAuth2Example {
         try {
             // 获取access_token
             User user = WeiboApiOauth2.apiGetUserByCode(code, state);
-            String accessToken = user.getAccessToken();
+            AccessToken tokenInfo = user.getAccessToken();
+            String accessToken = tokenInfo.getAccessToken();
             System.out.println("access_token:" + accessToken);
             System.out.println("uid:" + user.getId());
+            System.out.println("createAt:" + tokenInfo.getCreateAt());
 
             System.out.println(WeiboApiOauth2.apiGetTokenInfo(accessToken));
-            // System.out.println(WeiboApiOauth2.apiRevokeoauth2(accessToken));
+            // System.out.println(WeiboApiOauth2.apiRevokeOAuth2(accessToken));
         } catch (WeiboException e) {
             if (401 == e.getStatusCode()) {
                 System.out.println("Unable to get the access token.");

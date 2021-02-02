@@ -40,7 +40,7 @@ public abstract class WeiboCacheHandler {
     }
 
     /**
-     * 根据key缓存value
+     * 根据key缓存value，缓存不过期
      * 
      * @param key
      *            缓存key
@@ -58,10 +58,10 @@ public abstract class WeiboCacheHandler {
      * @param value
      *            缓存值
      * @param expiresInSeconds
-     *            key的有效时间，单位秒
+     *            key的有效时间，单位秒，为0时表示不过期
      * @throws WeiboException
      */
-    public abstract void cache(String key, String value, Long expiresInSeconds) throws WeiboException;
+    public abstract void cache(String key, String value, long expiresInSeconds) throws WeiboException;
 
     /**
      * 判断key是否存在
@@ -70,7 +70,7 @@ public abstract class WeiboCacheHandler {
      * @return
      * @throws WeiboException
      */
-    public abstract boolean existsKey(String key) throws WeiboException;
+    public abstract boolean exists(String key) throws WeiboException;
 
     /**
      * 从缓存中读取值，key不存在时返回null
@@ -79,7 +79,23 @@ public abstract class WeiboCacheHandler {
      * @return
      * @throws WeiboException
      */
-    public abstract String getFromCache(String key) throws WeiboException;
+    public abstract String get(String key) throws WeiboException;
+
+    /**
+     * 根据key删除缓存
+     * 
+     * @param key
+     * @throws WeiboException
+     */
+    public abstract void remove(String key) throws WeiboException;
+
+    /**
+     * 根据key删除缓存，并返回被删除的缓存值
+     * 
+     * @param key
+     * @throws WeiboException
+     */
+    public abstract String popup(String key) throws WeiboException;
 
     private static class DefaultWeiboCacheHandler extends WeiboCacheHandler {
         private static final Duration NO_EXPIRES = Duration.ofDays(300L);
@@ -91,7 +107,8 @@ public abstract class WeiboCacheHandler {
                 public long expireAfterCreate(@NonNull String key, @NonNull String value, long currentTime) {
                     Duration expireDuration =
                         expiresMap.containsKey(key) ? Duration.ofSeconds(expiresMap.get(key)) : NO_EXPIRES;
-                    if (expireDuration.compareTo(NO_EXPIRES) > 0) {
+                    if (expireDuration.compareTo(Duration.ofSeconds(0L)) <= 0
+                        || expireDuration.compareTo(NO_EXPIRES) > 0) {
                         expireDuration = NO_EXPIRES; // 如果过期时间超过300天，则按300天设置，避免缓存太久(开发者获取到的授权有效期是5年)
                     }
                     expiresMap.remove(key);
@@ -115,26 +132,50 @@ public abstract class WeiboCacheHandler {
                 }
             }).build();
 
+        private void checkKey(String key) {
+            if (CheckUtils.isEmpty(key)) {
+                throw WeiboException.ofParamCanNotNull("key");
+            }
+        }
+
         @Override
         public void cache(String key, String value) throws WeiboException {
-            cache(key, value, NO_EXPIRES.getSeconds());
+            cache(key, value, 0);
         }
 
         @Override
-        public void cache(String key, String value, Long expiresInSeconds) throws WeiboException {
+        public void cache(String key, String value, long expiresInSeconds) throws WeiboException {
             // 由于默认使用的Caffeine缓存是在builder中设置有效期策略，需要expiresMap把有效期带进expireXXX方法中
+            if (!CheckUtils.areNotEmpty(key, value)) {
+                throw WeiboException.ofParamCanNotNull("key和value");
+            }
             expiresMap.put(key, expiresInSeconds);
-            cache.put(key, value);
+            cache.put(key, value); // put实际上Caffeine内部会判断新建还是更新key
         }
 
         @Override
-        public boolean existsKey(String key) throws WeiboException {
-            return CheckUtils.isNotEmpty(getFromCache(key));
+        public boolean exists(String key) throws WeiboException {
+            checkKey(key);
+            return CheckUtils.isNotEmpty(get(key));
         }
 
         @Override
-        public String getFromCache(String key) throws WeiboException {
+        public String get(String key) throws WeiboException {
+            checkKey(key);
             return cache.getIfPresent(key);
+        }
+
+        @Override
+        public void remove(String key) throws WeiboException {
+            checkKey(key);
+            cache.invalidate(key);
+        }
+
+        @Override
+        public String popup(String key) throws WeiboException {
+            String cacheValue = get(key);
+            remove(key);
+            return cacheValue;
         }
     }
 }

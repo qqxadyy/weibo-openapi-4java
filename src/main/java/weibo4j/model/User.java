@@ -128,7 +128,7 @@ public class User extends WeiboResponse {
     private Status status; // 用户最新一条微博
     private @WeiboJsonName(value = "vplususer_name", isNewAndNoDesc = true) String vplususerName;
     private @WeiboJsonName(value = "status_id") String statusId;
-    private @WeiboJsonName(fromJson = false) String accessToken; // 用于记录授权token
+    private @WeiboJsonName(fromJson = false) AccessToken accessToken; // 用于记录授权token信息
 
     public User(JSONObject json) {
         super(json);
