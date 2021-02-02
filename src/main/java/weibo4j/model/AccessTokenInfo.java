@@ -24,7 +24,7 @@ public class AccessTokenInfo extends WeiboResponse implements Serializable {
     private String uid;
     private String appkey;
     private String scope;
-    private @WeiboJsonName(value = "create_at", isDeleted = true) String createAt; // 新版接口中已不返回
+    private @WeiboJsonName("create_at") String createAt; // 秒级别的时间戳，例如1612230566
     private @WeiboJsonName("expire_in") String expireIn; // 官网说明该参数即将废弃，用expires_in
 
     public AccessTokenInfo(Response res) {

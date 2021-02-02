@@ -2,7 +2,9 @@ package pjq.weibo.openapi.apis;
 
 import java.util.List;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import pjq.weibo.openapi.constant.ParamConstant.CommonLanguage;
@@ -25,6 +27,7 @@ import weibo4j.model.WeiboException;
 @Getter
 @Setter
 @Accessors(fluent = true)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WeiboApiCommon extends Weibo<WeiboApiCommon> {
     /**
      * 国家的首字母，a-z或A-Z，可为空代表返回全部，默认为全部，只能传一个

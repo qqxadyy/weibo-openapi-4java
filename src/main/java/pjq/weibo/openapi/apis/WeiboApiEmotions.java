@@ -2,7 +2,9 @@ package pjq.weibo.openapi.apis;
 
 import java.util.List;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import pjq.weibo.openapi.constant.ParamConstant.EmotionsLanguage;
@@ -27,6 +29,7 @@ import weibo4j.model.WeiboResponse;
 @Getter
 @Setter
 @Accessors(fluent = true)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WeiboApiEmotions extends Weibo<WeiboApiEmotions> {
     /**
      * 表情类别，face：普通表情、ani：魔法表情、cartoon：动漫表情，默认为face

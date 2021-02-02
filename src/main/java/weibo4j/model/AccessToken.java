@@ -1,6 +1,7 @@
 package weibo4j.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,6 +29,7 @@ public class AccessToken extends WeiboResponse implements Serializable {
     private String uid;
     private @WeiboJsonName("remind_in") String remindIn; // 官网说明该参数即将废弃，用expires_in
     private @WeiboJsonName(isNewAndNoDesc = true) String isRealName;
+    private @WeiboJsonName(fromJson = false) Date createAt; // 用于记录授权时间
 
     public AccessToken(Response res) {
         super(res);

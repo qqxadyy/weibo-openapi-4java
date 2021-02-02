@@ -22,6 +22,7 @@ import java.util.Date;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import pjq.weibo.openapi.constant.ParamConstant.Gender;
 import pjq.weibo.openapi.support.WeiboJsonName;
 import weibo4j.http.Response;
@@ -37,6 +38,7 @@ import weibo4j.org.json.JSONObject;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
+@NoArgsConstructor
 @WeiboJsonName
 @SuppressWarnings("serial")
 public class User extends WeiboResponse {
@@ -83,7 +85,7 @@ public class User extends WeiboResponse {
     private @WeiboJsonName(value = "verified_contact_name", isNewAndNoDesc = true) String verifiedContactName;
     private @WeiboJsonName(value = "verified_contact_email", isNewAndNoDesc = true) String verifiedContactEmail;
     private @WeiboJsonName(value = "verified_contact_mobile", isNewAndNoDesc = true) String verifiedContactMobile;
-    private @WeiboJsonName(value = "verified_detail", isNewAndNoDesc = true) UserVerifiedDetail userVerifiedDetail;
+    private @WeiboJsonName(value = "verified_detail", isNewAndNoDesc = true) UserVerifiedDetail verifiedDetail;
     private @WeiboJsonName(value = "has_service_tel", isNewAndNoDesc = true) Boolean hasServiceTel;
     private @WeiboJsonName(value = "type", isNewAndNoDesc = true) String type;
     private @WeiboJsonName("follow_me") Boolean followMe; // 该用户是否关注当前登录用户
@@ -93,7 +95,7 @@ public class User extends WeiboResponse {
     private @WeiboJsonName("online_status") Integer onlineStatus; // 用户在线状态
     private @WeiboJsonName("bi_followers_count") Long biFollowersCount; // 互粉数
     private String remark; // 用户备注信息，只有在查询用户关系时才返回此字段
-    private @WeiboJsonName(isNewAndNoDesc = true) UserInsecurity userInsecurity;
+    private @WeiboJsonName(isNewAndNoDesc = true) UserInsecurity insecurity;
     private String lang; // 用户语言版本
     private String weihao; // 用户的微号
     private @WeiboJsonName(isNewAndNoDesc = true) Integer star;
@@ -118,14 +120,15 @@ public class User extends WeiboResponse {
     private @WeiboJsonName(value = "user_ability_extend", isNewAndNoDesc = true) Integer userAbilityExtend;
     private @WeiboJsonName(value = "tab_manage", isNewAndNoDesc = true) String tabManage;
     private @WeiboJsonName(value = "cover_image_phone", isNewAndNoDesc = true) String coverImagePhone;
-    private @WeiboJsonName(isNewAndNoDesc = true) UserExtend userExtend;
+    private @WeiboJsonName(isNewAndNoDesc = true) UserExtend extend;
     private @WeiboJsonName(isNewAndNoDesc = true) JSONObject badge; // 这个返回是一大段key的json对象,而且可能key不十分固定,直接用JSONObject
     private @WeiboJsonName(value = "badge_top", isNewAndNoDesc = true) String badgeTop;
     private @WeiboJsonName(value = "has_ability_tag", isNewAndNoDesc = true) Integer hasAbilityTag;
     private @WeiboJsonName(isNewAndNoDesc = true) String ulevel;
     private Status status; // 用户最新一条微博
     private @WeiboJsonName(value = "vplususer_name", isNewAndNoDesc = true) String vplususerName;
-    private @WeiboJsonName(isDeleted = true) String statusId; // 新版本接口已不返回
+    private @WeiboJsonName(value = "status_id") String statusId;
+    private @WeiboJsonName(fromJson = false) String accessToken; // 用于记录授权token
 
     public User(JSONObject json) {
         super(json);

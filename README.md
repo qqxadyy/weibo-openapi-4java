@@ -15,3 +15,8 @@
 6、可选参数是每个apiXXX接口方法都可共用，但实际是否会生效需要参考官网的API文档；;每个接口本身的必填参数定义在具体的方法中  
 
 7、具体新版接口的使用可参考pjq.weibo.openapi.exxamplesnew包下每个类的写法  
+
+8.服务器需要连通以下域名  
+api.weibo.com  
+rm.api.weibo.com  
+XXX.sinaimg.cn(有多个，XXX不固定)

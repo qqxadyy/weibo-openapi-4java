@@ -4,23 +4,19 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import com.alibaba.fastjson.JSON;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Expiry;
 
-import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.utils.CheckUtils;
-import weibo4j.model.AccessToken;
 import weibo4j.model.WeiboException;
 
 /**
  * 微博相关缓存处理器父类<br/>
- * 已有用本地内存实现的默认类，如果需要自行实现缓存的部分，需要继承该父类，并只实现抽象方法即可(尽量不要重写其它非抽象方法)
+ * 已有用本地内存实现的默认类，如果需要自行实现缓存的部分，需要继承该父类，并只实现相关方法
  * 
  * @author pengjianqiang
  * @date 2021年1月21日
@@ -41,109 +37,6 @@ public abstract class WeiboCacheHandler {
      */
     public static WeiboCacheHandler getInstance() {
         return InstanceHolder.INSTANCE;
-    }
-
-    private static final String COMMON_PREFIX = "weibo:";
-    private static final String KEY_PREFIX_ACCESS_TOKEN = COMMON_PREFIX + "accessTokens:";
-    private static final String KEY_PREFIX_STATE = COMMON_PREFIX + "states:";
-    private static final Duration EXPIRES_IN_STATE = Duration.ofSeconds(120L); // state缓存有效期为2分钟
-
-    private String getKey(String prefix, String suffix) {
-        return prefix.concat(DigestUtils.md5Hex(suffix));
-    }
-
-    /**
-     * 缓存登录授权时的state参数
-     * 
-     * @param state
-     */
-    public void cacheStateOfAuthorize(String state) {
-        try {
-            if (CheckUtils.isEmpty(state)) {
-                throw WeiboException.ofParamCanNotNull(MoreUseParamNames.STATE);
-            }
-            cache(getKey(KEY_PREFIX_STATE, state), state, EXPIRES_IN_STATE.getSeconds());
-        } catch (Exception e) {
-            if (e instanceof WeiboException) {
-                throw (WeiboException)e;
-            } else {
-                throw new WeiboException(e);
-            }
-        }
-    }
-
-    /**
-     * 判断授权回调返回的state是否在缓存中，用于安全验证
-     * 
-     * @param state
-     * @return
-     */
-    public boolean existsStateOfAuthorize(String state) {
-        try {
-            if (CheckUtils.isEmpty(state)) {
-                return false;
-            }
-            return existsKey(getKey(KEY_PREFIX_STATE, state));
-        } catch (Exception e) {
-            if (e instanceof WeiboException) {
-                throw (WeiboException)e;
-            } else {
-                throw new WeiboException(e);
-            }
-        }
-    }
-
-    /**
-     * 缓存用code换取到的accessToken信息
-     * 
-     * @param tokenInfo
-     * @return
-     */
-    public AccessToken cacheAccessToken(AccessToken tokenInfo) {
-        try {
-            if (CheckUtils.isNull(tokenInfo)) {
-                throw WeiboException.ofParamCanNotNull("accessToken对象");
-            }
-            String accessToken = tokenInfo.getAccessToken();
-            cache(getKey(KEY_PREFIX_ACCESS_TOKEN, accessToken), JSON.toJSONString(tokenInfo),
-                Long.valueOf(tokenInfo.getExpiresIn()) - 120L); // 接口返回的expires_in减去2分钟，提早让用户知道授权即将失效
-            return tokenInfo;
-        } catch (Exception e) {
-            if (e instanceof WeiboException) {
-                throw (WeiboException)e;
-            } else {
-                throw new WeiboException(e);
-            }
-        }
-    }
-
-    /**
-     * 检查accessToken信息在缓存中
-     * 
-     * @param accessToken
-     * @return
-     */
-    public AccessToken checkAccessTokenExists(String accessToken) {
-        try {
-            if (CheckUtils.isEmpty(accessToken)) {
-                throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ACCESS_TOKEN);
-            }
-            String tokenInfo = getFromCache(getKey(KEY_PREFIX_ACCESS_TOKEN, accessToken));
-            if (CheckUtils.isEmpty(tokenInfo)) {
-                throw new WeiboException(MoreUseParamNames.ACCESS_TOKEN + "[" + accessToken + "]已失效，请重新获取授权");
-            }
-            AccessToken tokenInCache = JSON.parseObject(tokenInfo, AccessToken.class);
-            if (CheckUtils.isNull(tokenInCache) || !accessToken.equals(tokenInCache.getAccessToken())) {
-                throw new WeiboException(MoreUseParamNames.ACCESS_TOKEN + "[" + accessToken + "]与缓存不匹配，请重新获取授权");
-            }
-            return tokenInCache;
-        } catch (Exception e) {
-            if (e instanceof WeiboException) {
-                throw (WeiboException)e;
-            } else {
-                throw new WeiboException(e);
-            }
-        }
     }
 
     /**
@@ -193,13 +86,16 @@ public abstract class WeiboCacheHandler {
         private static final Map<String, Long> expiresMap = new ConcurrentHashMap<>();
 
         private static Cache<String, String> cache =
-            Caffeine.newBuilder().initialCapacity(100).maximumSize(500).expireAfter(new Expiry<String, String>() {
+            Caffeine.newBuilder().initialCapacity(300).maximumSize(1000).expireAfter(new Expiry<String, String>() {
                 @Override
                 public long expireAfterCreate(@NonNull String key, @NonNull String value, long currentTime) {
-                    Long nanoExpires =
-                        (expiresMap.containsKey(key) ? Duration.ofSeconds(expiresMap.get(key)) : NO_EXPIRES).toNanos();
+                    Duration expireDuration =
+                        expiresMap.containsKey(key) ? Duration.ofSeconds(expiresMap.get(key)) : NO_EXPIRES;
+                    if (expireDuration.compareTo(NO_EXPIRES) > 0) {
+                        expireDuration = NO_EXPIRES; // 如果过期时间超过300天，则按300天设置，避免缓存太久(开发者获取到的授权有效期是5年)
+                    }
                     expiresMap.remove(key);
-                    return nanoExpires; // 注意方法要求返回的时nanoseconds(微毫秒)单位
+                    return expireDuration.toNanos(); // 注意方法要求返回的时nanoseconds(微毫秒)单位
                 }
 
                 @Override
@@ -211,7 +107,7 @@ public abstract class WeiboCacheHandler {
                 @Override
                 public long expireAfterRead(@NonNull String key, @NonNull String value, long currentTime,
                     @NonNegative long currentDuration) {
-                    if (key.startsWith(KEY_PREFIX_STATE)) {
+                    if (key.startsWith(WeiboCacher.KEY_PREFIX_STATE)) {
                         return 0L; // state的缓存读取后马上失效，防止被二次使用
                     } else {
                         return currentDuration; // 读取缓存后的过期时间直接返回currentDuration即可，表示按当前剩下的缓存时间

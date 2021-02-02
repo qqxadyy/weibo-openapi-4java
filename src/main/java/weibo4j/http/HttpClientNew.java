@@ -254,8 +254,10 @@ public class HttpClientNew implements java.io.Serializable {
 
     public static Map<String, String> encodeParametersNew(PostParameter[] postParams) {
         Map<String, String> paramMap = new HashMap<>();
-        for (int j = 0; j < postParams.length; j++) {
-            paramMap.put(postParams[j].getName(), postParams[j].getValue());
+        if (CheckUtils.isNotEmpty(postParams)) {
+            for (int j = 0; j < postParams.length; j++) {
+                paramMap.put(postParams[j].getName(), postParams[j].getValue());
+            }
         }
         return paramMap;
     }

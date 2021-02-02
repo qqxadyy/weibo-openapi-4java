@@ -2,10 +2,13 @@ package pjq.weibo.openapi.apis;
 
 import java.util.List;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
+import pjq.weibo.openapi.constant.ParamConstant.TrimStatus;
 import pjq.weibo.openapi.constant.WeiboConfigs;
 import pjq.weibo.openapi.utils.CheckUtils;
 import weibo4j.Weibo;
@@ -27,7 +30,14 @@ import weibo4j.model.WeiboResponse;
 @Getter
 @Setter
 @Accessors(fluent = true)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WeiboApiUsers extends Weibo<WeiboApiUsers> {
+    /**
+     * 返回值中user字段中的status字段开关，0：返回完整status字段、1：status字段仅返回status_id，默认为1<br/>
+     * 官网接口中没有写该参数
+     */
+    private TrimStatus trimStatus;
+
     @Override
     protected String checkClientId() {
         // 有出现过show接口返回source参数不能为空的情况，但是之后又没有出现，以防万一还是检查该参数，接口传参也传该参数
@@ -35,7 +45,7 @@ public class WeiboApiUsers extends Weibo<WeiboApiUsers> {
     }
 
     /**
-     * 根据用户ID获取用户信息
+     * 根据用户ID获取用户信息(只返回最新的一条微博id，不返回其对应内容)
      * 
      * @param uid
      *            用户ID
@@ -43,11 +53,12 @@ public class WeiboApiUsers extends Weibo<WeiboApiUsers> {
      * @throws WeiboException
      */
     public User apiShowUserById(String uid) throws WeiboException {
-        return apiShowUser(MoreUseParamNames.UID, uid);
+        trimStatus(TrimStatus.ONLY_STATUS_ID);
+        return apiShowUserWithTrimStatusParam(MoreUseParamNames.UID, uid);
     }
 
     /**
-     * 根据用户昵称获取用户信息
+     * 根据用户昵称获取用户信息(只返回最新的一条微博id，不返回其对应内容)
      * 
      * @param screenName
      *            用户昵称
@@ -55,22 +66,36 @@ public class WeiboApiUsers extends Weibo<WeiboApiUsers> {
      * @throws WeiboException
      */
     public User apiShowUserByScreenName(String screenName) throws WeiboException {
-        return apiShowUser(MoreUseParamNames.SCREEN_NAME, screenName);
+        trimStatus(TrimStatus.ONLY_STATUS_ID);
+        return apiShowUserWithTrimStatusParam(MoreUseParamNames.SCREEN_NAME, screenName);
     }
 
-    private User apiShowUser(String uidOrScreenName, String val) throws WeiboException {
+    /**
+     * 根据用户ID/昵称获取用户信息(默认会返回最新一条微博的信息，也可以用trimStatus参数控制不返回)
+     * 
+     * @param uidOrScreenName
+     *            MoreUseParamNames.UID或MoreUseParamNames.SCREEN_NAME
+     * @param val
+     *            对应的参数值
+     * @return
+     * @throws WeiboException
+     */
+    public User apiShowUserWithTrimStatusParam(String uidOrScreenName, String val) throws WeiboException {
         if (CheckUtils.isEmpty(val)) {
             throw WeiboException.ofParamCanNotNull(uidOrScreenName);
         }
         List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter(MoreUseParamNames.CLIENT_ID_USE_SOURCE, clientId));
         paramList.add(new PostParameter(uidOrScreenName, val));
-        return new User(
-            client.get(WeiboConfigs.getApiUrl(WeiboConfigs.USERS_SHOW), paramListToArray(paramList), accessToken));
+        if (CheckUtils.isNotNull(trimStatus)) {
+            paramList.add(new PostParameter("trim_status", trimStatus.value()));
+        }
+        return localSet(new User(
+            client.get(WeiboConfigs.getApiUrl(WeiboConfigs.USERS_SHOW), paramListToArray(paramList), accessToken)));
     }
 
     /**
-     * 通过个性化域名获取用户资料以及用户最新的一条微博
+     * 通过个性化域名获取用户资料(只返回最新的一条微博id，不返回其对应内容)
      * 
      * @param domain
      *            个性化域名
@@ -78,14 +103,35 @@ public class WeiboApiUsers extends Weibo<WeiboApiUsers> {
      * @throws WeiboException
      */
     public User apiShowUserByDomain(String domain) throws WeiboException {
+        trimStatus(TrimStatus.ONLY_STATUS_ID);
+        return apiShowUserByDomainWithTrimStatusParam(domain);
+    }
+
+    /**
+     * 通过个性化域名获取用户资料(默认会返回最新一条微博的信息，也可以用trimStatus参数控制不返回)
+     * 
+     * @param domain
+     *            个性化域名
+     * @return
+     * @throws WeiboException
+     */
+    public User apiShowUserByDomainWithTrimStatusParam(String domain) throws WeiboException {
         if (CheckUtils.isEmpty(domain)) {
             throw WeiboException.ofParamCanNotNull("domain");
         }
         List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter(MoreUseParamNames.CLIENT_ID_USE_SOURCE, clientId));
         paramList.add(new PostParameter("domain", domain));
-        return new User(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.USERS_DOMAIN_SHOW), paramListToArray(paramList),
-            accessToken));
+        if (CheckUtils.isNotNull(trimStatus)) {
+            paramList.add(new PostParameter("trim_status", trimStatus.value()));
+        }
+        return localSet(new User(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.USERS_DOMAIN_SHOW),
+            paramListToArray(paramList), accessToken)));
+    }
+
+    private User localSet(User user) {
+        user.setAccessToken(accessToken);
+        return user;
     }
 
     /**

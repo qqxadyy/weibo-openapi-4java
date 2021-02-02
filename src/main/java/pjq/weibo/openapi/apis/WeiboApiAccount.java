@@ -2,7 +2,9 @@ package pjq.weibo.openapi.apis;
 
 import java.util.List;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
@@ -25,6 +27,7 @@ import weibo4j.model.WeiboResponse;
 @Getter
 @Setter
 @Accessors(fluent = true)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WeiboApiAccount extends Weibo<WeiboApiAccount> {
     private Account apiOld;
 

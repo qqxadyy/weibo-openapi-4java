@@ -1,5 +1,10 @@
 package weibo4j;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,7 +13,7 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.WeiboConfigs;
-import pjq.weibo.openapi.support.WeiboCacheHandler;
+import pjq.weibo.openapi.support.WeiboCacher;
 import pjq.weibo.openapi.utils.CheckUtils;
 import pjq.weibo.openapi.utils.StreamUtils;
 import weibo4j.http.HttpClientNew;
@@ -31,7 +36,6 @@ import weibo4j.model.WeiboException;
 public abstract class Weibo<T> implements java.io.Serializable {
     private static final long serialVersionUID = 4282616848978535016L;
 
-    protected static WeiboCacheHandler cacheHandler = WeiboCacheHandler.getInstance();
     protected static HttpClientNew client = new HttpClientNew();
 
     // 如果希望自己设置HttpClient的各种参数，可以使用下面的构造方法
@@ -163,7 +167,7 @@ public abstract class Weibo<T> implements java.io.Serializable {
      *            业务接口类
      * @return
      */
-    public static <T extends Weibo<T>> T of(Class<? extends T> apiClass) {
+    public static <T extends Weibo<T>> T of(Class<T> apiClass) {
         return of(apiClass, null);
     }
 
@@ -178,9 +182,16 @@ public abstract class Weibo<T> implements java.io.Serializable {
      * 
      * @return
      */
-    public static <T extends Weibo<T>> T of(Class<? extends T> apiClass, String accessToken) {
+    @SuppressWarnings("unchecked")
+    public static <T extends Weibo<T>> T of(Class<T> apiClass, String accessToken) {
         try {
-            T obj = apiClass.newInstance();
+            checkCanConnectToAPI();
+
+            // 接口实现类只有一个private的无参构造方法
+            Constructor<?> privateConstructor = apiClass.getDeclaredConstructors()[0];
+            privateConstructor.setAccessible(true);
+            T obj = (T)privateConstructor.newInstance();
+
             String checkAccessTokenName = obj.checkAccessToken();
             if (CheckUtils.isNotEmpty(checkAccessTokenName) && CheckUtils.isEmpty(accessToken)) {
                 throw WeiboException.ofParamCanNotNull(checkAccessTokenName);
@@ -192,9 +203,9 @@ public abstract class Weibo<T> implements java.io.Serializable {
                 throw WeiboException.ofParamCanNotNull(checkClientIdName);
             }
 
-            if (CheckUtils.isNotEmpty(accessToken)) {
+            if (CheckUtils.isNotEmpty(accessToken) && !WeiboConfigs.isDebugMode()) {
                 // 初始化接口对象时检查accessToken是否已失效
-                cacheHandler.checkAccessTokenExists(accessToken);
+                WeiboCacher.checkAccessTokenExists(accessToken);
             }
 
             obj.accessToken(accessToken);
@@ -207,6 +218,22 @@ public abstract class Weibo<T> implements java.io.Serializable {
             } else {
                 throw new WeiboException("初始化微博接口对象[" + apiClass.getName() + "]时报错", e);
             }
+        }
+    }
+
+    /**
+     * 检查是否能连通微博API的网络<br/>
+     * 暂时只会检查基本API的网络
+     * 
+     * @throws Exception
+     */
+    private static void checkCanConnectToAPI() throws Exception {
+        String apiBase = WeiboConfigs.getApiUrl(WeiboConfigs.BASE_URL_COMMON);
+        URLConnection url = new URL(apiBase).openConnection();
+        url.setConnectTimeout(3000); // 3秒超时
+        try (InputStream is = url.getInputStream()) {
+        } catch (IOException e) {
+            throw new WeiboException("微博API接口网络[" + apiBase + "]不可用，请检查网络或稍后再试");
         }
     }
 }

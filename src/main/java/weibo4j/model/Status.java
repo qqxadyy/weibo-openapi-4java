@@ -41,11 +41,11 @@ public class Status extends WeiboResponse {
     private @WeiboJsonName("in_reply_to_status_id") String inReplyToStatusId; // 回复ID
     private @WeiboJsonName("in_reply_to_user_id") String inReplyToUserId; // 回复人ID
     private @WeiboJsonName("in_reply_to_screen_name") String inReplyToScreenName; // 回复人昵称
-    private @WeiboJsonName(value = "pic_urls", isNewAndNoDesc = true) List<StatusPicUrl> statusPicUrls;
+    private @WeiboJsonName(value = "pic_urls", isNewAndNoDesc = true) List<StatusPicUrl> picUrls;
     private @WeiboJsonName("thumbnail_pic") String thumbnailPic; // 微博内容中的图片的缩略地址
     private @WeiboJsonName("bmiddle_pic") String bmiddlePic; // 中型图片
     private @WeiboJsonName("original_pic") String originalPic; // 原始图片
-    private StatusGeo statusGeo; // 地理信息，保存经纬度，没有时不返回此字段
+    private StatusGeo geo; // 地理信息，保存经纬度，没有时不返回此字段
     private User user; // 作者信息
     private @WeiboJsonName(value = "retweeted_status") Status retweetedStatus; // 转发的博文，内容为status，如果不是转发，则没有此字段
     private @WeiboJsonName(value = "is_paid", isNewAndNoDesc = true) Boolean isPaid;
@@ -60,7 +60,7 @@ public class Status extends WeiboResponse {
     private @WeiboJsonName(value = "reward_scheme", isNewAndNoDesc = true) String rewardScheme;
     private @WeiboJsonName(value = "hide_flag", isNewAndNoDesc = true) Integer hideFlag;
     private Integer mlevel;
-    private StatusVisible statusVisible;
+    private StatusVisible visible;
     private @WeiboJsonName(value = "biz_feature", isNewAndNoDesc = true) Integer bizFeature;
     private @WeiboJsonName(isNewAndNoDesc = true) Integer hasActionTypeCard;
     private @WeiboJsonName(value = "darwin_tags", isNewAndNoDesc = true) List<JSONObject> darwinTags;
@@ -71,15 +71,15 @@ public class Status extends WeiboResponse {
     private @WeiboJsonName(isNewAndNoDesc = true) Integer userType;
     private @WeiboJsonName(value = "more_info_type", isNewAndNoDesc = true) Integer moreUnfoType;
     private @WeiboJsonName(value = "number_display_strategy",
-        isNewAndNoDesc = true) StatusNumberDisplayStrategy statusNumberDisplayStrategy;
+        isNewAndNoDesc = true) StatusNumberDisplayStrategy numberDisplayStrategy;
     private @WeiboJsonName(value = "positive_recom_flag", isNewAndNoDesc = true) Integer positiveRecomFlag;
     private @WeiboJsonName(value = "content_auth", isNewAndNoDesc = true) Integer contentAuth;
     private @WeiboJsonName(value = "gif_ids", isNewAndNoDesc = true) String gifIds;
     private @WeiboJsonName(value = "is_show_bulletin", isNewAndNoDesc = true) Integer isShowBulletin;
     private @WeiboJsonName(value = "comment_manage_info",
-        isNewAndNoDesc = true) StatusCommentManageInfo statusCommentManageInfo;
+        isNewAndNoDesc = true) StatusCommentManageInfo commentManageInfo;
     private @WeiboJsonName(value = "pic_num", isNewAndNoDesc = true) Integer picNum;
-    private @WeiboJsonName(value = "alchemy_params", isNewAndNoDesc = true) StatusAlchemyParams statusAlchemyParams;
+    private @WeiboJsonName(value = "alchemy_params", isNewAndNoDesc = true) StatusAlchemyParams alchemyParams;
     private @WeiboJsonName(value = "pic_ids") List<JSONObject> picIds; // 微博配图ID
     private @WeiboJsonName(value = "pic_types") String picTypes;
     private @WeiboJsonName List<JSONObject> ad; // 微博流内的推广微博ID

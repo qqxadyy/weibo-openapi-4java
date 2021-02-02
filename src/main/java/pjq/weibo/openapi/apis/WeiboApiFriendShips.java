@@ -2,7 +2,9 @@ package pjq.weibo.openapi.apis;
 
 import java.util.List;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
@@ -31,6 +33,7 @@ import weibo4j.org.json.JSONObject;
 @Getter
 @Setter
 @Accessors(fluent = true)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WeiboApiFriendShips extends Weibo<WeiboApiFriendShips> {
     /**
      * 单页返回的记录条数，默认为5，最大不超过5

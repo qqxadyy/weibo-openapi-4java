@@ -19,6 +19,7 @@
 package weibo4j.model;
 
 import lombok.Getter;
+import pjq.weibo.openapi.utils.CheckUtils;
 import weibo4j.org.json.JSONException;
 import weibo4j.org.json.JSONObject;
 
@@ -55,7 +56,6 @@ public class WeiboException extends RuntimeException {
         this.errorCode = json.getInt("error_code");
         this.error = json.getString("error");
         this.request = json.getString("request");
-
     }
 
     public WeiboException(String msg, Exception cause) {
@@ -66,6 +66,38 @@ public class WeiboException extends RuntimeException {
         super(msg, cause);
         this.statusCode = statusCode;
 
+    }
+
+    @Override
+    public String getMessage() {
+        // 把较常用的微博错误码转成中文，其它的还是按照英文返回
+        String oriMsg = super.getMessage();
+        String chineseMsg = null;
+        switch (this.errorCode) {
+            case 21325:
+                chineseMsg = "换取accessToken的code已失效";
+                break;
+            case 21321:
+                chineseMsg = "用户授权已被取消，不能调用接口";
+                break;
+            case 10006:
+                chineseMsg = "缺少source(appkey)参数，或accessToken不合法";
+                break;
+            case 10020:
+                chineseMsg = "微博API接口不存在";
+                break;
+            case 10014:
+                chineseMsg = "应用的接口访问权限受限";
+                break;
+            case 10022:
+            case 10023:
+            case 10024:
+                chineseMsg = "接口请求频次超过上限";
+                break;
+            default:
+                break;
+        }
+        return CheckUtils.getValue(oriMsg, chineseMsg);
     }
 
     public static WeiboException ofParamCanNotNull(String paramName) {

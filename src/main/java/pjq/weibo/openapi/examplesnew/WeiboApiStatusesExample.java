@@ -12,7 +12,7 @@ import weibo4j.org.json.JSONException;
 public class WeiboApiStatusesExample {
     public static void main(String[] args) throws WeiboException, IOException, JSONException {
         try {
-            String accessToken = "2.0035IE5CHIqjUEadcfc3fe8b0fdTHu";
+            String accessToken = "2.0035IE5CHIqjUE31eaef52b3OSHbME";
 
             WeiboApiStatuses apiObj = Weibo.of(WeiboApiStatuses.class, accessToken);
 

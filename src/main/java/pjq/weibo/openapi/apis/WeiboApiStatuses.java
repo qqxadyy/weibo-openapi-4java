@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import pjq.weibo.openapi.constant.BizConstant.StatusType;
@@ -47,6 +49,7 @@ import weibo4j.org.json.JSONObject;
 @Getter
 @Setter
 @Accessors(fluent = true)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
     private Timeline apiOld;
 
@@ -419,7 +422,7 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
         JSONArray ja =
             client.get(WeiboConfigs.getApiUrl(apiName), paramListToArray(paramList), accessToken).asJSONArray();
 
-        Map<String, String> midMap = new HashMap<String, String>();
+        Map<String, String> midMap = new HashMap<>();
         if (CheckUtils.isNull(ja)) {
             return midMap;
         }

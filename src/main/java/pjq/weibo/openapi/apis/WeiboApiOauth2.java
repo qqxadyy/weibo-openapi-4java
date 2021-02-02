@@ -5,7 +5,9 @@ import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.UUID;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import pjq.weibo.openapi.constant.BizConstant.TrueOrFalse;
@@ -14,14 +16,17 @@ import pjq.weibo.openapi.constant.ParamConstant.OAuth2Display;
 import pjq.weibo.openapi.constant.ParamConstant.OAuth2Language;
 import pjq.weibo.openapi.constant.ParamConstant.OAuth2Scope;
 import pjq.weibo.openapi.constant.WeiboConfigs;
+import pjq.weibo.openapi.support.WeiboCacher;
 import pjq.weibo.openapi.utils.CharsetUtils;
 import pjq.weibo.openapi.utils.CheckUtils;
+import pjq.weibo.openapi.utils.DateTimeUtils;
 import weibo4j.Oauth;
 import weibo4j.Weibo;
 import weibo4j.model.AccessToken;
 import weibo4j.model.AccessTokenInfo;
 import weibo4j.model.PostParameter;
 import weibo4j.model.RevokeOAuth2;
+import weibo4j.model.User;
 import weibo4j.model.WeiboException;
 
 /**
@@ -35,6 +40,7 @@ import weibo4j.model.WeiboException;
 @Getter
 @Setter
 @Accessors(fluent = true)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
     private static Oauth apiOld = new Oauth();
 
@@ -86,7 +92,7 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
      */
     public String apiBuildAuthorizeURL() throws WeiboException {
         String state = UUID.randomUUID().toString().replaceAll("-", "");
-        cacheHandler.cacheStateOfAuthorize(state);
+        WeiboCacher.cacheStateOfAuthorize(state);
 
         StringBuilder url = new StringBuilder();
         url.append(WeiboConfigs.getApiUrl(WeiboConfigs.OAUTH2_AUTHORIZE));
@@ -135,10 +141,28 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
         if (CheckUtils.isEmpty(state)) {
             throw WeiboException.ofParamCanNotNull(MoreUseParamNames.STATE);
         }
-        if (!cacheHandler.existsStateOfAuthorize(state)) {
+        if (!WeiboCacher.existsStateOfAuthorize(state)) {
             throw new WeiboException("不存在" + MoreUseParamNames.STATE + "信息，该授权回调可能不安全");
         }
-        return cacheHandler.cacheAccessToken(apiOld.getAccessTokenByCode(code));
+        AccessToken tokenInfo = apiOld.getAccessTokenByCode(code);
+        tokenInfo.setCreateAt(DateTimeUtils.currentDateObj());
+        return WeiboCacher.cacheAccessToken(tokenInfo);
+    }
+
+    /**
+     * 用code换取到accessToken并通过该token获取到User信息
+     * 
+     * @param code
+     *            授权回调后获取的code
+     * @param state
+     *            授权回调地址返回的state(该参数不是调接口需要的参数，而是用于安全验证)
+     * @return
+     * @throws WeiboException
+     */
+    public static User apiGetUserByCode(String code, String state) throws WeiboException {
+        AccessToken tokenInfo = apiGetAccessTokenByCode(code, state);
+        return WeiboCacher.cacheUser(
+            Weibo.of(WeiboApiUsers.class, tokenInfo.getAccessToken()).apiShowUserById(tokenInfo.getUid()), tokenInfo);
     }
 
     /**
@@ -153,7 +177,7 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
         if (CheckUtils.isEmpty(accessToken)) {
             throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ACCESS_TOKEN);
         }
-        cacheHandler.checkAccessTokenExists(accessToken);
+        WeiboCacher.checkAccessTokenExists(accessToken);
         return new AccessTokenInfo(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.OAUTH2_GET_TOKEN_INFO),
             new PostParameter[] {new PostParameter(MoreUseParamNames.ACCESS_TOKEN, accessToken)}, false, null));
     }
@@ -171,7 +195,7 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
         if (CheckUtils.isEmpty(accessToken)) {
             throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ACCESS_TOKEN);
         }
-        cacheHandler.checkAccessTokenExists(accessToken);
+        WeiboCacher.checkAccessTokenExists(accessToken);
         return new RevokeOAuth2(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.OAUTH2_REVOKE_OAUTH2),
             new PostParameter[] {new PostParameter(MoreUseParamNames.ACCESS_TOKEN, accessToken)}, false, null));
     }

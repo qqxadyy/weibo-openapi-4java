@@ -55,6 +55,11 @@ public final class WeiboConfigs {
     public static final String CONFIG_SAFE_DOMAINS = CONFIG_PREFIX + "safe_domains";
 
     /**
+     * debug_mode(调试模式)配置
+     */
+    public static final String CONFIG_DEBUG_MODE = CONFIG_PREFIX + "debug_mode";
+
+    /**
      * URL中的后缀
      */
     @WeiboPropName("suffix_json")
@@ -761,5 +766,9 @@ public final class WeiboConfigs {
 
     public static List<String> getSafeDomains() {
         return Arrays.asList(getPropConfig(CONFIG_SAFE_DOMAINS).split(","));
+    }
+
+    public static boolean isDebugMode() {
+        return "true".equalsIgnoreCase(getPropConfig(CONFIG_DEBUG_MODE));
     }
 }

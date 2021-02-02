@@ -10,12 +10,12 @@ import weibo4j.org.json.JSONException;
 public class WeiboApiFriendShipsExample {
     public static void main(String[] args) throws WeiboException, IOException, JSONException {
         try {
-            String accessToken = "2.0035IE5CHIqjUEadcfc3fe8b0fdTHu";
-            String uid = "2187883302";
-            String screenName = "qqxadyy";
+            String accessToken = "2.0035IE5CHIqjUE31eaef52b3OSHbME";
+            String uid = "";
+            String screenName = "";
 
             // String accessToken = "2.00bqKnvBHIqjUEb1a1a269fcNCa72B";
-            // String uid = "1770103757";
+            // String uid = "";
             // String screenName = "";
 
             WeiboApiFriendShips apiObj = Weibo.of(WeiboApiFriendShips.class, accessToken);
@@ -26,7 +26,7 @@ public class WeiboApiFriendShipsExample {
             // System.out.println(apiObj.apiGetMyFansIdsById(uid));
             // System.out.println(apiObj.apiShowFriendShipBetweenUsersById("", ""));
             // System.out.println(apiObj.apiGetActiveFollowers(uid));
-            System.out.println(apiObj.apiFollowerUserById("1770103757"));
+            System.out.println(apiObj.apiFollowerUserById("2187883302"));
         } catch (WeiboException e) {
             if (401 == e.getStatusCode()) {
                 System.out.println("Unable to get the access token.");
