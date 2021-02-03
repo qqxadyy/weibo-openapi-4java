@@ -21,9 +21,8 @@
 		</developer>
 	</developers>
 	<scm>
-		<tag>master</tag>
-		<connection>scm:git:https://https://github.com/qqxadyy/weibo-openapi-4java.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com:qqxadyy/weibo-openapi-4java.git</developerConnection>
+		<connection>scm:git:https://github.com/qqxadyy/weibo-openapi-4java.git</connection>
+		<developerConnection>scm:git:https://github.com/qqxadyy/weibo-openapi-4java.git</developerConnection>
 		<url>https://github.com/qqxadyy/weibo-openapi-4java</url>
 	</scm>
 
@@ -179,7 +178,7 @@
 					<execution>
 						<id>attach-sources</id>
 						<goals>
-							<goal>jar</goal>
+							<goal>jar-no-fork</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -194,17 +193,26 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>3.2.0</version>
-				<!-- 禁用java8 的DocLint新特性，以确保当javadoc有编译错误时，也能正常生成javadoc jar包(取消对源码中的doc参数注释等检查) -->
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
 					<encoding>${project.build.sourceEncoding}</encoding>
 					<aggregate>true</aggregate>
 					<charset>${project.build.sourceEncoding}</charset>
 					<docencoding>${project.build.sourceEncoding}</docencoding>
+					<!-- 禁用java8 的DocLint新特性，以确保当javadoc有编译错误时，也能正常生成javadoc jar包(取消对源码中的doc参数注释等检查) -->
 					<doclint>none</doclint>
+					<additionalparam>-Xdoclint:none</additionalparam>
 				</configuration>
 			</plugin>
 			<plugin>
-				<!-- 自动进行gpg签名(实际发布过程中还是要手输密钥) -->
+				<!-- 自动进行gpg验证 -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
 				<version>1.6</version>
