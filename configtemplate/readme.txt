@@ -1,0 +1,1 @@
+把weibo-openapi-config.properties拷贝到工程的classes路径中并按实际配置即可
