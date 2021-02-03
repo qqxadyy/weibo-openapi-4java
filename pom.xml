@@ -204,7 +204,7 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<!-- 自动进行gpg签名 -->
+				<!-- 自动进行gpg签名(实际发布过程中还是要手输密钥) -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
 				<version>1.6</version>
