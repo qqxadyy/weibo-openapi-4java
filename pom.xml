@@ -34,10 +34,9 @@
 		<skipTests>true</skipTests>
 
 		<!-- 这里定义的版本号可以覆盖传递依赖中有的版本号 -->
-		<lombok.version>1.18.16</lombok.version>
+		<lombok.version>1.18.18</lombok.version>
 		<apache.commons.lang3.version>3.11</apache.commons.lang3.version>
 		<apache.commons.collection4.version>4.4</apache.commons.collection4.version>
-		<apache.commons.beanutils.version>1.9.4</apache.commons.beanutils.version>
 		<apache.commons.codec.version>1.15</apache.commons.codec.version>
 		<apache.commons.logging.version>1.2</apache.commons.logging.version>
 		<apache.tika.version>2.0.0-ALPHA</apache.tika.version>
@@ -69,11 +68,6 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-collections4</artifactId>
 			<version>${apache.commons.collection4.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-beanutils</groupId>
-			<artifactId>commons-beanutils</artifactId>
-			<version>${apache.commons.beanutils.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
@@ -118,7 +112,7 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
-			<!-- <scope>test</scope> -->
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- okhttp相关包 -->

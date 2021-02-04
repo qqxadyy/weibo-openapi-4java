@@ -8,9 +8,11 @@ import com.alibaba.fastjson.JSON;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import pjq.weibo.openapi.apis.WeiboApiUsers;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.utils.CheckUtils;
 import pjq.weibo.openapi.utils.DateTimeUtils;
+import weibo4j.Weibo;
 import weibo4j.model.AccessToken;
 import weibo4j.model.User;
 import weibo4j.model.WeiboException;
@@ -29,12 +31,11 @@ public final class WeiboCacher {
     public static final String KEY_PREFIX_ACCESS_TOKEN = COMMON_PREFIX + "accessTokens:";
     public static final String KEY_PREFIX_STATE = COMMON_PREFIX + "states:";
     public static final String KEY_PREFIX_USER = COMMON_PREFIX + "users:";
-    public static final String KEY_PREFIX_TOKEN_TO_USER = COMMON_PREFIX + "token_to_users:";
     public static final Duration EXPIRES_IN_STATE = Duration.ofSeconds(120L); // state缓存有效期为2分钟
 
     private static String getKey(String prefix, String suffix) {
         if (CheckUtils.isEmpty(suffix)) {
-            throw WeiboException.ofParamCanNotNull("key");
+            throw WeiboException.ofParamCanNotNull("缓存key");
         }
         return prefix.concat(DigestUtils.md5Hex(suffix));
     }
@@ -148,10 +149,6 @@ public final class WeiboCacher {
             }
             Long expiresInSeconds = Long.valueOf(tokenInfo.getExpiresIn()) - 120L; // 接口返回的expires_in减去2分钟，提早让用户知道授权即将失效
             cacheHandler.cache(getKey(KEY_PREFIX_USER, user.getId()), JSON.toJSONString(user), expiresInSeconds);
-
-            // 另外缓存accessToken和uid的关系
-            String accessToken = tokenInfo.getAccessToken();
-            cacheHandler.cache(getKey(KEY_PREFIX_TOKEN_TO_USER, accessToken), user.getId());
             return user;
         } catch (Exception e) {
             if (e instanceof WeiboException) {
@@ -220,11 +217,18 @@ public final class WeiboCacher {
      */
     public static User getUserByToken(String accessToken) {
         try {
-            String uid = cacheHandler.get(getKey(KEY_PREFIX_TOKEN_TO_USER, accessToken));
-            if (CheckUtils.isEmpty(uid)) {
-                throw new WeiboException(MoreUseParamNames.ACCESS_TOKEN + "[" + accessToken + "]已失效，请重新获取授权");
+            AccessToken tokenInfo = checkAccessTokenExists(accessToken);
+            String uid = tokenInfo.getUid();
+            User userInCache = null;
+            try {
+                userInCache = getUserById(uid);
+            } catch (Exception e) {
+                // 如果从缓存获取失效，则根据token查询一次用户信息再缓存
+                User user = Weibo.of(WeiboApiUsers.class, accessToken).apiShowUserById(uid);
+                user.setAccessToken(tokenInfo);
+                userInCache = cacheUser(user);
             }
-            return getUserById(uid);
+            return userInCache;
         } catch (Exception e) {
             if (e instanceof WeiboException) {
                 throw (WeiboException)e;
@@ -241,12 +245,28 @@ public final class WeiboCacher {
      */
     public static void removeCachesByTokenWhenRevokeOAuth(String accessToken) {
         try {
-            String uid = cacheHandler.popup(getKey(KEY_PREFIX_TOKEN_TO_USER, accessToken)); // 清除token和uid的关联信息
-            if (CheckUtils.isEmpty(uid)) {
-                throw new WeiboException(MoreUseParamNames.ACCESS_TOKEN + "[" + accessToken + "]已失效，请重新获取授权");
-            }
+            AccessToken tokenInfo = checkAccessTokenExists(accessToken);
             cacheHandler.remove(getKey(KEY_PREFIX_ACCESS_TOKEN, accessToken)); // 清除缓存的token信息
-            disActiveUserAccessToken(uid);
+            disActiveUserAccessToken(tokenInfo.getUid());
+        } catch (Exception e) {
+            if (e instanceof WeiboException) {
+                throw (WeiboException)e;
+            } else {
+                throw new WeiboException(e);
+            }
+        }
+    }
+
+    /**
+     * 根据用户ID移除缓存的授权信息
+     * 
+     * @param uid
+     */
+    public static void removeCachesByUidWhenRevokeOAuth(String uid) {
+        try {
+            User userInCache = disActiveUserAccessToken(uid);
+            String accessToken = userInCache.getAccessToken().getAccessToken();
+            cacheHandler.remove(getKey(KEY_PREFIX_ACCESS_TOKEN, accessToken)); // 清除缓存的token信息
         } catch (Exception e) {
             if (e instanceof WeiboException) {
                 throw (WeiboException)e;
@@ -261,25 +281,5 @@ public final class WeiboCacher {
         userInCache.getAccessToken().setActive(false); // 不清除缓存的授权用户信息，只把其对应的token状态设成失效
         userInCache.getAccessToken().setAuthEnd(DateTimeUtils.currentDateObj());
         return updateUser(userInCache);
-    }
-
-    /**
-     * 根据用户ID移除缓存的授权信息
-     * 
-     * @param uid
-     */
-    public static void removeCachesByUidWhenRevokeOAuth(String uid) {
-        try {
-            User userInCache = disActiveUserAccessToken(uid);
-            String accessToken = userInCache.getAccessToken().getAccessToken();
-            cacheHandler.remove(getKey(KEY_PREFIX_TOKEN_TO_USER, accessToken)); // 清除token和uid的关联信息
-            cacheHandler.remove(getKey(KEY_PREFIX_ACCESS_TOKEN, accessToken)); // 清除缓存的token信息
-        } catch (Exception e) {
-            if (e instanceof WeiboException) {
-                throw (WeiboException)e;
-            } else {
-                throw new WeiboException(e);
-            }
-        }
     }
 }
