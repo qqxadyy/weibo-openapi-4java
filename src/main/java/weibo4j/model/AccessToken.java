@@ -3,9 +3,7 @@ package weibo4j.model;
 import java.io.Serializable;
 import java.util.Date;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.support.WeiboJsonName;
 import weibo4j.http.Response;
@@ -32,6 +30,7 @@ public class AccessToken extends WeiboResponse implements Serializable {
     private @WeiboJsonName(fromJson = false) Date createAt; // 用于记录授权时间
     private @WeiboJsonName(fromJson = false) Date authEnd; // 用于记录取消授权时间
     private @WeiboJsonName(fromJson = false) boolean isActive = true; // 用于记录授权是否生效
+    private @WeiboJsonName(fromJson = false) int expiresInDays; // 用于记录授权码的有效天数
 
     public AccessToken(Response res) {
         super(res);
@@ -39,5 +38,13 @@ public class AccessToken extends WeiboResponse implements Serializable {
 
     public AccessToken(JSONObject json) {
         super(json);
+    }
+
+    public void expiresInToDays() {
+        try {
+            expiresInDays = Integer.parseInt(this.expiresIn) / (60 * 60 * 24);
+            setExpiresInDays(Double.valueOf(Math.floor(Math.min(300, expiresInDays))).intValue()); // 最长不超过300天(开发者获取到的授权有效期是5年)
+        } catch (Exception e) {
+        }
     }
 }

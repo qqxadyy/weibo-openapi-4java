@@ -93,9 +93,6 @@ public abstract class Weibo<T> implements java.io.Serializable {
      * @return
      */
     public String clientId() {
-        System.out.println("clientId=========" + isLoadConfigFromProperty());
-        System.out.println("clientId========="
-            + (isLoadConfigFromProperty() ? WeiboConfigs.getClientIdFromProperty() : weiboConfiguration.clientId()));
         return isLoadConfigFromProperty() ? WeiboConfigs.getClientIdFromProperty() : weiboConfiguration.clientId();
     }
 
@@ -105,9 +102,6 @@ public abstract class Weibo<T> implements java.io.Serializable {
      * @return
      */
     public String clientSecret() {
-        System.out.println("clientSecret=========" + isLoadConfigFromProperty());
-        System.out.println("clientSecret=========" + (isLoadConfigFromProperty()
-            ? WeiboConfigs.getClientSecretFromProperty() : weiboConfiguration.clientSecret()));
         return isLoadConfigFromProperty() ? WeiboConfigs.getClientSecretFromProperty()
             : weiboConfiguration.clientSecret();
     }
@@ -118,9 +112,6 @@ public abstract class Weibo<T> implements java.io.Serializable {
      * @return
      */
     public String redirectURI() {
-        System.out.println("redirectURI=========" + isLoadConfigFromProperty());
-        System.out.println("redirectURI=========" + (isLoadConfigFromProperty()
-            ? WeiboConfigs.getRedirectURIFromProperty() : weiboConfiguration.redirectUri()));
         return isLoadConfigFromProperty() ? WeiboConfigs.getRedirectURIFromProperty()
             : weiboConfiguration.redirectUri();
     }
@@ -131,10 +122,6 @@ public abstract class Weibo<T> implements java.io.Serializable {
      * @return
      */
     public List<String> safeDomains() {
-        System.out.println("safeDomains=========" + isLoadConfigFromProperty());
-        System.out.println("safeDomains=========" + (Arrays.asList(
-            (isLoadConfigFromProperty() ? WeiboConfigs.getSafeDomainsFromProperty() : weiboConfiguration.safeDomains())
-                .split(","))));
         return Arrays.asList(
             (isLoadConfigFromProperty() ? WeiboConfigs.getSafeDomainsFromProperty() : weiboConfiguration.safeDomains())
                 .split(","));

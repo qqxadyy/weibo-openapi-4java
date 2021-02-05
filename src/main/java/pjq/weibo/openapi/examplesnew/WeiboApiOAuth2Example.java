@@ -31,6 +31,7 @@ public class WeiboApiOAuth2Example {
             System.out.println("access_token:" + accessToken);
             System.out.println("uid:" + user.getId());
             System.out.println("createAt:" + tokenInfo.getCreateAt());
+            System.out.println("expiresInDays:" + tokenInfo.getExpiresInDays());
 
             System.out.println(apiObj.apiGetTokenInfo(accessToken));
             // System.out.println(apiObj.apiRevokeOAuth2(accessToken));

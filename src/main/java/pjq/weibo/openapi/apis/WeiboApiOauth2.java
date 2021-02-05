@@ -133,6 +133,7 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
         }
         AccessToken tokenInfo = ((Oauth)apiOld.weiboConfiguration(weiboConfiguration())).getAccessTokenByCode(code);
         tokenInfo.setCreateAt(DateTimeUtils.currentDateObj());
+        tokenInfo.expiresInToDays();
         return WeiboCacher.cacheAccessToken(tokenInfo);
     }
 

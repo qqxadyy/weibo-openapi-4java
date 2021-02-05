@@ -281,6 +281,8 @@ public final class WeiboCacher {
         User userInCache = getUserById(uid);
         userInCache.getAccessToken().setActive(false); // 不清除缓存的授权用户信息，只把其对应的token状态设成失效
         userInCache.getAccessToken().setAuthEnd(DateTimeUtils.currentDateObj());
+        userInCache.getAccessToken().setExpiresIn("0");
+        userInCache.getAccessToken().setExpiresInDays(0);
         return updateUser(userInCache);
     }
 }
