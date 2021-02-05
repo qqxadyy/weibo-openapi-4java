@@ -11,9 +11,7 @@ import javax.crypto.spec.SecretKeySpec;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.WeiboConfigs;
 import weibo4j.http.BASE64Encoder;
-import weibo4j.model.AccessToken;
-import weibo4j.model.PostParameter;
-import weibo4j.model.WeiboException;
+import weibo4j.model.*;
 import weibo4j.org.json.JSONException;
 import weibo4j.org.json.JSONObject;
 
@@ -43,7 +41,7 @@ public class Oauth extends Weibo {
         }
         String part1 = t[0].replace("-", "+").replace("_", "/");
 
-        SecretKey key = new SecretKeySpec(WeiboConfigs.getClientSecret().getBytes(), "hmacSHA256");
+        SecretKey key = new SecretKeySpec(clientSecret().getBytes(), "hmacSHA256");
         Mac m;
         m = Mac.getInstance("hmacSHA256");
         m.init(key);
@@ -78,25 +76,25 @@ public class Oauth extends Weibo {
 
     public AccessToken getAccessTokenByCode(String code) throws WeiboException {
         return new AccessToken(client.post(WeiboConfigs.getAccessTokenURL(),
-            new PostParameter[] {new PostParameter(MoreUseParamNames.CLIENT_ID, WeiboConfigs.getClientId()),
-                new PostParameter(MoreUseParamNames.CLIENT_SECRET, WeiboConfigs.getClientSecret()),
+            new PostParameter[] {new PostParameter(MoreUseParamNames.CLIENT_ID, clientId()),
+                new PostParameter(MoreUseParamNames.CLIENT_SECRET, clientSecret()),
                 new PostParameter("grant_type", "authorization_code"), new PostParameter("code", code),
-                new PostParameter(MoreUseParamNames.REDIRECT_URI, WeiboConfigs.getRedirectURI())},
+                new PostParameter(MoreUseParamNames.REDIRECT_URI, redirectURI())},
             false, null));
     }
 
     public String authorize(String response_type) throws WeiboException {
-        return WeiboConfigs.getAuthorizeURL() + "?client_id=" + WeiboConfigs.getClientId() + "&redirect_uri="
-            + WeiboConfigs.getRedirectURI() + "&response_type=" + response_type;
+        return WeiboConfigs.getAuthorizeURL() + "?client_id=" + clientId() + "&redirect_uri=" + redirectURI()
+            + "&response_type=" + response_type;
     }
 
     public String authorize(String response_type, String state) throws WeiboException {
-        return WeiboConfigs.getAuthorizeURL() + "?client_id=" + WeiboConfigs.getClientId() + "&redirect_uri="
-            + WeiboConfigs.getRedirectURI() + "&response_type=" + response_type + "&state=" + state;
+        return WeiboConfigs.getAuthorizeURL() + "?client_id=" + clientId() + "&redirect_uri=" + redirectURI()
+            + "&response_type=" + response_type + "&state=" + state;
     }
 
     public String authorize(String response_type, String state, String scope) throws WeiboException {
-        return WeiboConfigs.getAuthorizeURL() + "?client_id=" + WeiboConfigs.getClientId() + "&redirect_uri="
-            + WeiboConfigs.getRedirectURI() + "&response_type=" + response_type + "&state=" + state + "&scope=" + scope;
+        return WeiboConfigs.getAuthorizeURL() + "?client_id=" + clientId() + "&redirect_uri=" + redirectURI()
+            + "&response_type=" + response_type + "&state=" + state + "&scope=" + scope;
     }
 }

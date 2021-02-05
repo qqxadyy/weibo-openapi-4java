@@ -1,15 +1,12 @@
 package weibo4j.util;
 
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
-import org.apache.commons.collections4.map.HashedMap;
+import org.apache.commons.collections4.map.*;
 
-import pjq.weibo.openapi.constant.WeiboConfigs;
-import pjq.weibo.openapi.utils.CheckUtils;
-import pjq.weibo.openapi.utils.PropertiesUtils;
-import pjq.weibo.openapi.utils.ThreeDesUtils;
-import weibo4j.model.WeiboException;
+import pjq.weibo.openapi.constant.*;
+import pjq.weibo.openapi.utils.*;
+import weibo4j.model.*;
 
 /**
  * 微博官网SDK自带，官网SDK代码可能还会用到<br/>
@@ -63,14 +60,17 @@ public class WeiboConfig {
      */
     private static String[] encryptOrDecrypt(String value) {
         String[] infos = new String[] {"", ""};
-        if (CheckUtils.isEmpty(value) || !value.startsWith(ENCRYPT_PREFIX)) {
-            // 加密
-            infos[0] = value;
-            infos[1] = ENCRYPT_PREFIX + ThreeDesUtils.encrypt(value, THREE_DES_KEY);
-        } else {
-            // 解密
-            infos[0] = ThreeDesUtils.decrypt(value.substring(ENCRYPT_PREFIX.length()), THREE_DES_KEY);
-            infos[1] = value;
+        if (CheckUtils.isNotEmpty(value)) {
+            // 空配置值不用加密
+            if (value.startsWith(ENCRYPT_PREFIX)) {
+                // 解密
+                infos[0] = ThreeDesUtils.decrypt(value.substring(ENCRYPT_PREFIX.length()), THREE_DES_KEY);
+                infos[1] = value;
+            } else {
+                // 加密
+                infos[0] = value;
+                infos[1] = ENCRYPT_PREFIX + ThreeDesUtils.encrypt(value, THREE_DES_KEY);
+            }
         }
         return infos;
     }

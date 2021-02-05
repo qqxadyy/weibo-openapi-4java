@@ -1,9 +1,7 @@
 package pjq.weibo.openapi.constant;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import lombok.AccessLevel;
@@ -752,20 +750,40 @@ public final class WeiboConfigs {
         return getApiUrl(BASE_URL_REMIND);
     }
 
-    public static String getClientId() {
+    /**
+     * 从配置文件获取clientId
+     * 
+     * @return
+     */
+    public static String getClientIdFromProperty() {
         return getPropConfig(CONFIG_CLIENT_ID);
     }
 
-    public static String getClientSecret() {
+    /**
+     * 从配置文件获取clientSecret
+     * 
+     * @return
+     */
+    public static String getClientSecretFromProperty() {
         return getPropConfig(CONFIG_CLIENT_SECRET);
     }
 
-    public static String getRedirectURI() {
+    /**
+     * 从配置文件获取redirectUri
+     * 
+     * @return
+     */
+    public static String getRedirectURIFromProperty() {
         return getPropConfig(CONFIG_REDIRECT_URI);
     }
 
-    public static List<String> getSafeDomains() {
-        return Arrays.asList(getPropConfig(CONFIG_SAFE_DOMAINS).split(","));
+    /**
+     * 从配置文件获取safeDomains
+     * 
+     * @return
+     */
+    public static String getSafeDomainsFromProperty() {
+        return getPropConfig(CONFIG_SAFE_DOMAINS);
     }
 
     public static boolean isDebugMode() {

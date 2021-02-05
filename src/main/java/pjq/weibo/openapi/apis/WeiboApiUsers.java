@@ -2,22 +2,14 @@ package pjq.weibo.openapi.apis;
 
 import java.util.List;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.ParamConstant.TrimStatus;
 import pjq.weibo.openapi.constant.WeiboConfigs;
 import pjq.weibo.openapi.utils.CheckUtils;
 import weibo4j.Weibo;
-import weibo4j.model.PostParameter;
-import weibo4j.model.User;
-import weibo4j.model.UserCounts;
-import weibo4j.model.UserRank;
-import weibo4j.model.WeiboException;
-import weibo4j.model.WeiboResponse;
+import weibo4j.model.*;
 
 /**
  * Users相关接口<br/>
@@ -85,7 +77,7 @@ public class WeiboApiUsers extends Weibo<WeiboApiUsers> {
             throw WeiboException.ofParamCanNotNull(uidOrScreenName);
         }
         List<PostParameter> paramList = newParamList();
-        paramList.add(new PostParameter(MoreUseParamNames.CLIENT_ID_USE_SOURCE, clientId));
+        paramList.add(new PostParameter(MoreUseParamNames.CLIENT_ID_USE_SOURCE, clientId()));
         paramList.add(new PostParameter(uidOrScreenName, val));
         if (CheckUtils.isNotNull(trimStatus)) {
             paramList.add(new PostParameter("trim_status", trimStatus.value()));
@@ -120,7 +112,7 @@ public class WeiboApiUsers extends Weibo<WeiboApiUsers> {
             throw WeiboException.ofParamCanNotNull("domain");
         }
         List<PostParameter> paramList = newParamList();
-        paramList.add(new PostParameter(MoreUseParamNames.CLIENT_ID_USE_SOURCE, clientId));
+        paramList.add(new PostParameter(MoreUseParamNames.CLIENT_ID_USE_SOURCE, clientId()));
         paramList.add(new PostParameter("domain", domain));
         if (CheckUtils.isNotNull(trimStatus)) {
             paramList.add(new PostParameter("trim_status", trimStatus.value()));

@@ -2,25 +2,13 @@ package pjq.weibo.openapi.apis;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 import pjq.weibo.openapi.constant.BizConstant.StatusType;
-import pjq.weibo.openapi.constant.ParamConstant.AuthorType;
-import pjq.weibo.openapi.constant.ParamConstant.FilterType;
-import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
-import pjq.weibo.openapi.constant.ParamConstant.QueryIdInbox;
-import pjq.weibo.openapi.constant.ParamConstant.QueryIdType;
-import pjq.weibo.openapi.constant.ParamConstant.SourceType;
-import pjq.weibo.openapi.constant.ParamConstant.StatusesFeature;
-import pjq.weibo.openapi.constant.ParamConstant.TrimUser;
+import pjq.weibo.openapi.constant.ParamConstant.*;
 import pjq.weibo.openapi.constant.WeiboConfigs;
 import pjq.weibo.openapi.utils.CheckUtils;
 import pjq.weibo.openapi.utils.ImageTypeJudger;
@@ -28,13 +16,7 @@ import pjq.weibo.openapi.utils.http.SimpleAsyncCallback;
 import weibo4j.Timeline;
 import weibo4j.WeiboParamPager;
 import weibo4j.http.Response;
-import weibo4j.model.PostParameter;
-import weibo4j.model.Status;
-import weibo4j.model.StatusIdsPager;
-import weibo4j.model.StatusPager;
-import weibo4j.model.StatusesCounts;
-import weibo4j.model.WeiboException;
-import weibo4j.model.WeiboResponse;
+import weibo4j.model.*;
 import weibo4j.org.json.JSONArray;
 import weibo4j.org.json.JSONObject;
 
@@ -349,7 +331,7 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
         paramList.add(new PostParameter(MoreUseParamNames.ID, statusId));
         if (useClientId) {
             // statusgo接口的source参数和access_token参数互斥，所以传入source参数时不传access_token参数
-            paramList.add(new PostParameter(MoreUseParamNames.CLIENT_ID_USE_SOURCE, clientId));
+            paramList.add(new PostParameter(MoreUseParamNames.CLIENT_ID_USE_SOURCE, clientId()));
             return client
                 .get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_GO), paramListToArray(paramList), false, accessToken)
                 .asString();
@@ -580,9 +562,9 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
      * @throws WeiboException
      */
     private void checkIfHasSafeLink(String statusText) throws WeiboException {
-        List<String> safeDomains = WeiboConfigs.getSafeDomains();
+        List<String> safeDomains = safeDomains();
         if (CheckUtils.isEmpty(safeDomains)) {
-            throw new WeiboException("配置文件的" + WeiboConfigs.CONFIG_SAFE_DOMAINS + "配置不能为空");
+            throw new WeiboException("应用的安全域名配置不能为空");
         }
 
         for (String safeDomain : safeDomains) {

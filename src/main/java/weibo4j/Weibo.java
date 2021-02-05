@@ -5,12 +5,11 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import pjq.weibo.openapi.WeiboConfiguration;
 import pjq.weibo.openapi.apis.WeiboApiOauth2;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.WeiboConfigs;
@@ -23,7 +22,7 @@ import weibo4j.model.WeiboException;
 
 /**
  * 扩展旧版的该类<br/>
- * 1.每个接口的通用参数有accessToken、clientId<br/>
+ * 1.每个接口的通用参数有accessToken；clientId等参数从对应参数名的方法中获取<br/>
  * 2.每个接口本身的可选参数在接口类中的属性变量中，并使用链式调用方式设置参数值，设置值后再调用api方法(接口类中的apiXXX方法)<br/>
  * 3.可选参数是每个方法都可共用，但实际是否会生效需要参考官网的API文档<br/>
  * 4.每个接口本身的必填参数定义在具体的方法中<br/>
@@ -44,14 +43,14 @@ public abstract class Weibo<T> implements java.io.Serializable {
     // int maxSize);
 
     /**
+     * 微博配置对象，为空时从配置文件加载配置信息；不为空时从该对象加载配置信息
+     */
+    private WeiboConfiguration weiboConfiguration;
+
+    /**
      * 授权后的token
      */
     protected String accessToken;
-
-    /**
-     * 申请应用时分配的AppKey
-     */
-    protected String clientId;
 
     /**
      * 用于{@link #of}方法生成对象后，单独改变accessToken
@@ -67,20 +66,82 @@ public abstract class Weibo<T> implements java.io.Serializable {
     }
 
     /**
-     * 用于{@link #of}方法生成对象后，单独改变clientId(一般不需要改变，接口调用过程中会直接从配置文件中获取)
+     * 用于{@link #of}方法生成对象后，单独改变weiboConfiguration
      * 
-     * @param clientId
-     *            申请应用时分配的AppKey
+     * @param weiboConfiguration
+     *            微博配置对象
      * @return
      */
     @SuppressWarnings("unchecked")
-    public T clientId(String clientId) {
-        this.clientId = clientId;
+    public T weiboConfiguration(WeiboConfiguration weiboConfiguration) {
+        this.weiboConfiguration = weiboConfiguration;
         return (T)this;
     }
 
     /**
-     * 调用完{@link Weibo#of}方法后需要另外做其它处理的方法，且根据具体接口检查accessToken和clientId的为空情况
+     * 判断是否从配置文件中获取微博配置信息
+     * 
+     * @return
+     */
+    public boolean isLoadConfigFromProperty() {
+        return CheckUtils.isNull(weiboConfiguration);
+    }
+
+    /**
+     * 获取clientId配置
+     * 
+     * @return
+     */
+    public String clientId() {
+        System.out.println("clientId=========" + isLoadConfigFromProperty());
+        System.out.println("clientId========="
+            + (isLoadConfigFromProperty() ? WeiboConfigs.getClientIdFromProperty() : weiboConfiguration.clientId()));
+        return isLoadConfigFromProperty() ? WeiboConfigs.getClientIdFromProperty() : weiboConfiguration.clientId();
+    }
+
+    /**
+     * 创建clientSecret配置
+     * 
+     * @return
+     */
+    public String clientSecret() {
+        System.out.println("clientSecret=========" + isLoadConfigFromProperty());
+        System.out.println("clientSecret=========" + (isLoadConfigFromProperty()
+            ? WeiboConfigs.getClientSecretFromProperty() : weiboConfiguration.clientSecret()));
+        return isLoadConfigFromProperty() ? WeiboConfigs.getClientSecretFromProperty()
+            : weiboConfiguration.clientSecret();
+    }
+
+    /**
+     * 获取redirectUri配置
+     * 
+     * @return
+     */
+    public String redirectURI() {
+        System.out.println("redirectURI=========" + isLoadConfigFromProperty());
+        System.out.println("redirectURI=========" + (isLoadConfigFromProperty()
+            ? WeiboConfigs.getRedirectURIFromProperty() : weiboConfiguration.redirectUri()));
+        return isLoadConfigFromProperty() ? WeiboConfigs.getRedirectURIFromProperty()
+            : weiboConfiguration.redirectUri();
+    }
+
+    /**
+     * 获取创建应用时分配的AppKey
+     * 
+     * @return
+     */
+    public List<String> safeDomains() {
+        System.out.println("safeDomains=========" + isLoadConfigFromProperty());
+        System.out.println("safeDomains=========" + (Arrays.asList(
+            (isLoadConfigFromProperty() ? WeiboConfigs.getSafeDomainsFromProperty() : weiboConfiguration.safeDomains())
+                .split(","))));
+        return Arrays.asList(
+            (isLoadConfigFromProperty() ? WeiboConfigs.getSafeDomainsFromProperty() : weiboConfiguration.safeDomains())
+                .split(","));
+    }
+
+    /**
+     * 调用完{@link Weibo#of}方法后需要另外做其它处理的方法
      * 
      * @param accessToken
      *            授权后的token
@@ -162,18 +223,33 @@ public abstract class Weibo<T> implements java.io.Serializable {
     }
 
     /**
-     * 构造具体业务接口类(应该只有OAuth接口类会用到)
+     * 构造具体业务接口类(不需要token，从配置文件读取微博配置)<br>
+     * 应该只有OAuth接口类会用到
      * 
      * @param apiClass
      *            业务接口类
      * @return
      */
     public static <T extends Weibo<T>> T of(Class<T> apiClass) {
-        return of(apiClass, null);
+        return of(apiClass, null, null);
     }
 
     /**
-     * 构造具体业务接口类
+     * 构造具体业务接口类(不需要token，从配置文件读取微博配置)<br>
+     * 应该只有OAuth接口类会用到
+     * 
+     * @param apiClass
+     *            业务接口类
+     * @param weiboConfiguration
+     *            微博配置对象，为空时从配置文件加载配置信息；不为空时从该对象加载配置信息
+     * @return
+     */
+    public static <T extends Weibo<T>> T of(Class<T> apiClass, WeiboConfiguration weiboConfiguration) {
+        return of(apiClass, null, weiboConfiguration);
+    }
+
+    /**
+     * 构造具体业务接口类(需要token，从配置文件读取微博配置)
      * 
      * @param apiClass
      *            业务接口类
@@ -183,8 +259,24 @@ public abstract class Weibo<T> implements java.io.Serializable {
      * 
      * @return
      */
-    @SuppressWarnings("unchecked")
     public static <T extends Weibo<T>> T of(Class<T> apiClass, String accessToken) {
+        return of(apiClass, accessToken, null);
+    }
+
+    /**
+     * 构造具体业务接口类(需要token，从配置对象读取微博配置)
+     * 
+     * @param apiClass
+     *            业务接口类
+     * @param accessToken
+     *            授权后的token
+     * @param weiboConfiguration
+     *            微博配置对象，为空时从配置文件加载配置信息；不为空时从该对象加载配置信息
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends Weibo<T>> T of(Class<T> apiClass, String accessToken,
+        WeiboConfiguration weiboConfiguration) {
         try {
             if (!WeiboApiOauth2.class.equals(apiClass)) {
                 // WeiboApiOauth2不需要检查
@@ -201,7 +293,9 @@ public abstract class Weibo<T> implements java.io.Serializable {
                 throw WeiboException.ofParamCanNotNull(checkAccessTokenName);
             }
 
-            String clientId = WeiboConfigs.getClientId(); // 默认把应用client_id/source/appkey值设到接口类中，实际是否使用和检查根据接口类决定
+            // 默认把应用client_id/source/appkey值设到接口类中，实际是否使用和检查根据接口类决定
+            String clientId = CheckUtils.isNull(weiboConfiguration) ? WeiboConfigs.getClientIdFromProperty()
+                : weiboConfiguration.clientId();
             String checkClientIdName = obj.checkClientId();
             if (CheckUtils.isNotEmpty(checkClientIdName) && CheckUtils.isEmpty(clientId)) {
                 throw WeiboException.ofParamCanNotNull(checkClientIdName);
@@ -213,7 +307,7 @@ public abstract class Weibo<T> implements java.io.Serializable {
             }
 
             obj.accessToken(accessToken);
-            obj.clientId(clientId);
+            obj.weiboConfiguration(weiboConfiguration);
             obj.afterOfInit(accessToken, clientId);
             return obj;
         } catch (Exception e) {

@@ -11,7 +11,7 @@ import weibo4j.org.json.JSONException;
 public class WeiboApiCommonExample {
     public static void main(String[] args) throws WeiboException, IOException, JSONException {
         try {
-            String accessToken = "2.0035IE5CHIqjUE9c4dc96e7d0LlkqG";
+            String accessToken = "2.0035IE5CHIqjUEa25cf779509xGamC";
 
             WeiboApiCommon apiObj = Weibo.of(WeiboApiCommon.class, accessToken);
 

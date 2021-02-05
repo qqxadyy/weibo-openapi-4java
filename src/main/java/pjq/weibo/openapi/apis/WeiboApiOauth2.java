@@ -5,29 +5,16 @@ import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.UUID;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 import pjq.weibo.openapi.constant.BizConstant.TrueOrFalse;
-import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
-import pjq.weibo.openapi.constant.ParamConstant.OAuth2Display;
-import pjq.weibo.openapi.constant.ParamConstant.OAuth2Language;
-import pjq.weibo.openapi.constant.ParamConstant.OAuth2Scope;
+import pjq.weibo.openapi.constant.ParamConstant.*;
 import pjq.weibo.openapi.constant.WeiboConfigs;
 import pjq.weibo.openapi.support.WeiboCacher;
-import pjq.weibo.openapi.utils.CharsetUtils;
-import pjq.weibo.openapi.utils.CheckUtils;
-import pjq.weibo.openapi.utils.DateTimeUtils;
+import pjq.weibo.openapi.utils.*;
 import weibo4j.Oauth;
 import weibo4j.Weibo;
-import weibo4j.model.AccessToken;
-import weibo4j.model.AccessTokenInfo;
-import weibo4j.model.PostParameter;
-import weibo4j.model.RevokeOAuth2;
-import weibo4j.model.User;
-import weibo4j.model.WeiboException;
+import weibo4j.model.*;
 
 /**
  * oauth2相关接口<br/>
@@ -96,13 +83,13 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
 
         StringBuilder url = new StringBuilder();
         url.append(WeiboConfigs.getApiUrl(WeiboConfigs.OAUTH2_AUTHORIZE));
-        url.append("?").append(MoreUseParamNames.CLIENT_ID).append("=").append(WeiboConfigs.getClientId());
+        url.append("?").append(MoreUseParamNames.CLIENT_ID).append("=").append(clientId());
 
         url.append("&").append(MoreUseParamNames.REDIRECT_URI).append("=");
         try {
-            url.append(URLEncoder.encode(WeiboConfigs.getRedirectURI(), CharsetUtils.UTF_8));
+            url.append(URLEncoder.encode(redirectURI(), CharsetUtils.UTF_8));
         } catch (UnsupportedEncodingException e) {
-            url.append(WeiboConfigs.getRedirectURI());
+            url.append(redirectURI());
         }
 
         if (CheckUtils.isNotEmpty(scopes)) {
@@ -134,7 +121,7 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
      * @return
      * @throws WeiboException
      */
-    public static AccessToken apiGetAccessTokenByCode(String code, String state) throws WeiboException {
+    public AccessToken apiGetAccessTokenByCode(String code, String state) throws WeiboException {
         if (CheckUtils.isEmpty(code)) {
             throw WeiboException.ofParamCanNotNull("code");
         }
@@ -144,7 +131,7 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
         if (!WeiboCacher.existsStateOfAuthorize(state)) {
             throw new WeiboException("不存在" + MoreUseParamNames.STATE + "信息，该授权回调可能不安全");
         }
-        AccessToken tokenInfo = apiOld.getAccessTokenByCode(code);
+        AccessToken tokenInfo = ((Oauth)apiOld.weiboConfiguration(weiboConfiguration())).getAccessTokenByCode(code);
         tokenInfo.setCreateAt(DateTimeUtils.currentDateObj());
         return WeiboCacher.cacheAccessToken(tokenInfo);
     }
@@ -159,9 +146,10 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
      * @return
      * @throws WeiboException
      */
-    public static User apiGetUserByCode(String code, String state) throws WeiboException {
+    public User apiGetUserByCode(String code, String state) throws WeiboException {
         AccessToken accessToken = apiGetAccessTokenByCode(code, state);
-        User user = Weibo.of(WeiboApiUsers.class, accessToken.getAccessToken()).apiShowUserById(accessToken.getUid());
+        User user = Weibo.of(WeiboApiUsers.class, accessToken.getAccessToken(), weiboConfiguration())
+            .apiShowUserById(accessToken.getUid());
         user.setAccessToken(accessToken);
         return WeiboCacher.cacheUser(user);
     }
@@ -174,7 +162,7 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
      * @return
      * @throws WeiboException
      */
-    public static AccessTokenInfo apiGetTokenInfo(String accessToken) throws WeiboException {
+    public AccessTokenInfo apiGetTokenInfo(String accessToken) throws WeiboException {
         if (CheckUtils.isEmpty(accessToken)) {
             throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ACCESS_TOKEN);
         }
@@ -192,7 +180,7 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
      * @return
      * @throws WeiboException
      */
-    public static boolean apiRevokeOAuth2(String accessToken) throws WeiboException {
+    public boolean apiRevokeOAuth2(String accessToken) throws WeiboException {
         if (CheckUtils.isEmpty(accessToken)) {
             throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ACCESS_TOKEN);
         }
@@ -210,7 +198,8 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
 
     /**
      * 取消授权回调<br/>
-     * 这个方法必须在收到取消授权回调请求的时候才能调用
+     * 这个方法必须在收到取消授权回调请求的时候才能调用<br/>
+     * 考虑到安全问题，该方法不做实质处理
      * 
      * @param clientId
      *            应用clientid/appkey
@@ -222,9 +211,6 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
      *            应该是用于验证该请求是否微博发出参数，但是在官网没找到相关说明
      */
     public static void apiRevokeOAuth2Callback(String clientId, String uid, String authEnd, String verification) {
-        if (!WeiboConfigs.getClientId().equals(clientId)) {
-            throw new WeiboException("clientId与配置值不一致，该取消授权回调请求不安全");
-        }
-        WeiboCacher.removeCachesByUidWhenRevokeOAuth(uid); // 收到取消授权的回调时再清除一次相关缓存，确保相关信息被移除
+        // WeiboCacher.removeCachesByUidWhenRevokeOAuth(uid); // 收到取消授权的回调时再清除一次相关缓存，确保相关信息被移除
     }
 }

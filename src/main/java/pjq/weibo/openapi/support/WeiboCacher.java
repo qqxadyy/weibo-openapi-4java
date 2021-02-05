@@ -8,14 +8,13 @@ import com.alibaba.fastjson.JSON;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import pjq.weibo.openapi.WeiboConfiguration;
 import pjq.weibo.openapi.apis.WeiboApiUsers;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.utils.CheckUtils;
 import pjq.weibo.openapi.utils.DateTimeUtils;
 import weibo4j.Weibo;
-import weibo4j.model.AccessToken;
-import weibo4j.model.User;
-import weibo4j.model.WeiboException;
+import weibo4j.model.*;
 
 /**
  * 微博缓存业务类
@@ -213,9 +212,11 @@ public final class WeiboCacher {
      * 
      * @param accessToken
      *            已授权的token
+     * @param weiboConfiguration
+     *            微博配置对象，为空时从配置文件加载配置信息；不为空时从该对象加载配置信息(用于缓存中没有用用户信息时先根据token查询一次用户信息再缓存)
      * @return
      */
-    public static User getUserByToken(String accessToken) {
+    public static User getUserByToken(String accessToken, WeiboConfiguration weiboConfiguration) {
         try {
             AccessToken tokenInfo = checkAccessTokenExists(accessToken);
             String uid = tokenInfo.getUid();
