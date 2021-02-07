@@ -1,8 +1,7 @@
 package pjq.weibo.openapi.constant;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import pjq.weibo.openapi.support.ValuableEnum;
+import lombok.*;
+import pjq.weibo.openapi.support.EnhanceEnum;
 
 /**
  * 接口相关参数的枚举值常量类
@@ -45,7 +44,8 @@ public final class ParamConstant {
     /**
      * OAuth2接口-scope参数枚举
      */
-    public static enum OAuth2Scope implements ValuableEnum {
+    @AllArgsConstructor
+    public static enum OAuth2Scope implements EnhanceEnum {
         /**
          * 请求所有scope权限
          */
@@ -93,16 +93,13 @@ public final class ParamConstant {
 
         @SuppressWarnings("unused")
         private String value;
-
-        OAuth2Scope(String value) {
-            this.value = value;
-        }
     }
 
     /**
      * OAuth2接口-display参数枚举
      */
-    public static enum OAuth2Display implements ValuableEnum {
+    @AllArgsConstructor
+    public static enum OAuth2Display implements EnhanceEnum {
         /**
          * 默认的授权页面，适用于web浏览器
          */
@@ -130,16 +127,13 @@ public final class ParamConstant {
 
         @SuppressWarnings("unused")
         private String value;
-
-        OAuth2Display(String value) {
-            this.value = value;
-        }
     }
 
     /**
      * OAuth2接口-language参数枚举
      */
-    public static enum OAuth2Language implements ValuableEnum {
+    @AllArgsConstructor
+    public static enum OAuth2Language implements EnhanceEnum {
         /**
          * 简体中文(官网没给出具体的参数值)
          */
@@ -152,16 +146,13 @@ public final class ParamConstant {
 
         @SuppressWarnings("unused")
         private String value;
-
-        OAuth2Language(String value) {
-            this.value = value;
-        }
     }
 
     /**
      * 返回的gender枚举
      */
-    public static enum Gender implements ValuableEnum {
+    @AllArgsConstructor
+    public static enum Gender implements EnhanceEnum {
         /**
          * 男
          */
@@ -179,16 +170,13 @@ public final class ParamConstant {
 
         @SuppressWarnings("unused")
         private String value;
-
-        Gender(String value) {
-            this.value = value;
-        }
     }
 
     /**
      * common接口-language参数枚举
      */
-    public static enum CommonLanguage implements ValuableEnum {
+    @AllArgsConstructor
+    public static enum CommonLanguage implements EnhanceEnum {
         /**
          * 简体中文
          */
@@ -206,16 +194,12 @@ public final class ParamConstant {
 
         @SuppressWarnings("unused")
         private String value;
-
-        CommonLanguage(String value) {
-            this.value = value;
-        }
     }
 
     /**
      * filter_by_author参数枚举(评论作者类型)
      */
-    public static enum AuthorType implements ValuableEnum {
+    public static enum AuthorType implements EnhanceEnum {
         /**
          * 全部
          */
@@ -235,7 +219,7 @@ public final class ParamConstant {
     /**
      * filter_by_source参数枚举(评论来源类型)
      */
-    public static enum SourceType implements ValuableEnum {
+    public static enum SourceType implements EnhanceEnum {
         /**
          * 全部
          */
@@ -255,7 +239,7 @@ public final class ParamConstant {
     /**
      * trim_user参数枚举(返回值中user字段过滤开关)
      */
-    public static enum TrimUser implements ValuableEnum {
+    public static enum TrimUser implements EnhanceEnum {
         /**
          * 返回完整User字段
          */
@@ -270,7 +254,7 @@ public final class ParamConstant {
     /**
      * trim_status参数枚举(返回值中status字段过滤开关)
      */
-    public static enum TrimStatus implements ValuableEnum {
+    public static enum TrimStatus implements EnhanceEnum {
         /**
          * 返回完整Status字段
          */
@@ -285,7 +269,7 @@ public final class ParamConstant {
     /**
      * filter_by_type参数枚举(筛选类型)
      */
-    public static enum FilterType implements ValuableEnum {
+    public static enum FilterType implements EnhanceEnum {
         /**
          * 全部微博
          */
@@ -300,7 +284,7 @@ public final class ParamConstant {
     /**
      * 隐私设置对象中的用户类型
      */
-    public static enum PrivacyUserType implements ValuableEnum {
+    public static enum PrivacyUserType implements EnhanceEnum {
         /**
          * 全部
          */
@@ -320,7 +304,8 @@ public final class ParamConstant {
     /**
      * emotions接口-type参数枚举(表情类别)
      */
-    public static enum EmotionsType implements ValuableEnum {
+    @AllArgsConstructor
+    public static enum EmotionsType implements EnhanceEnum {
         /**
          * 普通表情
          */
@@ -338,16 +323,13 @@ public final class ParamConstant {
 
         @SuppressWarnings("unused")
         private String value;
-
-        EmotionsType(String value) {
-            this.value = value;
-        }
     }
 
     /**
      * emotions接口-language参数枚举(语言类别)
      */
-    public static enum EmotionsLanguage implements ValuableEnum {
+    @AllArgsConstructor
+    public static enum EmotionsLanguage implements EnhanceEnum {
         /**
          * 简体
          */
@@ -360,16 +342,12 @@ public final class ParamConstant {
 
         @SuppressWarnings("unused")
         private String value;
-
-        EmotionsLanguage(String value) {
-            this.value = value;
-        }
     }
 
     /**
      * statuses接口-feature参数枚举(过滤类型)
      */
-    public static enum StatusesFeature implements ValuableEnum {
+    public static enum StatusesFeature implements EnhanceEnum {
         /**
          * 全部
          */
@@ -399,7 +377,8 @@ public final class ParamConstant {
     /**
      * statuses-querymid/queryid接口-type参数枚举(获取类型)
      */
-    public static enum QueryIdType implements ValuableEnum {
+    @AllArgsConstructor
+    public static enum QueryIdType implements EnhanceEnum {
         /**
          * 微博
          */
@@ -417,16 +396,12 @@ public final class ParamConstant {
 
         @SuppressWarnings("unused")
         private String value;
-
-        QueryIdType(String value) {
-            this.value = value;
-        }
     }
 
     /**
      * statuses-queryid接口-inbox参数枚举(信箱类型)
      */
-    public static enum QueryIdInbox implements ValuableEnum {
+    public static enum QueryIdInbox implements EnhanceEnum {
         /**
          * 发件箱
          */

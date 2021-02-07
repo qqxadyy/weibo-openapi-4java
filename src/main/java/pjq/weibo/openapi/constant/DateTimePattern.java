@@ -5,9 +5,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
-import pjq.weibo.openapi.support.ValuableEnum;
+import pjq.weibo.openapi.support.EnhanceEnum;
 
-public enum DateTimePattern implements ValuableEnum {
+public enum DateTimePattern implements EnhanceEnum {
     /**
      * - 默认日期格式, <code>yyyy-MM-dd</code>
      */

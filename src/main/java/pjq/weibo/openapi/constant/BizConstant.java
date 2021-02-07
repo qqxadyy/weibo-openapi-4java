@@ -2,7 +2,7 @@ package pjq.weibo.openapi.constant;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import pjq.weibo.openapi.support.ValuableEnum;
+import pjq.weibo.openapi.support.EnhanceEnum;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BizConstant {
@@ -12,7 +12,7 @@ public final class BizConstant {
      * NO--N：否<br/>
      * YES--Y：是
      */
-    public static enum YesOrNo implements ValuableEnum {
+    public static enum YesOrNo implements EnhanceEnum {
         NO("N"), YES("Y");
 
         @SuppressWarnings("unused")
@@ -28,14 +28,14 @@ public final class BizConstant {
      * INVALID--0：无效<br/>
      * VALID--1：有效
      */
-    public static enum StatusType implements ValuableEnum {
+    public static enum StatusType implements EnhanceEnum {
         INVALID, VALID
     }
 
     /**
      * ture或false类型
      */
-    public static enum TrueOrFalse implements ValuableEnum {
+    public static enum TrueOrFalse implements EnhanceEnum {
         FALSE("false"), TRUE("true");
 
         @SuppressWarnings("unused")

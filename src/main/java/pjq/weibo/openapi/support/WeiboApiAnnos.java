@@ -1,10 +1,6 @@
 package pjq.weibo.openapi.support;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 import pjq.weibo.openapi.constant.WeiboConfigs;
 
@@ -15,8 +11,8 @@ public interface WeiboApiAnnos {
      * @author pengjianqiang
      * @date 2021年1月20日
      */
-    @Retention(RUNTIME)
-    @Target(FIELD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
     public @interface WeiboPropName {
         /**
          * 配置项名，为空时使用变量的值代替<br/>
@@ -33,8 +29,8 @@ public interface WeiboApiAnnos {
      * @author pengjianqiang
      * @date 2021年1月20日
      */
-    @Retention(RUNTIME)
-    @Target(FIELD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
     public @interface WeiboApi {
         /**
          * 接口URL的前段，默认为BASE_URL

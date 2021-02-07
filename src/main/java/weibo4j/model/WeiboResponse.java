@@ -44,7 +44,7 @@ import org.w3c.dom.NodeList;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import pjq.weibo.openapi.constant.DateTimePattern;
-import pjq.weibo.openapi.support.ValuableEnum.DefualtValueableEnum;
+import pjq.weibo.openapi.support.EnhanceEnum.DefualtEnhanceEnum;
 import pjq.weibo.openapi.support.WeiboJsonName;
 import pjq.weibo.openapi.utils.CheckUtils;
 import pjq.weibo.openapi.utils.CommonTypeJudger;
@@ -177,7 +177,7 @@ public abstract class WeiboResponse implements java.io.Serializable {
                     } else if (CommonTypeJudger.isLongType(type)) {
                         field.set(_this, json.getLong(jsonName));
                     } else if (type.isEnum()) {
-                        field.set(_this, DefualtValueableEnum.valueOrNameOf(type.getName(),
+                        field.set(_this, DefualtEnhanceEnum.valueOrNameOf(type.getName(),
                             CheckUtils.getValue(null, json.getString(jsonName))));
                     } else if (JSONObject.class.isAssignableFrom(type)) {
                         field.set(_this, json.getJSONObject(jsonName));
