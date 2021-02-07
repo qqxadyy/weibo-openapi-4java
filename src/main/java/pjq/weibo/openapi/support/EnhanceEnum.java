@@ -73,6 +73,19 @@ public interface EnhanceEnum {
     }
 
     /**
+     * 返回int类型的value值，value值不是int类型时返回-1
+     * 
+     * @return
+     */
+    default int valueOfInt() {
+        try {
+            return Integer.parseInt(value());
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    /**
      * -1.如果枚举类有desc属性，则desc属性值作为枚举描述<br>
      * -2.否则使用name()作为枚举描述<br>
      * -3.或枚举类重写desc方法，用其返回值作为枚举描述
