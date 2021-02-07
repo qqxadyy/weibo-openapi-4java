@@ -7,15 +7,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.Expiry;
+import com.github.benmanes.caffeine.cache.*;
 
 import pjq.weibo.openapi.utils.CheckUtils;
 import weibo4j.model.WeiboException;
 
 /**
- * 微博相关缓存处理器父类<br/>
+ * 微博相关缓存处理器父类<br>
  * 已有用本地内存实现的默认类，如果需要自行实现缓存的部分，需要继承该父类，并只实现相关方法
  * 
  * @author pengjianqiang
@@ -30,7 +28,7 @@ public abstract class WeiboCacheHandler {
     }
 
     /**
-     * 返回微博缓存处理器的实例<br/>
+     * 返回微博缓存处理器的实例<br>
      * 如果有调用{@link WeiboImplRegister#registCacheHandler(WeiboCacheHandler)}方法，则返回其参数对象；否则返回SDK默认的缓存实现
      * 
      * @return

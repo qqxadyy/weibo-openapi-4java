@@ -15,7 +15,7 @@ public interface WeiboApiAnnos {
     @Target(ElementType.FIELD)
     public @interface WeiboPropName {
         /**
-         * 配置项名，为空时使用变量的值代替<br/>
+         * 配置项名，为空时使用变量的值代替<br>
          * (实际配置时要配置成{@link WeiboConfigs.CONFIG_API_PREFIX}的值+value值，例如weibo.api.propName)
          * 
          * @return

@@ -21,7 +21,7 @@ import weibo4j.org.json.JSONArray;
 import weibo4j.org.json.JSONObject;
 
 /**
- * Statuses相关接口<br/>
+ * Statuses相关接口<br>
  * 使用{@code Weibo.of(WeiboApiStatuses.class,accessToken)}生成对象
  * 
  * @author pengjianqiang
@@ -119,9 +119,9 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
     }
 
     /**
-     * 获取授权用户发布的最新微博<br/>
-     * 官网中已说明新版下，该接口只能获取授权用户的微博，uid和access_token都可以不传<br/>
-     * 此接口最多只返回最新的5条数据，官方移动SDK调用可返回10条<br/>
+     * 获取授权用户发布的最新微博<br>
+     * 官网中已说明新版下，该接口只能获取授权用户的微博，uid和access_token都可以不传<br>
+     * 此接口最多只返回最新的5条数据，官方移动SDK调用可返回10条<br>
      * 因为只查询授权用户的最新微博，该方法默认不返回该用户的详细字段，要返回该用户的详细字段需要调用{@link #apiGetMyLatestStatusesWithTrimUserParam()}
      * 
      * @return
@@ -133,9 +133,9 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
     }
 
     /**
-     * 获取授权用户发布的最新微博<br/>
-     * 官网中已说明新版下，该接口只能获取授权用户的微博，uid和access_token都可以不传<br/>
-     * 此接口最多只返回最新的5条数据，官方移动SDK调用可返回10条<br/>
+     * 获取授权用户发布的最新微博<br>
+     * 官网中已说明新版下，该接口只能获取授权用户的微博，uid和access_token都可以不传<br>
+     * 此接口最多只返回最新的5条数据，官方移动SDK调用可返回10条<br>
      * 该方法根据传入的trim_user参数判断是否返回用户的详细字段
      * 
      * @return
@@ -149,8 +149,8 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
     }
 
     /**
-     * 获取授权用户发布的最新微博的ID列表<br/>
-     * 官网中已说明新版下，该接口只能获取授权用户的微博，uid和access_token都可以不传<br/>
+     * 获取授权用户发布的最新微博的ID列表<br>
+     * 官网中已说明新版下，该接口只能获取授权用户的微博，uid和access_token都可以不传<br>
      * 
      * @return
      * @throws WeiboException
@@ -240,7 +240,7 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
     }
 
     /**
-     * 获取@当前授权用户的最新微博的ID列表<br/>
+     * 获取@当前授权用户的最新微博的ID列表<br>
      * 官网没有注明是废弃，但是调用后total_number有数量而id列表没返回，可能实际已废弃
      * 
      * @return
@@ -421,7 +421,7 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
     }
 
     /**
-     * 转发一条微博<br/>
+     * 转发一条微博<br>
      * 默认按不评论处理，不提供is_comment参数的传入
      * 
      * @param statusIds
@@ -504,10 +504,10 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
      * (同步)第三方分享一条链接到微博
      * 
      * @param statusText
-     *            用户分享到微博的文本内容，内容不超过140个汉字(可包含表情转义符)，文本中不能包含"#话题词#"(经测试加了也不报错，只是会被微博自动过滤掉)<br/>
-     *            同时文本中必须包含至少一个第三方分享到微博的网页URL，且该URL只能是该第三方（调用方）绑定域下的URL链接<br/>
-     *            绑定域在"我的应用-应用信息-基本应用信息编辑-安全域名"里设置<br/>
-     *            链接地址中如含有中文等字符，需要做URLEncode<br/>
+     *            用户分享到微博的文本内容，内容不超过140个汉字(可包含表情转义符)，文本中不能包含"#话题词#"(经测试加了也不报错，只是会被微博自动过滤掉)<br>
+     *            同时文本中必须包含至少一个第三方分享到微博的网页URL，且该URL只能是该第三方（调用方）绑定域下的URL链接<br>
+     *            绑定域在"我的应用-应用信息-基本应用信息编辑-安全域名"里设置<br>
+     *            链接地址中如含有中文等字符，需要做URLEncode<br>
      *            正文例子："这是一个测试微博http://安全域名{详细地址}"，里面的第三方地址是必须的，可以只到域名那段，例如http://www.myapp.com
      * @param picPath
      *            用户想要分享到微博的图片地址，仅支持JPEG、GIF、PNG图片，上传图片大小限制为<5M(只能传一个图片)
@@ -519,7 +519,7 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
     }
 
     /**
-     * (异步)第三方分享一条链接到微博<br/>
+     * (异步)第三方分享一条链接到微博<br>
      * callback为空时会转成同步请求，且不会返回具体的业务对象，所以如果不需要异步请求，直接使用{@link #apiShareStatus(String, String)}
      * 
      * @param statusText

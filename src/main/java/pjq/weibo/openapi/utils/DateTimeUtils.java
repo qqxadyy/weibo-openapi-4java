@@ -1,15 +1,7 @@
 package pjq.weibo.openapi.utils;
 
 import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
@@ -760,5 +752,25 @@ public final class DateTimeUtils {
      */
     public static long getUTCMillSeconds(LocalDateTime dateTime) {
         return dateTime.toInstant(ZoneOffset.UTC).toEpochMilli();
+    }
+
+    /**
+     * 时间戳转换为LocalDateTime(时区为UTC+8)
+     * 
+     * @param timeMillis
+     * @return
+     */
+    public static LocalDateTime timestampToLocalDateTime(long timeMillis) {
+        return Instant.ofEpochMilli(timeMillis).atZone(ZoneOffset.ofHours(8)).toLocalDateTime();
+    }
+
+    /**
+     * 时间戳转换为Date(时区为UTC+8)
+     * 
+     * @param timeMillis
+     * @return
+     */
+    public static Date timestampToDate(long timeMillis) {
+        return localDateTimeToDate(timestampToLocalDateTime(timeMillis));
     }
 }

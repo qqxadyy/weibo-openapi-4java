@@ -14,7 +14,7 @@ import pjq.weibo.openapi.utils.collection.CollectionUtils.Continue;
 import weibo4j.util.WeiboConfig;
 
 /**
- * 微博开放平台配置常量<br/>
+ * 微博开放平台配置常量<br>
  * 这些定义值可以通过在weibo-openapi-config.properties中重新定义进行覆盖(配置名看{@link WeiboPropName}的定义)，以防以后微博接口等有变更而需要重新编译的情况
  * 
  * @author pengjianqiang
@@ -297,7 +297,7 @@ public final class WeiboConfigs {
 
     // ----------------------------begin:statuses接口------------------------------------
     /**
-     * statuses-获取当前授权用户及其所关注用户的最新微博<br/>
+     * statuses-获取当前授权用户及其所关注用户的最新微博<br>
      * 实际和friends_timeline接口的作用、参数、返回完全一致，所以friends_timeline接口不再定义
      * 
      * @see https://open.weibo.com/wiki/2/statuses/home_timeline
@@ -357,7 +357,7 @@ public final class WeiboConfigs {
     public static final String STATUSES_MENTIONS = "statuses_mentions";
 
     /**
-     * statuses-获取@当前授权用户的最新微博的ID列表<br/>
+     * statuses-获取@当前授权用户的最新微博的ID列表<br>
      * 官网没有注明是废弃，但是调用后total_number有数量而id列表没返回，可能实际已废弃
      */
     @WeiboPropName

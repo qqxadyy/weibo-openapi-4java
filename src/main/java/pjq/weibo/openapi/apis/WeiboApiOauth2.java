@@ -17,7 +17,7 @@ import weibo4j.Weibo;
 import weibo4j.model.*;
 
 /**
- * oauth2相关接口<br/>
+ * oauth2相关接口<br>
  * 使用{@code Weibo.of(WeiboApiOauth2.class)}生成对象
  * 
  * @author pengjianqiang
@@ -47,7 +47,7 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
     private TrueOrFalse forcelogin;
 
     /**
-     * 授权页语言，缺省为中文简体版，en为英文版<br/>
+     * 授权页语言，缺省为中文简体版，en为英文版<br>
      * 英文版好像有问题，账号密码正确对会提示用扫码登录，建议不传该参数，默认用中文版
      */
     private OAuth2Language language;
@@ -71,7 +71,7 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
     /*----------------------------Oauth接口--------------------------------------*/
 
     /**
-     * 获取oahtu2-authorize接口的URL<br/>
+     * 获取oahtu2-authorize接口的URL<br>
      * 为保证安全，获取授权URL时强制传state值
      * 
      * @return
@@ -163,17 +163,38 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
      * @return
      * @throws WeiboException
      */
-    public AccessTokenInfo apiGetTokenInfo(String accessToken) throws WeiboException {
+    public AccessToken apiGetTokenInfo(String accessToken) throws WeiboException {
         if (CheckUtils.isEmpty(accessToken)) {
             throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ACCESS_TOKEN);
         }
         WeiboCacher.checkAccessTokenExists(accessToken);
-        return new AccessTokenInfo(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.OAUTH2_GET_TOKEN_INFO),
-            new PostParameter[] {new PostParameter(MoreUseParamNames.ACCESS_TOKEN, accessToken)}, false, null));
+        AccessTokenInfo tokenInfo =
+            new AccessTokenInfo(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.OAUTH2_GET_TOKEN_INFO),
+                new PostParameter[] {new PostParameter(MoreUseParamNames.ACCESS_TOKEN, accessToken)}, false, null));
+        return tokenInfo.toAccessTokenObj(accessToken);
     }
 
     /**
-     * 授权回收接口，帮助开发者主动取消用户的授权<br/>
+     * 查询用户access_token的授权相关信息并缓存<br>
+     * 用于系统缓存中没有token详细信息而需要根据token值查询并缓存的情况
+     * 
+     * @param accessToken
+     *            授权后的token
+     * @return
+     * @throws WeiboException
+     */
+    public AccessToken apiGetTokenInfoAndCache(String accessToken) throws WeiboException {
+        if (CheckUtils.isEmpty(accessToken)) {
+            throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ACCESS_TOKEN);
+        }
+        AccessTokenInfo tokenInfo =
+            new AccessTokenInfo(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.OAUTH2_GET_TOKEN_INFO),
+                new PostParameter[] {new PostParameter(MoreUseParamNames.ACCESS_TOKEN, accessToken)}, false, null));
+        return WeiboCacher.cacheAccessToken(tokenInfo.toAccessTokenObj(accessToken));
+    }
+
+    /**
+     * 授权回收接口，帮助开发者主动取消用户的授权<br>
      * 注意：取消授权后再调用其它接口，会报错[21321:Applications over the unaudited use restrictions:未审核的应用使用人数超过限制]，本地测试时尤其需要注意
      * 
      * @param accessToken
@@ -198,8 +219,8 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
     }
 
     /**
-     * 取消授权回调<br/>
-     * 这个方法必须在收到取消授权回调请求的时候才能调用<br/>
+     * 取消授权回调<br>
+     * 这个方法必须在收到取消授权回调请求的时候才能调用<br>
      * 考虑到安全问题，该方法不做实质处理
      * 
      * @param clientId

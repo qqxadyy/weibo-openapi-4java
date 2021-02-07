@@ -2,22 +2,16 @@ package pjq.weibo.openapi.apis;
 
 import java.util.List;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.WeiboConfigs;
 import weibo4j.Account;
 import weibo4j.Weibo;
-import weibo4j.model.RateLimitStatus;
-import weibo4j.model.UserEmails;
-import weibo4j.model.WeiboException;
-import weibo4j.model.WeiboResponse;
+import weibo4j.model.*;
 
 /**
- * Account相关接口<br/>
+ * Account相关接口<br>
  * 使用{@code Weibo.of(WeiboApiAccount.class,accessToken)}生成对象
  * 
  * @author pengjianqiang

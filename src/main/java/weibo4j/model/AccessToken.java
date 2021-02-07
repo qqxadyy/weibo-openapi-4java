@@ -23,7 +23,7 @@ import weibo4j.org.json.JSONObject;
 public class AccessToken extends WeiboResponse implements Serializable {
     private @WeiboJsonName(MoreUseParamNames.ACCESS_TOKEN) String accessToken;
     private @WeiboJsonName("expires_in") String expiresIn; // token有效期，单位秒
-    private @WeiboJsonName(value = "refresh_token", isDeleted = true) String refreshToken; // 新版接口中已不返回
+    private @WeiboJsonName(value = "refresh_token") String refreshToken; // 好像是安卓的SDK才会返回
     private String uid;
     private @WeiboJsonName("remind_in") String remindIn; // 官网说明该参数即将废弃，用expires_in
     private @WeiboJsonName(isNewAndNoDesc = true) String isRealName;
@@ -40,6 +40,9 @@ public class AccessToken extends WeiboResponse implements Serializable {
         super(json);
     }
 
+    /**
+     * 因为调接口返回生成对象时是直接对Field设值，不会set方法，所以这个方法需要显式调用
+     */
     public void expiresInToDays() {
         try {
             expiresInDays = Integer.parseInt(this.expiresIn) / (60 * 60 * 24);

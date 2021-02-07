@@ -2,13 +2,11 @@ package pjq.weibo.openapi.support;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
- * 定义微博API返回的json字段名<br/>
- * 1.在类定义中使用注解即可，表示整个类的private属性都从json串中转换获取，且默认转换为String类型的值(只处理private属性)<br/>
+ * 定义微博API返回的json字段名<br>
+ * 1.在类定义中使用注解即可，表示整个类的private属性都从json串中转换获取，且默认转换为String类型的值(只处理private属性)<br>
  * 2.对于需要特殊定义json字段名，在需要转换的属性中再单独使用属性
  * 
  * @author pengjianqiang

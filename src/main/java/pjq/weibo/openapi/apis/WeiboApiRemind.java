@@ -2,22 +2,17 @@ package pjq.weibo.openapi.apis;
 
 import java.util.List;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 import pjq.weibo.openapi.constant.BizConstant.StatusType;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.WeiboConfigs;
 import pjq.weibo.openapi.utils.CheckUtils;
 import weibo4j.Weibo;
-import weibo4j.model.PostParameter;
-import weibo4j.model.UnreadCount;
-import weibo4j.model.WeiboException;
+import weibo4j.model.*;
 
 /**
- * Remind相关接口<br/>
+ * Remind相关接口<br>
  * 使用{@code Weibo.of(WeiboApiRemind.class,accessToken)}生成对象
  * 
  * @author pengjianqiang

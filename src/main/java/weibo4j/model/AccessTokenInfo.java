@@ -2,10 +2,9 @@ package weibo4j.model;
 
 import java.io.Serializable;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import pjq.weibo.openapi.support.WeiboJsonName;
+import pjq.weibo.openapi.utils.DateTimeUtils;
 import weibo4j.http.Response;
 import weibo4j.org.json.JSONObject;
 
@@ -25,7 +24,7 @@ public class AccessTokenInfo extends WeiboResponse implements Serializable {
     private String appkey;
     private String scope;
     private @WeiboJsonName("create_at") String createAt; // 秒级别的时间戳，例如1612230566
-    private @WeiboJsonName("expire_in") String expireIn; // 官网说明该参数即将废弃，用expires_in
+    private @WeiboJsonName("expire_in") String expireIn;
 
     public AccessTokenInfo(Response res) {
         super(res);
@@ -33,5 +32,15 @@ public class AccessTokenInfo extends WeiboResponse implements Serializable {
 
     public AccessTokenInfo(JSONObject json) {
         super(json);
+    }
+
+    public AccessToken toAccessTokenObj(String accessToken) {
+        AccessToken tokenInfo = new AccessToken();
+        tokenInfo.setAccessToken(accessToken);
+        tokenInfo.setExpiresIn(expireIn);
+        tokenInfo.setUid(uid);
+        tokenInfo.setCreateAt(DateTimeUtils.timestampToDate(Long.valueOf(createAt) * 1000));
+        tokenInfo.expiresInToDays();
+        return tokenInfo;
     }
 }

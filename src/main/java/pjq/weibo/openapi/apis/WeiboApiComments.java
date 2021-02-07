@@ -13,7 +13,7 @@ import weibo4j.WeiboParamPager;
 import weibo4j.model.*;
 
 /**
- * Comments相关接口<br/>
+ * Comments相关接口<br>
  * 使用{@code Weibo.of(WeiboApiComment.class,accessToken)}生成对象
  * 
  * @author pengjianqiang

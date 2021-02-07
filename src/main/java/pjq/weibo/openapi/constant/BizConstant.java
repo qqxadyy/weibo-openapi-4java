@@ -8,8 +8,8 @@ import pjq.weibo.openapi.support.EnhanceEnum;
 public final class BizConstant {
     // ----------------通用枚举----------------
     /**
-     * 是或否类型--<br/>
-     * NO--N：否<br/>
+     * 是或否类型--<br>
+     * NO--N：否<br>
      * YES--Y：是
      */
     public static enum YesOrNo implements EnhanceEnum {
@@ -24,8 +24,8 @@ public final class BizConstant {
     }
 
     /**
-     * 状态类型--<br/>
-     * INVALID--0：无效<br/>
+     * 状态类型--<br>
+     * INVALID--0：无效<br>
      * VALID--1：有效
      */
     public static enum StatusType implements EnhanceEnum {

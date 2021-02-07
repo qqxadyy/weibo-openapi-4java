@@ -12,7 +12,7 @@ import weibo4j.Weibo;
 import weibo4j.model.*;
 
 /**
- * Users相关接口<br/>
+ * Users相关接口<br>
  * 使用{@code Weibo.of(WeiboApiUsers.class,accessToken)}生成对象
  * 
  * @author pengjianqiang
@@ -25,7 +25,7 @@ import weibo4j.model.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WeiboApiUsers extends Weibo<WeiboApiUsers> {
     /**
-     * 返回值中user字段中的status字段开关，0：返回完整status字段、1：status字段仅返回status_id，默认为1<br/>
+     * 返回值中user字段中的status字段开关，0：返回完整status字段、1：status字段仅返回status_id，默认为1<br>
      * 官网接口中没有写该参数
      */
     private TrimStatus trimStatus;
@@ -141,7 +141,7 @@ public class WeiboApiUsers extends Weibo<WeiboApiUsers> {
     }
 
     /**
-     * 获取用户等级信息<br/>
+     * 获取用户等级信息<br>
      * 实际会报错没有这个api
      * 
      * @param uid

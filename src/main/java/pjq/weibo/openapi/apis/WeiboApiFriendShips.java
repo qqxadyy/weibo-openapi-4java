@@ -2,10 +2,7 @@ package pjq.weibo.openapi.apis;
 
 import java.util.List;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.ParamConstant.TrimStatus;
@@ -13,18 +10,13 @@ import pjq.weibo.openapi.constant.WeiboConfigs;
 import pjq.weibo.openapi.utils.CheckUtils;
 import weibo4j.Weibo;
 import weibo4j.http.Response;
-import weibo4j.model.PostParameter;
-import weibo4j.model.User;
-import weibo4j.model.UserIdsPager;
-import weibo4j.model.UserPager;
-import weibo4j.model.WeiboException;
-import weibo4j.model.WeiboResponse;
+import weibo4j.model.*;
 import weibo4j.org.json.JSONObject;
 
 /**
- * FriendShips相关接口<br/>
- * 使用{@code Weibo.of(WeiboApiFriendShips.class,accessToken)}生成对象<br/>
- * 1.相关接口好像有如下问题：即使实际有多个对象也只能返回一个对象信息，page、count等参数也控制不了<br/>
+ * FriendShips相关接口<br>
+ * 使用{@code Weibo.of(WeiboApiFriendShips.class,accessToken)}生成对象<br>
+ * 1.相关接口好像有如下问题：即使实际有多个对象也只能返回一个对象信息，page、count等参数也控制不了<br>
  * 
  * @author pengjianqiang
  * @date 2021年1月21日

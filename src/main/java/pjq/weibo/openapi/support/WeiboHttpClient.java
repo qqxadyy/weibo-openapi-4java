@@ -3,15 +3,11 @@ package pjq.weibo.openapi.support;
 import java.util.Map;
 
 import pjq.weibo.openapi.utils.CheckUtils;
-import pjq.weibo.openapi.utils.http.HttpException;
-import pjq.weibo.openapi.utils.http.OKHttpSender;
-import pjq.weibo.openapi.utils.http.OKHttpSender4Async;
-import pjq.weibo.openapi.utils.http.OKHttpSenderBase;
+import pjq.weibo.openapi.utils.http.*;
 import pjq.weibo.openapi.utils.http.OKHttpSenderBase.ParamDataType;
-import pjq.weibo.openapi.utils.http.SimpleAsyncCallback;
 
 /**
- * 发送微博相关请求的父类<br/>
+ * 发送微博相关请求的父类<br>
  * 已有用okhttp实现的默认类，如果需要自行实现发http请求的部分，需要继承该父类，且实际发请求的参数编码必须为UTF-8
  * 
  * @author pengjianqiang
@@ -30,7 +26,7 @@ public abstract class WeiboHttpClient {
     }
 
     /**
-     * 返回微博http请求的处理实例<br/>
+     * 返回微博http请求的处理实例<br>
      * 如果有调用{@link WeiboImplRegister#registWeiboClient(WeiboHttpClient)}方法，则返回其参数对象；否则返回SDK默认的OKHttp实现
      * 
      * @return

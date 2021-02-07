@@ -11,7 +11,7 @@ import weibo4j.Weibo;
 import weibo4j.model.*;
 
 /**
- * Emotions相关接口<br/>
+ * Emotions相关接口<br>
  * 使用{@code Weibo.of(WeiboApiEmotions.class,accessToken)}生成对象
  * 
  * @author pengjianqiang

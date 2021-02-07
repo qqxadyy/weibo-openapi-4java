@@ -105,7 +105,7 @@ public final class WeiboCacher {
     }
 
     /**
-     * 检查accessToken信息在缓存中
+     * 检查accessToken信息在缓存中，是的话返回该对象，否则抛异常
      * 
      * @param accessToken
      * @return
