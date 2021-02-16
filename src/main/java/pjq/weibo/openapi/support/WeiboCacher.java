@@ -13,6 +13,7 @@ import pjq.weibo.openapi.apis.WeiboApiUsers;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.utils.CheckUtils;
 import pjq.weibo.openapi.utils.DateTimeUtils;
+import pjq.weibo.openapi.utils.collection.CollectionUtils;
 import weibo4j.Weibo;
 import weibo4j.model.*;
 
@@ -40,16 +41,21 @@ public final class WeiboCacher {
     }
 
     /**
-     * 缓存登录授权时的state参数
+     * 缓存登录授权时的state参数信息(clientId也缓存进去，用于有多个微博应用配置时获取正确的clientId)
      * 
      * @param state
+     * @param clientId
      */
-    public static void cacheStateOfAuthorize(String state) {
+    public static void cacheStateInfoOfAuthorize(String state, String clientId) {
         try {
             if (CheckUtils.isEmpty(state)) {
                 throw WeiboException.ofParamCanNotNull(MoreUseParamNames.STATE);
+            } else if (CheckUtils.isEmpty(clientId)) {
+                throw WeiboException.ofParamCanNotNull(MoreUseParamNames.CLIENT_ID);
             }
-            cacheHandler.cache(getKey(KEY_PREFIX_STATE, state), state, EXPIRES_IN_STATE.getSeconds());
+            StateClientId stateInfo = new StateClientId(state, clientId);
+            cacheHandler.cache(getKey(KEY_PREFIX_STATE, state), JSON.toJSONString(stateInfo),
+                EXPIRES_IN_STATE.getSeconds());
         } catch (Exception e) {
             if (e instanceof WeiboException) {
                 throw (WeiboException)e;
@@ -60,17 +66,67 @@ public final class WeiboCacher {
     }
 
     /**
-     * 判断授权回调返回的state是否在缓存中，用于安全验证
+     * 判断授权回调返回的state是否在缓存中，用于安全验证<br>
+     * 验证成功后返回clientId
      * 
      * @param state
      * @return
      */
-    public static boolean existsStateOfAuthorize(String state) {
+    public static void existsStateOfAuthorize(String state) {
+        try {
+            if (CheckUtils.isNotEmpty(state)) {
+                String stateInfoStr = cacheHandler.popup(getKey(KEY_PREFIX_STATE, state)); // state的缓存读取成功后马上失效，防止被二次使用
+                StateClientId stateInfo = JSON.parseObject(stateInfoStr, StateClientId.class);
+                if (state.equals(stateInfo.getState())) {
+                    return;
+                }
+            }
+            throw new Exception();
+        } catch (Exception e) {
+            throw new WeiboException("不存在" + MoreUseParamNames.STATE + "信息，该授权回调可能不安全");
+        }
+    }
+
+    /**
+     * 根据state从缓存中获取clientId<br>
+     * 使用于不从配置文件读取微博配置的情况(因为授权回调只有state和code参数，但是又不能从配置文件中获取配置值)
+     * 
+     * @param state
+     * @return
+     */
+    public static String getClientByStateOfAuthorize(String state) {
         try {
             if (CheckUtils.isEmpty(state)) {
-                return false;
+                return null;
             }
-            return cacheHandler.exists(getKey(KEY_PREFIX_STATE, state));
+            String stateInfoStr = cacheHandler.get(getKey(KEY_PREFIX_STATE, state)); // 这里只是获取缓存信息，获取后不要删掉缓存，check方法还要使用
+            if (CheckUtils.isEmpty(stateInfoStr)) {
+                return null;
+            }
+
+            StateClientId stateInfo = JSON.parseObject(stateInfoStr, StateClientId.class);
+            if (state.equals(stateInfo.getState())) {
+                return stateInfo.getClientId();
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            if (e instanceof WeiboException) {
+                throw (WeiboException)e;
+            } else {
+                throw new WeiboException(e);
+            }
+        }
+    }
+
+    /**
+     * 移除state的缓存信息
+     * 
+     * @param state
+     */
+    public static void removeStateOfAuthorize(String state) {
+        try {
+            cacheHandler.remove(getKey(KEY_PREFIX_STATE, state));
         } catch (Exception e) {
             if (e instanceof WeiboException) {
                 throw (WeiboException)e;
@@ -131,10 +187,9 @@ public final class WeiboCacher {
     }
 
     /**
-     * 缓存用code换取到的accessToken并通过该token获取到的User信息
+     * 缓存User信息
      * 
      * @param user
-     * @param tokenInfo
      * @return
      */
     public static User cacheUser(User user) {
@@ -142,32 +197,12 @@ public final class WeiboCacher {
             if (CheckUtils.isNull(user)) {
                 throw WeiboException.ofParamCanNotNull("user对象");
             }
-            AccessToken tokenInfo = user.getAccessToken();
-            if (CheckUtils.isNull(tokenInfo)) {
-                throw WeiboException.ofParamCanNotNull("accessToken对象");
-            }
-            Long expiresInSeconds = Long.valueOf(tokenInfo.getExpiresIn()) - 120L; // 接口返回的expires_in减去2分钟，提早让用户知道授权即将失效
-            cacheHandler.cache(getKey(KEY_PREFIX_USER, user.getId()), JSON.toJSONString(user), expiresInSeconds);
-            return user;
-        } catch (Exception e) {
-            if (e instanceof WeiboException) {
-                throw (WeiboException)e;
-            } else {
-                throw new WeiboException(e);
-            }
-        }
-    }
-
-    /**
-     * 更新缓存中的User对象
-     * 
-     * @param user
-     * @return
-     */
-    public static User updateUser(User user) {
-        try {
-            if (CheckUtils.isNull(user)) {
-                throw WeiboException.ofParamCanNotNull("user对象");
+            try {
+                // 如果缓存同一个微博用户，则更新其用户信息并把旧的token信息添加到新的用户对象中
+                User userInCache = getUserById(user.getId());
+                user.getAccessTokens().addAll(userInCache.getAccessTokens());
+            } catch (Exception e) {
+                // 表示缓存中没有用户对象
             }
             cacheHandler.cache(getKey(KEY_PREFIX_USER, user.getId()), JSON.toJSONString(user));
             return user;
@@ -225,8 +260,8 @@ public final class WeiboCacher {
                 userInCache = getUserById(uid);
             } catch (Exception e) {
                 // 如果从缓存获取失效，则根据token查询一次用户信息再缓存
-                User user = Weibo.of(WeiboApiUsers.class, accessToken).apiShowUserById(uid);
-                user.setAccessToken(tokenInfo);
+                User user = Weibo.of(WeiboApiUsers.class, accessToken, weiboConfiguration).apiShowUserById(uid);
+                user.addAccessToken(tokenInfo);
                 userInCache = cacheUser(user);
             }
             return userInCache;
@@ -248,7 +283,14 @@ public final class WeiboCacher {
         try {
             AccessToken tokenInfo = checkAccessTokenExists(accessToken);
             cacheHandler.remove(getKey(KEY_PREFIX_ACCESS_TOKEN, accessToken)); // 清除缓存的token信息
-            disActiveUserAccessToken(tokenInfo.getUid());
+            User userInCache = getUserById(tokenInfo.getUid());
+            CollectionUtils.forEach(userInCache.getAccessTokens(), tokenInfoInUser -> {
+                if (accessToken.equals(tokenInfoInUser.getAccessToken())) {
+                    tokenInfoInUser.setAuthEnd(DateTimeUtils.currentDateObj());
+                    tokenInfoInUser.setExpiresIn("0");
+                }
+            });
+            cacheUser(userInCache);
         } catch (Exception e) {
             if (e instanceof WeiboException) {
                 throw (WeiboException)e;
@@ -256,33 +298,5 @@ public final class WeiboCacher {
                 throw new WeiboException(e);
             }
         }
-    }
-
-    /**
-     * 根据用户ID移除缓存的授权信息
-     * 
-     * @param uid
-     */
-    public static void removeCachesByUidWhenRevokeOAuth(String uid) {
-        try {
-            User userInCache = disActiveUserAccessToken(uid);
-            String accessToken = userInCache.getAccessToken().getAccessToken();
-            cacheHandler.remove(getKey(KEY_PREFIX_ACCESS_TOKEN, accessToken)); // 清除缓存的token信息
-        } catch (Exception e) {
-            if (e instanceof WeiboException) {
-                throw (WeiboException)e;
-            } else {
-                throw new WeiboException(e);
-            }
-        }
-    }
-
-    private static User disActiveUserAccessToken(String uid) {
-        User userInCache = getUserById(uid);
-        userInCache.getAccessToken().setActive(false); // 不清除缓存的授权用户信息，只把其对应的token状态设成失效
-        userInCache.getAccessToken().setAuthEnd(DateTimeUtils.currentDateObj());
-        userInCache.getAccessToken().setExpiresIn("0");
-        userInCache.getAccessToken().setExpiresInDays(0);
-        return updateUser(userInCache);
     }
 }

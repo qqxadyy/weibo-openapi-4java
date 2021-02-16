@@ -1,9 +1,8 @@
 package weibo4j.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import pjq.weibo.openapi.support.WeiboJsonName;
+import pjq.weibo.openapi.utils.CheckUtils;
 import weibo4j.http.Response;
 import weibo4j.org.json.JSONObject;
 
@@ -32,5 +31,9 @@ public class UserCounts extends WeiboResponse {
 
     public UserCounts(JSONObject json) {
         super(json);
+    }
+
+    public long toLongValue(Long value) {
+        return CheckUtils.isNull(value) ? 0 : value;
     }
 }

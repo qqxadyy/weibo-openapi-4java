@@ -14,7 +14,8 @@ import weibo4j.model.WeiboException;
 
 /**
  * 微博相关缓存处理器父类<br>
- * 已有用本地内存实现的默认类，如果需要自行实现缓存的部分，需要继承该父类，并只实现相关方法
+ * 已有用本地内存实现的默认类，如果需要自行实现缓存的部分，需要继承该父类，并只实现相关方法<br>
+ * 实现相关方法时，记得先使用{@link #checkKey}或{@link #checkKeyAndValue}检查key、value
  * 
  * @author pengjianqiang
  * @date 2021年1月21日
@@ -37,8 +38,21 @@ public abstract class WeiboCacheHandler {
         return InstanceHolder.INSTANCE;
     }
 
+    protected void checkKey(String key) {
+        if (CheckUtils.isEmpty(key)) {
+            throw WeiboException.ofParamCanNotNull("key");
+        }
+    }
+
+    protected void checkKeyAndValue(String key, String value) {
+        if (!CheckUtils.areNotEmpty(key, value)) {
+            throw WeiboException.ofParamCanNotNull("key和value");
+        }
+    }
+
     /**
-     * 根据key缓存value，缓存不过期
+     * 根据key缓存value，缓存不过期<br>
+     * 注意:如果已有缓存值且缓存有过期时间，则更新缓存值时要继续保留过期时间，不能清空该时间
      * 
      * @param key
      *            缓存key
@@ -130,12 +144,6 @@ public abstract class WeiboCacheHandler {
                 }
             }).build();
 
-        private void checkKey(String key) {
-            if (CheckUtils.isEmpty(key)) {
-                throw WeiboException.ofParamCanNotNull("key");
-            }
-        }
-
         @Override
         public void cache(String key, String value) throws WeiboException {
             cache(key, value, 0);
@@ -144,9 +152,7 @@ public abstract class WeiboCacheHandler {
         @Override
         public void cache(String key, String value, long expiresInSeconds) throws WeiboException {
             // 由于默认使用的Caffeine缓存是在builder中设置有效期策略，需要expiresMap把有效期带进expireXXX方法中
-            if (!CheckUtils.areNotEmpty(key, value)) {
-                throw WeiboException.ofParamCanNotNull("key和value");
-            }
+            checkKeyAndValue(key, value);
             expiresMap.put(key, expiresInSeconds);
             cache.put(key, value); // put实际上Caffeine内部会判断新建还是更新key
         }

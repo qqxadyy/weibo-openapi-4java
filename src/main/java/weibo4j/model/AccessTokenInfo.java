@@ -34,13 +34,13 @@ public class AccessTokenInfo extends WeiboResponse implements Serializable {
         super(json);
     }
 
-    public AccessToken toAccessTokenObj(String accessToken) {
+    public AccessToken toAccessTokenObj(String clientId, String accessToken) {
         AccessToken tokenInfo = new AccessToken();
+        tokenInfo.setClientId(clientId);
         tokenInfo.setAccessToken(accessToken);
         tokenInfo.setExpiresIn(expireIn);
         tokenInfo.setUid(uid);
         tokenInfo.setCreateAt(DateTimeUtils.timestampToDate(Long.valueOf(createAt) * 1000));
-        tokenInfo.expiresInToDays();
         return tokenInfo;
     }
 }

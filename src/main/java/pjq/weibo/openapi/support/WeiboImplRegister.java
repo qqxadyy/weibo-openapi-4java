@@ -6,6 +6,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import weibo4j.model.WeiboException;
 
 /**
@@ -15,6 +16,7 @@ import weibo4j.model.WeiboException;
  * @date 2021年1月21日
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Slf4j
 public final class WeiboImplRegister {
     /**
      * 注册一个新的http请求实现类，替换默认的okhttp实现
@@ -25,6 +27,7 @@ public final class WeiboImplRegister {
     public static void registWeiboClient(WeiboHttpClient customInstance) throws WeiboException {
         try {
             setStaticValue(WeiboHttpClient.class.getDeclaredField("customInstance"), customInstance);
+            log.info("成功注册新的微博HTTP请求实现[" + customInstance.getClass() + "]");
         } catch (Throwable e) {
             throw new WeiboException("注册新的微博HTTP请求实现时报错：" + ExceptionUtils.getRootCauseMessage(e));
         }
@@ -39,6 +42,7 @@ public final class WeiboImplRegister {
     public static void registCacheHandler(WeiboCacheHandler customInstance) throws WeiboException {
         try {
             setStaticValue(WeiboCacheHandler.class.getDeclaredField("customInstance"), customInstance);
+            log.info("成功注册新的微缓存实现[" + customInstance.getClass() + "]");
         } catch (Throwable e) {
             throw new WeiboException("注册新的微缓存实现时报错：" + ExceptionUtils.getRootCauseMessage(e));
         }

@@ -18,17 +18,15 @@
  */
 package weibo4j.model;
 
-import java.util.Date;
+import java.util.*;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import pjq.weibo.openapi.constant.ParamConstant.Gender;
 import pjq.weibo.openapi.support.WeiboJsonName;
+import pjq.weibo.openapi.utils.CheckUtils;
+import pjq.weibo.openapi.utils.DateTimeUtils;
 import weibo4j.http.Response;
-import weibo4j.org.json.JSONArray;
-import weibo4j.org.json.JSONException;
-import weibo4j.org.json.JSONObject;
+import weibo4j.org.json.*;
 
 /**
  * 新版本改造
@@ -128,7 +126,8 @@ public class User extends WeiboResponse {
     private Status status; // 用户最新一条微博
     private @WeiboJsonName(value = "vplususer_name", isNewAndNoDesc = true) String vplususerName;
     private @WeiboJsonName(value = "status_id") String statusId;
-    private @WeiboJsonName(fromJson = false) AccessToken accessToken; // 用于记录授权token信息
+    private @WeiboJsonName(fromJson = false) Set<AccessToken> accessTokens; // 用于记录授权token信息(一个微博账号可以被多个应用授权)
+    private @WeiboJsonName(fromJson = false) AccessToken latestAccessToken; // 用于记录最新授权的token信息
 
     public User(JSONObject json) {
         super(json);
@@ -136,6 +135,38 @@ public class User extends WeiboResponse {
 
     public User(Response res) {
         super(res);
+    }
+
+    public void addAccessToken(AccessToken accessToken) {
+        if (CheckUtils.isEmpty(accessTokens)) {
+            accessTokens = new LinkedHashSet<>();
+        }
+        accessTokens.add(accessToken);
+        setLatestAccessToken(accessToken);
+    }
+
+    /**
+     * 根据授权token值获取对应的授权信息
+     * 
+     * @param accessToken
+     * @return
+     */
+    public AccessToken filterToken(String accessToken) {
+        AccessToken targetToken = null;
+        for (AccessToken tokenInfo : this.accessTokens) {
+            if (tokenInfo.getAccessToken().equals(accessToken)) {
+                targetToken = tokenInfo;
+                break;
+            }
+        }
+        if (CheckUtils.isNull(targetToken)) {
+            // 创建一个不存在的token信息
+            targetToken = new AccessToken();
+            targetToken.setAccessToken(accessToken);
+            targetToken.setCreateAt(DateTimeUtils.currentDateObj());
+            targetToken.setExpiresIn("0");
+        }
+        return targetToken;
     }
 
     public static String[] constructIds(Response res) throws WeiboException {

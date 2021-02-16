@@ -26,12 +26,12 @@ public class WeiboApiOAuth2Example {
         try {
             // 获取access_token
             User user = apiObj.apiGetUserByCode(code, state);
-            AccessToken tokenInfo = user.getAccessToken();
+            AccessToken tokenInfo = user.getLatestAccessToken();
             String accessToken = tokenInfo.getAccessToken();
             System.out.println("access_token:" + accessToken);
             System.out.println("uid:" + user.getId());
             System.out.println("createAt:" + tokenInfo.getCreateAt());
-            System.out.println("expiresInDays:" + tokenInfo.getExpiresInDays());
+            System.out.println("expiresInDays:" + tokenInfo.expiresInDays());
 
             System.out.println(apiObj.apiGetTokenInfo(accessToken));
             // System.out.println(apiObj.apiRevokeOAuth2(accessToken));
