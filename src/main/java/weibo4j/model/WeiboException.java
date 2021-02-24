@@ -75,13 +75,16 @@ public class WeiboException extends RuntimeException {
         String chineseMsg = null;
         switch (this.errorCode) {
             case 21325:
-                chineseMsg = "换取accessToken的code已失效";
+                chineseMsg = "换取授权码的code已失效";
                 break;
             case 21321:
                 chineseMsg = "用户授权已被取消，不能调用接口";
                 break;
+            case 21332:
+                chineseMsg = "授权码不存在";
+                break;
             case 10006:
-                chineseMsg = "缺少source(appkey)参数，或accessToken不合法";
+                chineseMsg = "缺少source(appkey)参数，或授权码不存在";
                 break;
             case 10020:
                 chineseMsg = "微博API接口不存在";

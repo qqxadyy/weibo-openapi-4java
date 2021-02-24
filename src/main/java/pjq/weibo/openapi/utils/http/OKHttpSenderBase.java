@@ -1,45 +1,24 @@
 package pjq.weibo.openapi.utils.http;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.URLEncoder;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.tika.Tika;
 
 import com.alibaba.fastjson.JSON;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
+import okhttp3.*;
 import okhttp3.OkHttpClient.Builder;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 import pjq.weibo.openapi.constant.HttpStatus;
 import pjq.weibo.openapi.utils.CharsetUtils;
 import pjq.weibo.openapi.utils.CheckUtils;
@@ -76,7 +55,11 @@ public abstract class OKHttpSenderBase {
                 // 不重试，避免链接本身就是不通时浪费资源
                 HTTP_INSTANCE = new Builder().connectTimeout(Duration.ofMillis(CONNECTION_TIMEOUT))
                     .writeTimeout(Duration.ofMillis(READ_TIMEOUT)).readTimeout(Duration.ofMillis(READ_TIMEOUT))
-                    .retryOnConnectionFailure(false).followRedirects(false).build();
+                    .retryOnConnectionFailure(false).followRedirects(false).addNetworkInterceptor(chain -> {
+                        // 处理可能出现的"java.io.EOFException: \n not found: size=0 content..."报错
+                        Request request = chain.request().newBuilder().addHeader("Connection", "close").build();
+                        return chain.proceed(request);
+                    }).build();
 
                 HTTPS_INSTANCE = HTTP_INSTANCE.newBuilder()
                     .sslSocketFactory(getSSLContext().getSocketFactory(), new AnyTrustManager())
@@ -779,14 +762,10 @@ public abstract class OKHttpSenderBase {
                 } else {
                     responseStr = thisSender.handleError(response, statusCode, true);
                 }
-                if (CheckUtils.isNotNull(simpleAsyncCallback)) {
-                    simpleAsyncCallback.onResponse(true, statusCode, responseStr);
-                }
+                onResponse(true, statusCode, responseStr);
             } catch (Exception e) {
                 log.info("异步请求失败=========>{}", e);
-                if (CheckUtils.isNotNull(simpleAsyncCallback)) {
-                    simpleAsyncCallback.onResponse(false, statusCode, e.getMessage());
-                }
+                onResponse(false, statusCode, e.getMessage());
             } finally {
                 if (CheckUtils.isNotNull(response)) {
                     response.close();
@@ -797,6 +776,13 @@ public abstract class OKHttpSenderBase {
         @Override
         public void onFailure(Call call, IOException e) {
             log.info("异步请求失败=========>{}", e);
+            onResponse(false, HttpStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+
+        private void onResponse(boolean isSuccess, int statusCode, String responseStr) {
+            if (CheckUtils.isNotNull(simpleAsyncCallback)) {
+                simpleAsyncCallback.onResponse(isSuccess, statusCode, responseStr);
+            }
         }
     }
 }

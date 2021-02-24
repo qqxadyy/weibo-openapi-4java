@@ -169,6 +169,10 @@ public class User extends WeiboResponse {
         return targetToken;
     }
 
+    public long toLongValue(Long value) {
+        return CheckUtils.isNull(value) ? 0 : value;
+    }
+
     public static String[] constructIds(Response res) throws WeiboException {
         try {
             JSONArray list = res.asJSONObject().getJSONArray("ids");

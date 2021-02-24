@@ -1,6 +1,8 @@
 package pjq.weibo.openapi.support;
 
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.Iterator;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -14,6 +16,7 @@ import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.utils.CheckUtils;
 import pjq.weibo.openapi.utils.DateTimeUtils;
 import pjq.weibo.openapi.utils.collection.CollectionUtils;
+import pjq.weibo.openapi.utils.collection.CollectionUtils.Break;
 import weibo4j.Weibo;
 import weibo4j.model.*;
 
@@ -201,6 +204,16 @@ public final class WeiboCacher {
                 // 如果缓存同一个微博用户，则更新其用户信息并把旧的token信息添加到新的用户对象中
                 User userInCache = getUserById(user.getId());
                 user.getAccessTokens().addAll(userInCache.getAccessTokens());
+
+                // 移除过期100填以上的token信息，避免缓存中的信息过多
+                Iterator<AccessToken> iterator = user.getAccessTokens().iterator();
+                while (iterator.hasNext()) {
+                    AccessToken tokenInfo = iterator.next();
+                    if (!tokenInfo.active() && DateTimeUtils.currentDate().isAfter(DateTimeUtils
+                        .plus(DateTimeUtils.dateToLocalDate(tokenInfo.getCreateAt()), 100, ChronoUnit.DAYS))) {
+                        iterator.remove();
+                    }
+                }
             } catch (Exception e) {
                 // 表示缓存中没有用户对象
             }
@@ -288,6 +301,7 @@ public final class WeiboCacher {
                 if (accessToken.equals(tokenInfoInUser.getAccessToken())) {
                     tokenInfoInUser.setAuthEnd(DateTimeUtils.currentDateObj());
                     tokenInfoInUser.setExpiresIn("0");
+                    throw new Break();
                 }
             });
             cacheUser(userInCache);

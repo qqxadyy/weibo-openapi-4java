@@ -2,10 +2,7 @@ package weibo4j.http;
 
 import java.net.InetAddress;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +12,7 @@ import pjq.weibo.openapi.support.WeiboHttpClient.MethodType;
 import pjq.weibo.openapi.utils.CheckUtils;
 import pjq.weibo.openapi.utils.http.HttpException;
 import pjq.weibo.openapi.utils.http.SimpleAsyncCallback;
-import weibo4j.model.Configuration;
-import weibo4j.model.Paging;
-import weibo4j.model.PostParameter;
-import weibo4j.model.WeiboException;
+import weibo4j.model.*;
 import weibo4j.org.json.JSONException;
 import weibo4j.org.json.JSONObject;
 
@@ -192,6 +186,17 @@ public class HttpClientNew implements java.io.Serializable {
     /**
      * 处理http post multipart请求
      * 
+     * @param url
+     * @param params
+     * @param token
+     * @param fileParamName
+     *            接收文件的参数名
+     * @param callback
+     *            异步请求后的业务处理器，为空时会发同步请求
+     * @param filePaths
+     *            要提交文件的文件路径
+     * @return
+     * @throws WeiboException
      */
     public Response postMultipartForm(String url, PostParameter[] params, String token, String fileParamName,
         SimpleAsyncCallback callback, String... filePaths) throws WeiboException {
@@ -204,6 +209,22 @@ public class HttpClientNew implements java.io.Serializable {
         return httpRequest(url, encodeParametersNew(params), MethodType.POST, WithTokenHeader, token, null, null);
     }
 
+    /**
+     * 
+     * @param url
+     * @param paramMap
+     * @param methodType
+     * @param WithTokenHeader
+     * @param token
+     * @param fileParamName
+     *            接收文件的参数名
+     * @param callback
+     *            异步请求后的业务处理器，为空时发同步请求
+     * @param filePaths
+     *            要提交文件的文件路径
+     * @return
+     * @throws WeiboException
+     */
     public Response httpRequest(String url, Map<String, String> paramMap, MethodType methodType,
         Boolean WithTokenHeader, String token, String fileParamName, SimpleAsyncCallback callback, String... filePaths)
         throws WeiboException {
@@ -226,7 +247,7 @@ public class HttpClientNew implements java.io.Serializable {
 
             String responseStr = null;
             if (CheckUtils.isEmpty(filePaths)) {
-                responseStr = weiboClient.httpExecute(methodType, url, paramMap, extraHeaders);
+                responseStr = weiboClient.httpExecute(methodType, url, paramMap, extraHeaders, callback);
             } else {
                 responseStr =
                     weiboClient.httpPostMultiPartForm(url, paramMap, extraHeaders, fileParamName, callback, filePaths);
@@ -250,6 +271,24 @@ public class HttpClientNew implements java.io.Serializable {
                 throw new WeiboException(e1);
             }
         }
+    }
+
+    /**
+     * 发异步请求
+     * 
+     * @param url
+     * @param paramMap
+     * @param methodType
+     * @param WithTokenHeader
+     * @param token
+     * @param callback
+     *            异步请求后的业务处理器，为空时发同步请求
+     * @return
+     * @throws WeiboException
+     */
+    public Response httpRequestAsync(String url, Map<String, String> paramMap, MethodType methodType,
+        Boolean WithTokenHeader, String token, SimpleAsyncCallback callback) throws WeiboException {
+        return httpRequest(url, paramMap, methodType, WithTokenHeader, token, null, callback);
     }
 
     public static Map<String, String> encodeParametersNew(PostParameter[] postParams) {

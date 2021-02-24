@@ -27,7 +27,7 @@ public final class WeiboImplRegister {
     public static void registWeiboClient(WeiboHttpClient customInstance) throws WeiboException {
         try {
             setStaticValue(WeiboHttpClient.class.getDeclaredField("customInstance"), customInstance);
-            log.info("成功注册新的微博HTTP请求实现[" + customInstance.getClass() + "]");
+            log.info("注册新的微博HTTP请求实现[" + customInstance.getClass() + "]");
         } catch (Throwable e) {
             throw new WeiboException("注册新的微博HTTP请求实现时报错：" + ExceptionUtils.getRootCauseMessage(e));
         }
@@ -42,7 +42,7 @@ public final class WeiboImplRegister {
     public static void registCacheHandler(WeiboCacheHandler customInstance) throws WeiboException {
         try {
             setStaticValue(WeiboCacheHandler.class.getDeclaredField("customInstance"), customInstance);
-            log.info("成功注册新的微缓存实现[" + customInstance.getClass() + "]");
+            log.info("注册新的微博缓存实现[" + customInstance.getClass() + "]");
         } catch (Throwable e) {
             throw new WeiboException("注册新的微缓存实现时报错：" + ExceptionUtils.getRootCauseMessage(e));
         }

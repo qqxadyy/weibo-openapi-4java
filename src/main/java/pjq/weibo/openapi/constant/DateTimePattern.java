@@ -5,8 +5,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
+import lombok.AllArgsConstructor;
 import pjq.weibo.openapi.support.EnhanceEnum;
 
+@AllArgsConstructor
 public enum DateTimePattern implements EnhanceEnum {
     /**
      * - 默认日期格式, <code>yyyy-MM-dd</code>
@@ -49,10 +51,6 @@ public enum DateTimePattern implements EnhanceEnum {
     PATTERN_PATH("yyyy" + File.separator + "MM" + File.separator + "dd" + File.separator);
 
     private String value;
-
-    DateTimePattern(String value) {
-        this.value = value;
-    }
 
     public DateTimeFormatter getFormatter() {
         return DateTimeFormatter.ofPattern(value);

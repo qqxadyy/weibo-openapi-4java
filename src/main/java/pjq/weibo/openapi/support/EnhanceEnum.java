@@ -77,11 +77,11 @@ public interface EnhanceEnum {
      * 
      * @return
      */
-    default int valueOfInt() {
+    default Integer valueOfInt() {
         try {
-            return Integer.parseInt(value());
+            return Integer.valueOf(value());
         } catch (Exception e) {
-            return -1;
+            return Integer.MIN_VALUE;
         }
     }
 

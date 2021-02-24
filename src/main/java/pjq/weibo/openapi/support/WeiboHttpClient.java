@@ -48,11 +48,13 @@ public abstract class WeiboHttpClient {
      *            headers集合
      * @throws HttpException
      *             http状态码不是200时要抛出这个异常
+     * @param callback
+     *            异步请求时的回调对象，为空时发同步请求
      * @throws Exception
      * @return
      */
     public abstract String httpExecute(MethodType methodType, String url, Map<String, String> paramMap,
-        Map<String, String> extraHeaders) throws HttpException, Exception;
+        Map<String, String> extraHeaders, SimpleAsyncCallback callback) throws HttpException, Exception;
 
     /**
      * 
@@ -65,7 +67,7 @@ public abstract class WeiboHttpClient {
      * @param fileParamName
      *            接收文件的参数名，不传时默认为"file"
      * @param callback
-     *            异步请求时的回调对象
+     *            异步请求时的回调对象，为空时发同步请求
      * @param filePaths
      *            要上传的文件绝对路径数组
      * @return
@@ -79,9 +81,10 @@ public abstract class WeiboHttpClient {
     private static class DefaultWeiboHttpClient extends WeiboHttpClient {
         @Override
         public String httpExecute(MethodType methodType, String url, Map<String, String> paramMap,
-            Map<String, String> extraHeaders) throws HttpException, Exception {
+            Map<String, String> extraHeaders, SimpleAsyncCallback callback) throws HttpException, Exception {
             String responseStr = null;
-            OKHttpSender sender = OKHttpSender.getInstance();
+            OKHttpSenderBase sender =
+                CheckUtils.isNull(callback) ? OKHttpSender.getInstance() : OKHttpSender4Async.getInstance(callback);
             if (MethodType.POST.equals(methodType)) {
                 responseStr = sender.httpExecute(sender.createCommonClient(url),
                     sender.createHttpPost(url, paramMap, ParamDataType.KEY_VALUE_MAP, extraHeaders));

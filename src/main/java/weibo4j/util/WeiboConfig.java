@@ -1,12 +1,13 @@
 package weibo4j.util;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Properties;
 
-import org.apache.commons.collections4.map.*;
+import org.apache.commons.collections4.map.HashedMap;
 
-import pjq.weibo.openapi.constant.*;
+import pjq.weibo.openapi.constant.WeiboConfigs;
 import pjq.weibo.openapi.utils.*;
-import weibo4j.model.*;
+import weibo4j.model.WeiboException;
 
 /**
  * 微博官网SDK自带，官网SDK代码可能还会用到<br/>
@@ -39,13 +40,16 @@ public class WeiboConfig {
             props.put(WeiboConfigs.CONFIG_REDIRECT_URI, redirectUriInfo[0]);
             props.put(WeiboConfigs.CONFIG_SAFE_DOMAINS, safeDomainsInfo[0]);
 
-            // 配置文件中更新为加密值
-            Map<String, String> propsToAddOrUpdate = new HashedMap<>();
-            propsToAddOrUpdate.put(WeiboConfigs.CONFIG_CLIENT_ID, clientIdInfo[1]);
-            propsToAddOrUpdate.put(WeiboConfigs.CONFIG_CLIENT_SECRET, clientSecretInfo[1]);
-            propsToAddOrUpdate.put(WeiboConfigs.CONFIG_REDIRECT_URI, redirectUriInfo[1]);
-            propsToAddOrUpdate.put(WeiboConfigs.CONFIG_SAFE_DOMAINS, safeDomainsInfo[1]);
-            PropertiesUtils.updateProperties(PROP_NAME, propsToAddOrUpdate, null);
+            String path = Thread.currentThread().getContextClassLoader().getResource(PROP_NAME).getPath();
+            if (!path.endsWith(".jar!/" + PROP_NAME)) {
+                // 配置文件中更新为加密值(配置文件在jar包中的情况下暂时不加密配置值)
+                Map<String, String> propsToAddOrUpdate = new HashedMap<>();
+                propsToAddOrUpdate.put(WeiboConfigs.CONFIG_CLIENT_ID, clientIdInfo[1]);
+                propsToAddOrUpdate.put(WeiboConfigs.CONFIG_CLIENT_SECRET, clientSecretInfo[1]);
+                propsToAddOrUpdate.put(WeiboConfigs.CONFIG_REDIRECT_URI, redirectUriInfo[1]);
+                propsToAddOrUpdate.put(WeiboConfigs.CONFIG_SAFE_DOMAINS, safeDomainsInfo[1]);
+                PropertiesUtils.updateProperties(PROP_NAME, propsToAddOrUpdate, null);
+            }
         } catch (Exception e) {
             throw new WeiboException(e);
         }

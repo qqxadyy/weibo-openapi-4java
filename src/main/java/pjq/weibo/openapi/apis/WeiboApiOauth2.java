@@ -2,15 +2,16 @@ package pjq.weibo.openapi.apis;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Arrays;
-import java.util.UUID;
+import java.util.*;
 
 import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 import pjq.weibo.openapi.constant.BizConstant.TrueOrFalse;
 import pjq.weibo.openapi.constant.ParamConstant.*;
 import pjq.weibo.openapi.constant.WeiboConfigs;
 import pjq.weibo.openapi.support.WeiboCacher;
+import pjq.weibo.openapi.support.WeiboHttpClient.MethodType;
 import pjq.weibo.openapi.utils.*;
 import weibo4j.Oauth;
 import weibo4j.Weibo;
@@ -28,6 +29,7 @@ import weibo4j.model.*;
 @Setter
 @Accessors(fluent = true)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Slf4j
 public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
     private static Oauth apiOld = new Oauth();
 
@@ -218,8 +220,17 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
         } catch (Exception e) {
             // 移除缓存时报错不影响后续发取消授权的请求
         }
-        client.post(WeiboConfigs.getApiUrl(WeiboConfigs.OAUTH2_REVOKE_OAUTH2),
-            new PostParameter[] {new PostParameter(MoreUseParamNames.ACCESS_TOKEN, accessToken)}, false, null);
+
+        // 异步发送取消授权的请求，不影响后续的业务流程
+        try {
+            Map<String, String> paramMap = new HashMap<>();
+            paramMap.put(MoreUseParamNames.ACCESS_TOKEN, accessToken);
+            client.httpRequestAsync(WeiboConfigs.getApiUrl(WeiboConfigs.OAUTH2_REVOKE_OAUTH2), paramMap,
+                MethodType.POST, false, null, (isSuccess, statusCode, responseStr) -> {
+                    log.info("取消微博授权结果[accessToken={},response={}]", accessToken, responseStr);
+                });
+        } catch (Exception e) {
+        }
     }
 
     /**

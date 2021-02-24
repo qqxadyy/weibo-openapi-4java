@@ -1,13 +1,10 @@
 package pjq.weibo.openapi.utils;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import pjq.weibo.openapi.utils.collection.CollectionUtils;
 import weibo4j.model.WeiboException;
@@ -105,7 +102,7 @@ public final class PropertiesUtils {
                 }
             }
         } catch (Exception e) {
-            throw new WeiboException("资源文件更新失败");
+            throw new WeiboException("资源文件更新失败," + ExceptionUtils.getRootCauseMessage(e));
         }
     }
 }

@@ -16,13 +16,14 @@ public class WeiboApiOAuth2Example {
         String authorizeURL = apiObj.scopes(OAuth2Scope.ALL, OAuth2Scope.EMAIL).apiBuildAuthorizeURL();
         BareBonesBrowserLaunch.openURL(authorizeURL);
         System.out.println("在浏览器中输入以下地址：" + authorizeURL);
-        System.out.println("授权成功后输入获取到的code");
+        System.out.println("授权成功后输入获取到的state:");
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String code = br.readLine();
-        System.out.println("code: " + code);
-        BufferedReader br2 = new BufferedReader(new InputStreamReader(System.in));
-        String state = br2.readLine();
+        String state = br.readLine();
         System.out.println("state: " + state);
+        System.out.println("授权成功后输入获取到的code:");
+        BufferedReader br2 = new BufferedReader(new InputStreamReader(System.in));
+        String code = br2.readLine();
+        System.out.println("code: " + code);
         try {
             // 获取access_token
             User user = apiObj.apiGetUserByCode(code, state);
@@ -34,7 +35,7 @@ public class WeiboApiOAuth2Example {
             System.out.println("expiresInDays:" + tokenInfo.expiresInDays());
 
             System.out.println(apiObj.apiGetTokenInfo(accessToken));
-            // System.out.println(apiObj.apiRevokeOAuth2(accessToken));
+            // apiObj.apiRevokeOAuth2(accessToken);
         } catch (WeiboException e) {
             if (401 == e.getStatusCode()) {
                 System.out.println("Unable to get the access token.");
