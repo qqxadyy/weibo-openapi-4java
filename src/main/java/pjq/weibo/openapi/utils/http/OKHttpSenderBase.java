@@ -1,24 +1,45 @@
 package pjq.weibo.openapi.utils.http;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.URLEncoder;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.net.ssl.*;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.tika.Tika;
 
 import com.alibaba.fastjson.JSON;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.*;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
 import okhttp3.OkHttpClient.Builder;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import pjq.weibo.openapi.constant.HttpStatus;
 import pjq.weibo.openapi.utils.CharsetUtils;
 import pjq.weibo.openapi.utils.CheckUtils;

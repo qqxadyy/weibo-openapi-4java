@@ -1,6 +1,8 @@
 package pjq.weibo.openapi;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import pjq.weibo.openapi.utils.CheckUtils;
 import weibo4j.model.WeiboException;

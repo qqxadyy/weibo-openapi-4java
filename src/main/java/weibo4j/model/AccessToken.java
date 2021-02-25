@@ -4,8 +4,10 @@ import java.io.Serializable;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.EqualsAndHashCode.Exclude;
+import lombok.NoArgsConstructor;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.support.WeiboJsonName;
 import pjq.weibo.openapi.utils.DateTimeUtils;

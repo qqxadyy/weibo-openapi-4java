@@ -2,20 +2,35 @@ package pjq.weibo.openapi.apis;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import pjq.weibo.openapi.constant.BizConstant.TrueOrFalse;
-import pjq.weibo.openapi.constant.ParamConstant.*;
+import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
+import pjq.weibo.openapi.constant.ParamConstant.OAuth2Display;
+import pjq.weibo.openapi.constant.ParamConstant.OAuth2Language;
+import pjq.weibo.openapi.constant.ParamConstant.OAuth2Scope;
 import pjq.weibo.openapi.constant.WeiboConfigs;
 import pjq.weibo.openapi.support.WeiboCacher;
 import pjq.weibo.openapi.support.WeiboHttpClient.MethodType;
-import pjq.weibo.openapi.utils.*;
+import pjq.weibo.openapi.utils.CharsetUtils;
+import pjq.weibo.openapi.utils.CheckUtils;
+import pjq.weibo.openapi.utils.DateTimeUtils;
 import weibo4j.Oauth;
 import weibo4j.Weibo;
-import weibo4j.model.*;
+import weibo4j.model.AccessToken;
+import weibo4j.model.AccessTokenInfo;
+import weibo4j.model.PostParameter;
+import weibo4j.model.User;
+import weibo4j.model.WeiboException;
 
 /**
  * oauth2相关接口<br>

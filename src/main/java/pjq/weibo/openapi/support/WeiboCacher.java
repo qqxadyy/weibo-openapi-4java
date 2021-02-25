@@ -18,7 +18,10 @@ import pjq.weibo.openapi.utils.DateTimeUtils;
 import pjq.weibo.openapi.utils.collection.CollectionUtils;
 import pjq.weibo.openapi.utils.collection.CollectionUtils.Break;
 import weibo4j.Weibo;
-import weibo4j.model.*;
+import weibo4j.model.AccessToken;
+import weibo4j.model.StateClientId;
+import weibo4j.model.User;
+import weibo4j.model.WeiboException;
 
 /**
  * 微博缓存业务类

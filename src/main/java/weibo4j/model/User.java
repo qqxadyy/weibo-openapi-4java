@@ -18,15 +18,21 @@
  */
 package weibo4j.model;
 
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import pjq.weibo.openapi.constant.ParamConstant.Gender;
 import pjq.weibo.openapi.support.WeiboJsonName;
 import pjq.weibo.openapi.utils.CheckUtils;
 import pjq.weibo.openapi.utils.DateTimeUtils;
 import weibo4j.http.Response;
-import weibo4j.org.json.*;
+import weibo4j.org.json.JSONArray;
+import weibo4j.org.json.JSONException;
+import weibo4j.org.json.JSONObject;
 
 /**
  * 新版本改造

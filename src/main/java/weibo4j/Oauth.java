@@ -11,7 +11,9 @@ import javax.crypto.spec.SecretKeySpec;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.WeiboConfigs;
 import weibo4j.http.BASE64Encoder;
-import weibo4j.model.*;
+import weibo4j.model.AccessToken;
+import weibo4j.model.PostParameter;
+import weibo4j.model.WeiboException;
 import weibo4j.org.json.JSONException;
 import weibo4j.org.json.JSONObject;
 

@@ -1,11 +1,15 @@
 package pjq.weibo.openapi.examplesnew;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 import pjq.weibo.openapi.apis.WeiboApiOauth2;
 import pjq.weibo.openapi.constant.ParamConstant.OAuth2Scope;
 import weibo4j.Weibo;
-import weibo4j.model.*;
+import weibo4j.model.AccessToken;
+import weibo4j.model.User;
+import weibo4j.model.WeiboException;
 import weibo4j.util.BareBonesBrowserLaunch;
 
 public class WeiboApiOAuth2Example {

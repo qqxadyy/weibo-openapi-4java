@@ -1,6 +1,8 @@
 package weibo4j.model;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import pjq.weibo.openapi.support.WeiboJsonName;
 import pjq.weibo.openapi.utils.CheckUtils;
 import weibo4j.http.Response;

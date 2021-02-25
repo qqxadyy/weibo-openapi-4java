@@ -2,14 +2,19 @@ package pjq.weibo.openapi.apis;
 
 import java.util.List;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import pjq.weibo.openapi.constant.ParamConstant.CommonLanguage;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.WeiboConfigs;
 import pjq.weibo.openapi.utils.CheckUtils;
 import weibo4j.Weibo;
-import weibo4j.model.*;
+import weibo4j.model.CodeAndNameObject;
+import weibo4j.model.PostParameter;
+import weibo4j.model.WeiboException;
 
 /**
  * Common相关接口<br>

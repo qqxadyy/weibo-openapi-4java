@@ -2,7 +2,9 @@ package pjq.weibo.openapi.support;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
  * 定义微博API返回的json字段名<br>

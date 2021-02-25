@@ -6,7 +6,10 @@ package weibo4j.model;
 
 import java.util.List;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import pjq.weibo.openapi.support.WeiboJsonName;
 import weibo4j.http.Response;
 import weibo4j.org.json.JSONObject;

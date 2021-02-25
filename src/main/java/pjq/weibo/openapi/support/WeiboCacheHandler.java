@@ -7,7 +7,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import com.github.benmanes.caffeine.cache.*;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Expiry;
 
 import pjq.weibo.openapi.utils.CheckUtils;
 import weibo4j.model.WeiboException;

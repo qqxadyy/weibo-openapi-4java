@@ -2,7 +2,9 @@ package weibo4j.model;
 
 import java.io.Serializable;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import pjq.weibo.openapi.support.WeiboJsonName;
 import pjq.weibo.openapi.utils.DateTimeUtils;
 import weibo4j.http.Response;

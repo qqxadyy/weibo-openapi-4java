@@ -1,6 +1,8 @@
 package pjq.weibo.openapi.constant;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import pjq.weibo.openapi.support.EnhanceEnum;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
