@@ -1,5 +1,6 @@
 package weibo4j.util;
 
+import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.Properties;
 
@@ -26,7 +27,8 @@ public class WeiboConfig {
 
     static {
         try {
-            props.load(Thread.currentThread().getContextClassLoader().getResourceAsStream(PROP_NAME));
+            props.load(new InputStreamReader(
+                Thread.currentThread().getContextClassLoader().getResourceAsStream(PROP_NAME), CharsetUtils.utf8()));
 
             // 加密敏感配置
             String[] clientIdInfo = encryptOrDecrypt(getValue(WeiboConfigs.CONFIG_CLIENT_ID));
