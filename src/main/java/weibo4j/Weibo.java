@@ -190,29 +190,6 @@ public abstract class Weibo<T> implements java.io.Serializable {
     }
 
     /**
-     * 检查推送的微博/评论文本内容是否超过字数限制
-     * 
-     * @param text
-     * @return
-     * @throws WeiboException
-     */
-    protected String checkPostTextAndReturn(String text) throws WeiboException {
-        if (CheckUtils.isEmpty(text)) {
-            return text;
-        } else if (text.length() > 140) {
-            throw new WeiboException("文本内容不能超过140个汉字");
-        }
-
-        try {
-            // return URLEncoder.encode(text, CharsetUtils.UTF_8); // 官网上说需要做URLEncode，但实际做了返回会乱码，所以去掉(应该是新版有改动)
-            return text;
-        } catch (Exception e) {
-            throw new WeiboException(e);
-        }
-
-    }
-
-    /**
      * 构造具体业务接口类(不需要token，从配置文件读取微博配置)<br>
      * 应该只有OAuth接口类会用到
      * 

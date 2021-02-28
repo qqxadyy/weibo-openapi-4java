@@ -2,7 +2,10 @@ package weibo4j.http;
 
 import java.net.InetAddress;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +15,10 @@ import pjq.weibo.openapi.support.WeiboHttpClient.MethodType;
 import pjq.weibo.openapi.utils.CheckUtils;
 import pjq.weibo.openapi.utils.http.HttpException;
 import pjq.weibo.openapi.utils.http.SimpleAsyncCallback;
-import weibo4j.model.*;
+import weibo4j.model.Configuration;
+import weibo4j.model.Paging;
+import weibo4j.model.PostParameter;
+import weibo4j.model.WeiboException;
 import weibo4j.org.json.JSONException;
 import weibo4j.org.json.JSONObject;
 
@@ -183,6 +189,21 @@ public class HttpClientNew implements java.io.Serializable {
         return post(url, params, true, token);
     }
 
+    public Response post(String url, PostParameter[] params, String token, SimpleAsyncCallback callback)
+        throws WeiboException {
+        return post(url, params, true, token, callback);
+    }
+
+    public Response post(String url, PostParameter[] params, Boolean WithTokenHeader, String token)
+        throws WeiboException {
+        return post(url, params, WithTokenHeader, token, null);
+    }
+
+    public Response post(String url, PostParameter[] params, Boolean WithTokenHeader, String token,
+        SimpleAsyncCallback callback) throws WeiboException {
+        return httpRequest(url, encodeParametersNew(params), MethodType.POST, WithTokenHeader, token, null, callback);
+    }
+
     /**
      * 处理http post multipart请求
      * 
@@ -202,11 +223,6 @@ public class HttpClientNew implements java.io.Serializable {
         SimpleAsyncCallback callback, String... filePaths) throws WeiboException {
         return httpRequest(url, encodeParametersNew(params), MethodType.POST, true, token, fileParamName, callback,
             filePaths);
-    }
-
-    public Response post(String url, PostParameter[] params, Boolean WithTokenHeader, String token)
-        throws WeiboException {
-        return httpRequest(url, encodeParametersNew(params), MethodType.POST, WithTokenHeader, token, null, null);
     }
 
     /**

@@ -14,6 +14,7 @@ import pjq.weibo.openapi.constant.ParamConstant.SourceType;
 import pjq.weibo.openapi.constant.ParamConstant.TrimUser;
 import pjq.weibo.openapi.constant.WeiboConfigs;
 import pjq.weibo.openapi.utils.CheckUtils;
+import pjq.weibo.openapi.utils.WeiboContentChecker;
 import weibo4j.Comments;
 import weibo4j.WeiboParamPager;
 import weibo4j.model.Comment;
@@ -237,7 +238,7 @@ public class WeiboApiComments extends WeiboParamPager<WeiboApiComments> {
         if (CheckUtils.isEmpty(commentText)) {
             throw WeiboException.ofParamCanNotNull("comment");
         }
-        return checkPostTextAndReturn(commentText);
+        return WeiboContentChecker.checkPostTextAndReturn(commentText);
     }
 
     private CommentPager commonCommentPager(List<PostParameter> paramList, String apiName) throws WeiboException {

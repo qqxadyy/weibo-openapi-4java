@@ -9,7 +9,6 @@ import org.apache.commons.collections4.map.HashedMap;
 import pjq.weibo.openapi.constant.WeiboConfigs;
 import pjq.weibo.openapi.utils.CharsetUtils;
 import pjq.weibo.openapi.utils.CheckUtils;
-import pjq.weibo.openapi.utils.PropertiesUtils;
 import pjq.weibo.openapi.utils.ThreeDesUtils;
 import weibo4j.model.WeiboException;
 
@@ -46,14 +45,14 @@ public class WeiboConfig {
             props.put(WeiboConfigs.CONFIG_SAFE_DOMAINS, safeDomainsInfo[0]);
 
             String path = Thread.currentThread().getContextClassLoader().getResource(PROP_NAME).getPath();
-            if (!path.endsWith(".jar!/" + PROP_NAME)) {
+            if (path.indexOf(".jar") < 0) {
                 // 配置文件中更新为加密值(配置文件在jar包中的情况下暂时不加密配置值)
                 Map<String, String> propsToAddOrUpdate = new HashedMap<>();
                 propsToAddOrUpdate.put(WeiboConfigs.CONFIG_CLIENT_ID, clientIdInfo[1]);
                 propsToAddOrUpdate.put(WeiboConfigs.CONFIG_CLIENT_SECRET, clientSecretInfo[1]);
                 propsToAddOrUpdate.put(WeiboConfigs.CONFIG_REDIRECT_URI, redirectUriInfo[1]);
                 propsToAddOrUpdate.put(WeiboConfigs.CONFIG_SAFE_DOMAINS, safeDomainsInfo[1]);
-                PropertiesUtils.updateProperties(PROP_NAME, propsToAddOrUpdate, null);
+                // PropertiesUtils.updateProperties(PROP_NAME, propsToAddOrUpdate, null);
             }
         } catch (Exception e) {
             throw new WeiboException(e);

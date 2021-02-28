@@ -1,12 +1,9 @@
 package pjq.weibo.openapi.utils.http;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.InputStream;
 import java.net.URLEncoder;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -669,12 +666,12 @@ public abstract class OKHttpSenderBase {
             log.info("statusCode=========>{}", statusCode);
             log.info("cost===============>{}ms", System.currentTimeMillis() - beginTime);
             if (statusCode == HttpStatus.SC_OK) {
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(response.body().byteStream()));
-                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath)))) {
-                    String tempLine = br.readLine();
-                    while (CheckUtils.isNotEmpty(tempLine)) {
-                        bw.write(tempLine);
-                        tempLine = br.readLine();
+                try (InputStream is = response.body().byteStream();
+                    FileOutputStream fos = new FileOutputStream(filePath)) {
+                    byte[] buf = new byte[1024];
+                    int len = 0;
+                    while ((len = is.read(buf)) != -1) {
+                        fos.write(buf, 0, len);
                     }
                     log.info("=========>写入文件{}", filePath);
                 }

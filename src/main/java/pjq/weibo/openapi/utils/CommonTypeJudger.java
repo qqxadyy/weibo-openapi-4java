@@ -21,8 +21,7 @@ import java.util.Set;
  * @author pengjianqiang
  */
 public final class CommonTypeJudger {
-    private CommonTypeJudger() {
-    }
+    private CommonTypeJudger() {}
 
     public static boolean isVoidType(Class<?> classType) {
         return void.class.equals(classType);
@@ -54,7 +53,7 @@ public final class CommonTypeJudger {
 
     public static boolean isNumberType(Class<?> classType) {
         return isByteType(classType) || isShortType(classType) || isIntType(classType) || isLongType(classType)
-                || isFloatType(classType) || isDoubleType(classType);
+            || isFloatType(classType) || isDoubleType(classType);
     }
 
     public static boolean isBigDecimalType(Class<?> classType) {
@@ -91,8 +90,8 @@ public final class CommonTypeJudger {
 
     public static boolean isBaseType(Class<?> classType) {
         return isNumberType(classType) || isBigDecimalType(classType) || isBigIntegerType(classType)
-                || isStringType(classType) || isCharType(classType) || isBooleanType(classType) || isDateType(classType)
-                || isObjectType(classType);
+            || isStringType(classType) || isCharType(classType) || isBooleanType(classType) || isDateType(classType)
+            || isObjectType(classType);
     }
 
     public static boolean isCollectionType(Class<?> classType) throws Exception {

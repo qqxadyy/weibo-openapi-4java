@@ -74,15 +74,6 @@ public class WeiboException extends RuntimeException {
         String oriMsg = super.getMessage();
         String chineseMsg = null;
         switch (this.errorCode) {
-            case 21325:
-                chineseMsg = "换取授权码的code已失效";
-                break;
-            case 21321:
-                chineseMsg = "用户授权已被取消，不能调用接口";
-                break;
-            case 21332:
-                chineseMsg = "授权码不存在";
-                break;
             case 10006:
                 chineseMsg = "缺少source(appkey)参数，或授权码不存在";
                 break;
@@ -92,10 +83,29 @@ public class WeiboException extends RuntimeException {
             case 10014:
                 chineseMsg = "应用的接口访问权限受限";
                 break;
+            case 10017:
+                if (CheckUtils.isNotEmpty(oriMsg) && oriMsg.toLowerCase().contains("text not find domain")) {
+                    chineseMsg = "微博正文缺少带安全域名下的链接URL";
+                } else {
+                    chineseMsg = "参数值非法";
+                }
+                break;
             case 10022:
             case 10023:
             case 10024:
                 chineseMsg = "接口请求频次超过上限";
+                break;
+            case 21325:
+                chineseMsg = "换取授权码的code已失效";
+                break;
+            case 21321:
+                chineseMsg = "用户授权已被取消，不能调用接口";
+                break;
+            case 21332:
+                chineseMsg = "授权码不存在";
+                break;
+            case 20012:
+                chineseMsg = "文本内容长度不能超过130(包括空格、换行等，纯英文不超过260)";
                 break;
             default:
                 break;

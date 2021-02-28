@@ -1,11 +1,8 @@
 package pjq.weibo.openapi.apis;
 
-import java.io.File;
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -23,7 +20,8 @@ import pjq.weibo.openapi.constant.ParamConstant.StatusesFeature;
 import pjq.weibo.openapi.constant.ParamConstant.TrimUser;
 import pjq.weibo.openapi.constant.WeiboConfigs;
 import pjq.weibo.openapi.utils.CheckUtils;
-import pjq.weibo.openapi.utils.ImageTypeJudger;
+import pjq.weibo.openapi.utils.WeiboContentChecker;
+import pjq.weibo.openapi.utils.WeiboContentChecker.PicCheckResult;
 import pjq.weibo.openapi.utils.http.SimpleAsyncCallback;
 import weibo4j.Timeline;
 import weibo4j.WeiboParamPager;
@@ -456,7 +454,7 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
         List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter(MoreUseParamNames.ID, statusId));
         if (CheckUtils.isNotEmpty(repostText)) {
-            paramList.add(new PostParameter("status", checkPostTextAndReturn(repostText[0])));
+            paramList.add(new PostParameter("status", WeiboContentChecker.checkPostTextAndReturn(repostText[0])));
         }
         if (CheckUtils.isNotEmpty(rip)) {
             paramList.add(new PostParameter(MoreUseParamNames.REAL_IP, rip));
@@ -552,9 +550,10 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
         if (CheckUtils.isEmpty(statusText)) {
             throw WeiboException.ofParamCanNotNull("status");
         }
-        statusText = checkPostTextAndReturn(statusText);
-        checkIfHasSafeLink(statusText);
-        boolean needUploadPic = checkIfPicFileValid(picPath);
+        statusText = WeiboContentChecker.checkPostTextAndReturn(statusText);
+        WeiboContentChecker.checkIfHasSafeLink(statusText, safeDomains());
+        PicCheckResult picCheckResult = WeiboContentChecker.checkIfPicValid(picPath);
+        boolean needUploadPic = picCheckResult.isValid();
 
         List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter("status", statusText));
@@ -564,56 +563,26 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
         Response response = null;
         if (!needUploadPic) {
             response = client.post(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_SHARE), paramListToArray(paramList),
-                accessToken);
+                accessToken, callback);
         } else {
-            // pic为上传图片的参数名
+            SimpleAsyncCallback actualCallback = null;
+            if (CheckUtils.isNotNull(callback)) {
+                actualCallback = (isSuccess, statusCode, responseStr) -> {
+                    // 上传完先删除临时文件
+                    picCheckResult.deleteTempFile();
+                    callback.onResponse(isSuccess, statusCode, responseStr);
+                };
+            }
+
+            // 开始调发微博的请求(pic为上传图片的参数名)
             response = client.postMultipartForm(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_SHARE),
-                paramListToArray(paramList), accessToken, "pic", callback, picPath);
-        }
-        return response;
-    }
+                paramListToArray(paramList), accessToken, "pic", actualCallback, picCheckResult.getFilePath());
 
-    /**
-     * 检查文本内容是否含有安全域名的链接
-     * 
-     * @param statusText
-     * @throws WeiboException
-     */
-    private void checkIfHasSafeLink(String statusText) throws WeiboException {
-        List<String> safeDomains = safeDomains();
-        if (CheckUtils.isEmpty(safeDomains)) {
-            throw new WeiboException("应用的安全域名配置不能为空");
-        }
-
-        for (String safeDomain : safeDomains) {
-            if (Pattern.matches("^[\\s\\S]*http(s)?://" + safeDomain + "[\\s\\S]*$", statusText)) {
-                return;
+            if (CheckUtils.isNull(callback)) {
+                // 同步上传时在这里删除临时文件
+                picCheckResult.deleteTempFile();
             }
         }
-        throw new WeiboException("文本内容必须包含以下安全域名的链接地址" + safeDomains + ",且链接地址的域名后面已做正确的URLEncode");
-    }
-
-    /**
-     * 检查图片列表是否均可上传，可上传时返回true
-     * 
-     * @param picPath
-     * @return
-     */
-    private boolean checkIfPicFileValid(String picPath) {
-        if (CheckUtils.isEmpty(picPath)) {
-            return false;
-        }
-        File file = new File(picPath);
-        String imageType = ImageTypeJudger.getImageType(file);
-        if (ImageTypeJudger.NOT_IMAGE.equals(imageType)) {
-            throw new WeiboException("文件不是图片类型[" + picPath + "]");
-        } else if ("bmp".equals(imageType)) {
-            throw new WeiboException("暂不支持bmp类型[" + picPath + "]");
-        }
-        BigDecimal fileSizeMB = new BigDecimal(file.length() + "").divide(new BigDecimal(String.valueOf(1024 * 1024)));
-        if (fileSizeMB.compareTo(new BigDecimal("5")) >= 0) {
-            throw new WeiboException("大小超过5MB，不能上传[" + picPath + "]");
-        }
-        return true;
+        return response;
     }
 }
