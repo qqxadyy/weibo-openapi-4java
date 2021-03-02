@@ -11,7 +11,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import pjq.weibo.openapi.utils.http.OKHttpSender;
+import pjq.weibo.openapi.support.WeiboHttpClient;
 import weibo4j.model.WeiboException;
 
 /**
@@ -123,7 +123,7 @@ public final class WeiboContentChecker {
                 isTempFile = true;
                 filePath = System.getProperty("java.io.tmpdir") + UUID.randomUUID().toString().replaceAll("-", "")
                     + DigestUtils.md5Hex(picPath);
-                OKHttpSender.getInstance().httpGetOriginalUrlFile(picPath, filePath);
+                WeiboHttpClient.getInstance().httpGetOriginalUrlFile(picPath, filePath);
             } catch (Exception e) {
                 throw new WeiboException("获取图片资源失败[" + picPath + "]");
             }

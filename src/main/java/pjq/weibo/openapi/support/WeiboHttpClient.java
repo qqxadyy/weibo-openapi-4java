@@ -82,6 +82,18 @@ public abstract class WeiboHttpClient {
         Map<String, String> extraHeaders, String fileParamName, SimpleAsyncCallback callback, String... filePaths)
         throws HttpException, Exception;
 
+    /**
+     * 发送请求获取文件流,并写入到filePath的文件中(用于必须严格按照第三方提供的url进行请求的情况)
+     * 
+     * @param url
+     *            文件的请求地址，实现该方法时不能变更该地址的内容
+     * @param filePath
+     *            保存文件的路径
+     * @throws HttpException
+     * @throws Exception
+     */
+    public abstract void httpGetOriginalUrlFile(String url, String filePath) throws HttpException, Exception;
+
     private static class DefaultWeiboHttpClient extends WeiboHttpClient {
         @Override
         public String httpExecute(MethodType methodType, String url, Map<String, String> paramMap,
@@ -112,6 +124,11 @@ public abstract class WeiboHttpClient {
                 sender.httpExecute(sender.createCommonClient(url), sender.createHttpPostMultiPartForm(url, paramMap,
                     ParamDataType.KEY_VALUE_MAP, extraHeaders, fileParamName, filePaths));
             return responseStr;
+        }
+
+        @Override
+        public void httpGetOriginalUrlFile(String url, String filePath) throws HttpException, Exception {
+            OKHttpSender.getInstance().httpGetOriginalUrlFile(url, filePath);
         }
     }
 }
