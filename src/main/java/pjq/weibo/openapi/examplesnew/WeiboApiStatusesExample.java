@@ -31,8 +31,8 @@ public class WeiboApiStatusesExample {
             // System.out.println(apiObj.apiQueryMidById(QueryIdType.STATUS, ""));
             // System.out.println(apiObj.isBase62(StatusType.VALID).apiQueryIdByMid(QueryIdType.STATUS, ""));
             // System.out.println(apiObj.apiShareStatus("http://pjq.mynatapp.cc/ ss", ""));
-            System.out.println(
-                apiObj.apiShareStatusAsync("http://pjq.mynatapp.cc/ ss", "", (isSuccess, statusCode, responseStr) -> {
+            System.out.println(apiObj.apiShareStatusAsync("http://pjq.mynatapp.cc/ ,sss#", "",
+                (isSuccess, statusCode, responseStr) -> {
                     Response res = new Response();
                     res.setResponseAsString(responseStr);
                     System.out.println(new Status(res));

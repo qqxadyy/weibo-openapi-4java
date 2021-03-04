@@ -24,8 +24,10 @@ import weibo4j.model.WeiboException;
 public final class WeiboContentChecker {
     private WeiboContentChecker() {}
 
+    private static final String ANY_CHAR = "[\\s\\S]*";
+
     /**
-     * 检查推送的微博/评论文本内容是否超过字数限制
+     * 检查推送的微博/评论文本内容是否超过字数限制，及是否包含话题词
      * 
      * @param text
      * @return
@@ -46,6 +48,10 @@ public final class WeiboContentChecker {
         } else if (!isContainChinese && textLength > (130 * 2)) {
             // 无中文的字符串实际长度限为140*2，这里限制位130*2
             throw new WeiboException(textErrMsg);
+        }
+
+        if (Pattern.matches("^" + ANY_CHAR + "#" + ANY_CHAR + "#" + ANY_CHAR + "$", text)) {
+            throw new WeiboException("文本内容不能包含 #话题词#");
         }
 
         try {
@@ -96,7 +102,7 @@ public final class WeiboContentChecker {
         }
 
         for (String safeDomain : safeDomains) {
-            if (Pattern.matches("^[\\s\\S]*http(s)?://" + safeDomain + "[\\s\\S]*$", statusText)) {
+            if (Pattern.matches("^" + ANY_CHAR + "http(s)?://" + safeDomain + ANY_CHAR + "$", statusText)) {
                 return;
             }
         }

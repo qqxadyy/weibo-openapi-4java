@@ -41,6 +41,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import pjq.weibo.openapi.constant.DateTimePattern;
@@ -82,7 +84,7 @@ public abstract class WeiboResponse implements java.io.Serializable {
     /**
      * 生成对象的原始json对象，用于定义的对象不能完全正确解析json时能从源json中做解析
      */
-    private JSONObject srcJson;
+    private @JSONField(serialize = false) JSONObject srcJson;
 
     public WeiboResponse(Response res) {
         String limit = res.getResponseHeader("X-RateLimit-Limit");

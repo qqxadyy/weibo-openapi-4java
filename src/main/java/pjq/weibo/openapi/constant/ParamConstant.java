@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import pjq.weibo.openapi.support.EnhanceEnum;
+import pjq.weibo.openapi.support.EnhanceEnum.EnhanceEnumFieldDefine;
 
 /**
  * 接口相关参数的枚举值常量类
@@ -307,24 +308,28 @@ public final class ParamConstant {
      * emotions接口-type参数枚举(表情类别)
      */
     @AllArgsConstructor
+    @EnhanceEnumFieldDefine
     public static enum EmotionsType implements EnhanceEnum {
         /**
          * 普通表情
          */
-        FACE("face"),
+        FACE("face", "普通表情"),
 
         /**
          * 魔法表情
          */
-        MAGIC("ani"),
+        MAGIC("ani", "魔法表情"),
 
         /**
          * 动漫表情
          */
-        CARTOON("cartoon");
+        CARTOON("cartoon", "动漫表情");
 
         @SuppressWarnings("unused")
         private String value;
+
+        @SuppressWarnings("unused")
+        private String desc;
     }
 
     /**

@@ -71,6 +71,24 @@ public abstract class WeiboCacheHandler {
      *            缓存key
      * @param value
      *            缓存值
+     * @param duration
+     *            key的有效时间，为空时表示不过期
+     * @throws WeiboException
+     */
+    public void cache(String key, String value, Duration duration) throws WeiboException {
+        if (CheckUtils.isNull(duration)) {
+            duration = Duration.ofSeconds(0L);
+        }
+        cache(key, value, duration.getSeconds());
+    }
+
+    /**
+     * 根据key缓存value
+     * 
+     * @param key
+     *            缓存key
+     * @param value
+     *            缓存值
      * @param expiresInSeconds
      *            key的有效时间，单位秒，为0时表示不过期
      * @throws WeiboException

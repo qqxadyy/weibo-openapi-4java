@@ -1,5 +1,8 @@
 package pjq.weibo.openapi;
 
+import java.util.Arrays;
+import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -44,7 +47,7 @@ public class WeiboConfiguration {
      * @param clientSecret
      * @param redirectUri
      * @param safeDomains
-     *            应用配置的安全域名(如果应用没有发微博的需求，这不用传这个参数)
+     *            应用配置的安全域名(如果应用没有发微博的需求，就不用传这个参数)
      * @return
      */
     public static WeiboConfiguration of(String clientId, String clientSecret, String redirectUri, String safeDomains) {
@@ -54,5 +57,15 @@ public class WeiboConfiguration {
 
         return new WeiboConfiguration().clientId(clientId).clientSecret(clientSecret).redirectUri(redirectUri)
             .safeDomains(safeDomains);
+    }
+
+    /**
+     * 获取安全域名的list对象
+     * 
+     * @return
+     * @creator pengjianqiang@2021年3月4日
+     */
+    public List<String> safeDomainList() {
+        return CheckUtils.isNotEmpty(safeDomains) ? Arrays.asList(safeDomains.split(",")) : null;
     }
 }

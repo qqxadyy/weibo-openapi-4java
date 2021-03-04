@@ -1,6 +1,8 @@
 package pjq.weibo.openapi.apis;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,6 +13,7 @@ import pjq.weibo.openapi.constant.ParamConstant.EmotionsLanguage;
 import pjq.weibo.openapi.constant.ParamConstant.EmotionsType;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.WeiboConfigs;
+import pjq.weibo.openapi.support.WeiboCacher;
 import pjq.weibo.openapi.utils.CheckUtils;
 import weibo4j.Weibo;
 import weibo4j.model.Emotion;
@@ -54,6 +57,16 @@ public class WeiboApiEmotions extends Weibo<WeiboApiEmotions> {
      */
     public List<Emotion> apiGetEmotions() throws WeiboException {
         List<PostParameter> paramList = newParamList();
+        if (CheckUtils.isNull(type)) {
+            type(EmotionsType.FACE); // 默认为face类型
+        }
+
+        // 先从缓存获取
+        List<Emotion> emotions = WeiboCacher.getEmotions(type);
+        if (CheckUtils.isNotEmpty(emotions)) {
+            return emotions;
+        }
+
         if (CheckUtils.isNotNull(type)) {
             paramList.add(new PostParameter(MoreUseParamNames.TYPE, type.value()));
         }
@@ -61,8 +74,33 @@ public class WeiboApiEmotions extends Weibo<WeiboApiEmotions> {
             paramList.add(new PostParameter(MoreUseParamNames.LANGUAGE, language.value()));
         }
         paramList.add(new PostParameter(MoreUseParamNames.CLIENT_ID_USE_APPKEY, clientId()));
-        return WeiboResponse.buildList(
+        emotions = WeiboResponse.buildList(
             client.get(WeiboConfigs.getApiUrl(WeiboConfigs.EMOTIONS), paramListToArray(paramList), accessToken),
             Emotion.class);
+        WeiboCacher.cacheEmotions(type, emotions);
+        return emotions;
+    }
+
+    /**
+     * 获取微博所有类型的表情
+     * 
+     * @return
+     * @creator pengjianqiang@2021年3月4日
+     */
+    public Map<String, List<Emotion>> apiGetAllTypeEmotions() {
+        Map<String, List<Emotion>> allList = new HashMap<>();
+        try {
+            allList.put(EmotionsType.FACE.desc(), type(EmotionsType.FACE).apiGetEmotions());
+        } catch (Exception e) {
+        }
+        try {
+            allList.put(EmotionsType.MAGIC.desc(), type(EmotionsType.MAGIC).apiGetEmotions());
+        } catch (Exception e) {
+        }
+        try {
+            allList.put(EmotionsType.CARTOON.desc(), type(EmotionsType.CARTOON).apiGetEmotions());
+        } catch (Exception e) {
+        }
+        return allList;
     }
 }

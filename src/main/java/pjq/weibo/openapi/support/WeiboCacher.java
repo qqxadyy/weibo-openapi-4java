@@ -2,7 +2,9 @@ package pjq.weibo.openapi.support;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -12,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import pjq.weibo.openapi.WeiboConfiguration;
 import pjq.weibo.openapi.apis.WeiboApiUsers;
+import pjq.weibo.openapi.constant.ParamConstant.EmotionsType;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.utils.CheckUtils;
 import pjq.weibo.openapi.utils.DateTimeUtils;
@@ -19,6 +22,7 @@ import pjq.weibo.openapi.utils.collection.CollectionUtils;
 import pjq.weibo.openapi.utils.collection.CollectionUtils.Break;
 import weibo4j.Weibo;
 import weibo4j.model.AccessToken;
+import weibo4j.model.Emotion;
 import weibo4j.model.StateClientId;
 import weibo4j.model.User;
 import weibo4j.model.WeiboException;
@@ -37,6 +41,7 @@ public final class WeiboCacher {
     public static final String KEY_PREFIX_ACCESS_TOKEN = COMMON_PREFIX + "accessTokens:";
     public static final String KEY_PREFIX_STATE = COMMON_PREFIX + "states:";
     public static final String KEY_PREFIX_USER = COMMON_PREFIX + "users:";
+    public static final String KEY_PREFIX_EMOTIONS = COMMON_PREFIX + "emotions:";
     public static final Duration EXPIRES_IN_STATE = Duration.ofSeconds(120L); // state缓存有效期为2分钟
 
     private static String getKey(String prefix, String suffix) {
@@ -60,8 +65,7 @@ public final class WeiboCacher {
                 throw WeiboException.ofParamCanNotNull(MoreUseParamNames.CLIENT_ID);
             }
             StateClientId stateInfo = new StateClientId(state, clientId);
-            cacheHandler.cache(getKey(KEY_PREFIX_STATE, state), JSON.toJSONString(stateInfo),
-                EXPIRES_IN_STATE.getSeconds());
+            cacheHandler.cache(getKey(KEY_PREFIX_STATE, state), JSON.toJSONString(stateInfo), EXPIRES_IN_STATE);
         } catch (Exception e) {
             if (e instanceof WeiboException) {
                 throw (WeiboException)e;
@@ -308,6 +312,54 @@ public final class WeiboCacher {
                 }
             });
             cacheUser(userInCache);
+        } catch (Exception e) {
+            if (e instanceof WeiboException) {
+                throw (WeiboException)e;
+            } else {
+                throw new WeiboException(e);
+            }
+        }
+    }
+
+    /**
+     * 缓存表情信息
+     * 
+     * @param type
+     *            表情类型
+     * @param emotions
+     *            表情列表
+     * @creator pengjianqiang@2021年3月4日
+     */
+    public static void cacheEmotions(EmotionsType type, List<Emotion> emotions) {
+        try {
+            if (CheckUtils.isNull(type) || CheckUtils.isEmpty(emotions)) {
+                return;
+            }
+            cacheHandler.cache(getKey(KEY_PREFIX_EMOTIONS + type.value(), type.value()), JSON.toJSONString(emotions),
+                Duration.ofDays(100));
+        } catch (Exception e) {
+            if (e instanceof WeiboException) {
+                throw (WeiboException)e;
+            } else {
+                throw new WeiboException(e);
+            }
+        }
+    }
+
+    /**
+     * 从缓存中获取对应类型的表情信息
+     * 
+     * @param type
+     * @return
+     * @creator pengjianqiang@2021年3月4日
+     */
+    public static List<Emotion> getEmotions(EmotionsType type) {
+        try {
+            if (CheckUtils.isNull(type)) {
+                return new ArrayList<>();
+            }
+            return JSON.parseArray(cacheHandler.get(getKey(KEY_PREFIX_EMOTIONS + type.value(), type.value())),
+                Emotion.class);
         } catch (Exception e) {
             if (e instanceof WeiboException) {
                 throw (WeiboException)e;
