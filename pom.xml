@@ -7,12 +7,12 @@
 	<version>1.0.1-SNAPSHOT</version>
 	<name>微博开放平台API-JAVA SDK</name>
 	<description>基于微博开放平台官网的weibo4j-oauth2-beta3.1.1包及新版接口做二次开发</description>
+	<inceptionYear>2021</inceptionYear>
 	<url>https://github.com/qqxadyy/weibo-openapi-4java</url>
 	<licenses>
 		<license>
-			<name>GNU Lesser General Public License Version 3</name>
-			<url>http://www.gnu.org/licenses/lgpl.txt</url>
-			<distribution>repo</distribution>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
 		</license>
 	</licenses>
 	<developers>
@@ -208,6 +208,7 @@
 					<additionalparam>-Xdoclint:none</additionalparam>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<!-- 自动进行gpg验证 -->
 				<groupId>org.apache.maven.plugins</groupId>
@@ -223,6 +224,7 @@
 					</execution>
 				</executions>
 			</plugin>
+
 			<plugin>
 				<!-- 自动提交到sonatype审批发布 -->
 				<groupId>org.sonatype.plugins</groupId>
@@ -245,6 +247,69 @@
 					<releaseProfiles>release</releaseProfiles>
 					<goals>deploy</goals>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>4.0.rc2</version>
+				<configuration>
+					<licenseSets>
+						<licenseSet>
+							<multi>
+								<header>licenseHeaders/MY_LICENSE_HEADER</header>
+								<separator>======================================================================</separator>
+								<header>com/mycila/maven/plugin/license/templates/MIT.txt</header>
+							</multi>
+							<excludes>
+								<exclude>**/pom.xml</exclude>
+								<exclude>**/README</exclude>
+								<exclude>README.md</exclude>
+								<exclude>LICENSE</exclude>
+								<exclude>licenseHeaders/**</exclude>
+								<exclude>src/test/java/**</exclude>
+								<exclude>src/test/resources/**</exclude>
+								<exclude>src/main/resources/**</exclude>
+								<exclude>src/main/java/weibo4j/**</exclude>
+								<exclude>configtemplate/**</exclude>
+								<exclude>examplesold/**</exclude>
+							</excludes>
+						</licenseSet>
+						<licenseSet>
+							<multi>
+								<header>licenseHeaders/MY_LICENSE_HEADER</header>
+								<separator>======================================================================</separator>
+								<header>licenseHeaders/MY_LICENSE_HEADER_OTHER</header>
+							</multi>
+							<excludes>
+								<exclude>**/pom.xml</exclude>
+								<exclude>**/README</exclude>
+								<exclude>README.md</exclude>
+								<exclude>LICENSE</exclude>
+								<exclude>licenseHeaders/**</exclude>
+								<exclude>src/test/java/**</exclude>
+								<exclude>src/test/resources/**</exclude>
+								<exclude>src/main/resources/**</exclude>
+								<exclude>src/main/java/pjq/**</exclude>
+								<exclude>configtemplate/**</exclude>
+								<exclude>examplesold/**</exclude>
+							</excludes>
+						</licenseSet>
+					</licenseSets>
+					<properties>
+						<owner>pengjianqiang</owner>
+					</properties>
+					<strictCheck>true</strictCheck> <!--严格检查 -->
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal> <!-- 检查某些源文件中是否缺少头信息 -->
+							<goal>remove</goal> <!-- 删除现有的头信息 -->
+							<goal>format</goal> <!-- 如果缺少则头信息 -->
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

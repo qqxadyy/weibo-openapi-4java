@@ -1,0 +1,6 @@
+Copyright © ${project.inceptionYear} ${owner}
+All rights reserved.
+项目名称：${project.name}
+项目描述：${project.description}
+项目地址：${project.url}
+许可证信息：见下文
