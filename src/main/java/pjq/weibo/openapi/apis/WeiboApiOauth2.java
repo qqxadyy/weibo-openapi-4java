@@ -85,6 +85,11 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
     private OAuth2Scope[] scopes;
 
     /**
+     * 是否使用state参数，true：是，false：否。默认true，并生成随机state值
+     */
+    private TrueOrFalse useState;
+
+    /**
      * 授权页面的终端类型
      */
     private OAuth2Display display;
@@ -126,9 +131,6 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
      * @throws WeiboException
      */
     public String apiBuildAuthorizeURL() throws WeiboException {
-        String state = UUID.randomUUID().toString().replaceAll("-", "");
-        WeiboCacher.cacheStateInfoOfAuthorize(state, clientId());
-
         StringBuilder url = new StringBuilder();
         url.append(WeiboConfigs.getApiUrl(WeiboConfigs.OAUTH2_AUTHORIZE));
         url.append("?").append(MoreUseParamNames.CLIENT_ID).append("=").append(clientId());
@@ -146,7 +148,17 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
                 }).toString();
             url.append("&scope=").append(scopesStr.substring(0, scopesStr.length() - 1));
         }
-        url.append("&state=").append(state);
+
+        // useState默认为true
+        if (CheckUtils.isNull(useState)) {
+            useState = TrueOrFalse.TRUE;
+        }
+        if (TrueOrFalse.TRUE.equals(useState)) {
+            String state = UUID.randomUUID().toString().replaceAll("-", "");
+            WeiboCacher.cacheStateInfoOfAuthorize(state, clientId());
+            url.append("&state=").append(state);
+        }
+
         if (CheckUtils.isNotNull(display)) {
             url.append("&display=").append(display.value());
         }
@@ -173,10 +185,10 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
         if (CheckUtils.isEmpty(code)) {
             throw WeiboException.ofParamCanNotNull("code");
         }
-        if (CheckUtils.isEmpty(state)) {
-            throw WeiboException.ofParamCanNotNull(MoreUseParamNames.STATE);
+        if (CheckUtils.isNotEmpty(state)) {
+            // 如果state不为空，则检查安全性
+            WeiboCacher.existsStateOfAuthorize(state);
         }
-        WeiboCacher.existsStateOfAuthorize(state);
         AccessToken tokenInfo = ((Oauth)apiOld.weiboConfiguration(weiboConfiguration())).getAccessTokenByCode(code);
         tokenInfo.setClientId(clientId());
         tokenInfo.setCreateAt(DateTimeUtils.currentDateObj());
