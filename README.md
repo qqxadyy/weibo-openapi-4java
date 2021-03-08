@@ -6,6 +6,7 @@
 2、配置方式：  
 	2.1：配置文件：在weibo-openapi-config.properties文件，按所新建应用时获取的配置值进行配置；该配置文件编码必须保持为UTF-8  
 	2.2：从外部来源获取配置值(例如数据库)：通过Weibo.of方法初始化对象时传入WeiboConfiguration参数(配置文件还是要保留，只是不用配置应用信息)  
+	2.3：<font color='red'>如果不能保证只使用SDK中的WeiboApiOauth2.apiBuildAuthorizeURL的方法获取带state参数的授权链接(即state可能为空)，则配置文件中必须配置一个默认应用的信息</font>  
 
 3、测试过的接口都在pjq.weibo.openapi.exxamplesnew包下(由于没有高级接口的权限，目前只测试完一般常用的开放平台接口，其它没测试过的类可以尝试根据旧版的example去调用对应接口)  
 	旧版地址：https://github.com/sunxiaowei2014/weibo4j-oauth2-beta3.1.1

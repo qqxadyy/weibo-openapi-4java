@@ -130,7 +130,7 @@ public final class WeiboCacher {
 
     /**
      * 根据state从缓存中获取clientId<br>
-     * 使用于不从配置文件读取微博配置的情况(因为授权回调只有state和code参数，但是又不能从配置文件中获取配置值)
+     * 适用于不从配置文件读取微博配置的情况(因为授权回调只有state和code参数，但是又不能从配置文件中获取配置值)
      * 
      * @param state
      * @return
