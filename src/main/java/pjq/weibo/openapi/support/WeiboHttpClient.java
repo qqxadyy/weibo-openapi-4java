@@ -33,7 +33,7 @@ package pjq.weibo.openapi.support;
 
 import java.util.Map;
 
-import pjq.weibo.openapi.utils.CheckUtils;
+import pjq.commons.utils.CheckUtils;
 import pjq.weibo.openapi.utils.http.HttpException;
 import pjq.weibo.openapi.utils.http.OKHttpSender;
 import pjq.weibo.openapi.utils.http.OKHttpSender4Async;

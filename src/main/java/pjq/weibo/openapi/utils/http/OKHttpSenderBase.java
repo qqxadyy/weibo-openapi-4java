@@ -68,11 +68,12 @@ import okhttp3.OkHttpClient.Builder;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import pjq.commons.utils.CharsetUtils;
+import pjq.commons.utils.CheckUtils;
+import pjq.commons.utils.DefaultValueGetter;
+import pjq.commons.utils.collection.CollectionUtils;
+import pjq.commons.utils.collection.CollectionUtils.Continue;
 import pjq.weibo.openapi.constant.HttpStatus;
-import pjq.weibo.openapi.utils.CharsetUtils;
-import pjq.weibo.openapi.utils.CheckUtils;
-import pjq.weibo.openapi.utils.collection.CollectionUtils;
-import pjq.weibo.openapi.utils.collection.CollectionUtils.Continue;
 
 /**
  * OKHttp3工具类(暂时只提供一般常用的请求方式，根据实际用到的情况做扩展)
@@ -137,14 +138,14 @@ public abstract class OKHttpSenderBase {
     }
 
     public static SSLContext getSSLContext(String... sslProtocol) throws Exception {
-        SSLContext sslContext = SSLContext.getInstance(CheckUtils.getValue(SSL_PROTOCOL_TLS, sslProtocol));
+        SSLContext sslContext = SSLContext.getInstance(DefaultValueGetter.getValue(SSL_PROTOCOL_TLS, sslProtocol));
         sslContext.init(null, new TrustManager[] {new AnyTrustManager()}, new java.security.SecureRandom());
         return sslContext;
     }
 
     public static SSLContext getSSLContextWithCA(String cafilepath, String capwd, String keyStoreType,
         String keyManagerFactoryAlgorithm, String... sslProtocol) throws Exception {
-        SSLContext sslContext = SSLContext.getInstance(CheckUtils.getValue(SSL_PROTOCOL_TLS, sslProtocol));
+        SSLContext sslContext = SSLContext.getInstance(DefaultValueGetter.getValue(SSL_PROTOCOL_TLS, sslProtocol));
         sslContext.init(HttpCertFileUtils
             .getKeyManagerFactory(cafilepath, capwd, keyStoreType, keyManagerFactoryAlgorithm).getKeyManagers(),
             new TrustManager[] {new AnyTrustManager()}, new java.security.SecureRandom());
@@ -347,7 +348,7 @@ public abstract class OKHttpSenderBase {
         String[] urlInfos = checkUrl(url);
         String trueUrl = urlInfos[1];
         String paramAfterUrl = "";
-        String truePararmCharset = CheckUtils.getValue(CharsetUtils.UTF_8, paramCharset);
+        String truePararmCharset = DefaultValueGetter.getValue(CharsetUtils.UTF_8, paramCharset);
 
         if (urlInfos.length > 2 && CheckUtils.isNotEmpty(urlInfos[2])) {
             // GET请求要对参数进行编码
@@ -405,7 +406,7 @@ public abstract class OKHttpSenderBase {
         String[] urlInfos = checkUrl(url);
         String trueUrl = urlInfos[1];
         String paramAfterUrl = "";
-        String truePararmCharset = CheckUtils.getValue(CharsetUtils.UTF_8, paramCharset);
+        String truePararmCharset = DefaultValueGetter.getValue(CharsetUtils.UTF_8, paramCharset);
         log.info("requestURL=========>{}", trueUrl);
 
         if (urlInfos.length > 2 && CheckUtils.isNotEmpty(urlInfos[2])) {
@@ -525,7 +526,7 @@ public abstract class OKHttpSenderBase {
         String[] urlInfos = checkUrl(url);
         String trueUrl = urlInfos[1];
         String paramAfterUrl = "";
-        String truePararmCharset = CheckUtils.getValue(CharsetUtils.UTF_8, paramCharset);
+        String truePararmCharset = DefaultValueGetter.getValue(CharsetUtils.UTF_8, paramCharset);
         log.info("requestURL=========>{}", trueUrl);
 
         if (urlInfos.length > 2 && CheckUtils.isNotEmpty(urlInfos[2])) {
@@ -596,7 +597,7 @@ public abstract class OKHttpSenderBase {
                     }
 
                     okhttp3.MediaType meidaType = okhttp3.MediaType.parse(new Tika().detect(file));
-                    bodyBuilder.addFormDataPart(CheckUtils.getValue("file", fileParamName), file.getName(),
+                    bodyBuilder.addFormDataPart(DefaultValueGetter.getValue("file", fileParamName), file.getName(),
                         RequestBody.create(file, meidaType));
                 } catch (Exception e) {
                     throw new Continue(e);
@@ -670,8 +671,8 @@ public abstract class OKHttpSenderBase {
             log.info("cost===============>{}ms", System.currentTimeMillis() - beginTime);
             if (statusCode == HttpStatus.SC_OK) {
                 // 读取内容
-                responseStr = new String(
-                    response.body().string().getBytes(CheckUtils.getValue(CharsetUtils.UTF_8, responseCharset)));
+                responseStr = new String(response.body().string()
+                    .getBytes(DefaultValueGetter.getValue(CharsetUtils.UTF_8, responseCharset)));
                 log.info("responseStr========>{}", responseStr);
             } else {
                 responseStr = handleError(response, statusCode, true);
@@ -805,8 +806,8 @@ public abstract class OKHttpSenderBase {
                 log.info("cost===============>{}ms", System.currentTimeMillis() - beginTime);
                 if (statusCode == HttpStatus.SC_OK) {
                     // 读取内容
-                    responseStr = new String(
-                        response.body().string().getBytes(CheckUtils.getValue(CharsetUtils.UTF_8, responseCharset)));
+                    responseStr = new String(response.body().string()
+                        .getBytes(DefaultValueGetter.getValue(CharsetUtils.UTF_8, responseCharset)));
                     log.info("responseStr========>{}", responseStr);
                 } else {
                     responseStr = thisSender.handleError(response, statusCode, true);

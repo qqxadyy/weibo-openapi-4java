@@ -23,10 +23,10 @@ import java.util.Map;
 
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import pjq.commons.utils.CheckUtils;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.support.WeiboHttpClient;
 import pjq.weibo.openapi.support.WeiboHttpClient.MethodType;
-import pjq.weibo.openapi.utils.CheckUtils;
 import pjq.weibo.openapi.utils.http.HttpException;
 import pjq.weibo.openapi.utils.http.SimpleAsyncCallback;
 import weibo4j.model.Configuration;

@@ -35,8 +35,8 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import pjq.weibo.openapi.utils.CharsetUtils;
-import pjq.weibo.openapi.utils.CheckUtils;
+import pjq.commons.utils.CharsetUtils;
+import pjq.commons.utils.DefaultValueGetter;
 
 /**
  * 异步方式发送请求
@@ -70,7 +70,7 @@ public final class OKHttpSender4Async extends OKHttpSenderBase {
     @Override
     public String httpExecute(OkHttpClient client, Request request, String... responseCharset) throws Exception {
         client.newCall(request).enqueue(new DefaultOkHttpAsyncCallback(this, System.currentTimeMillis(), callback,
-            CheckUtils.getValue(CharsetUtils.UTF_8, responseCharset)));
+            DefaultValueGetter.getValue(CharsetUtils.UTF_8, responseCharset)));
         return "已发送异步请求";
     }
 }

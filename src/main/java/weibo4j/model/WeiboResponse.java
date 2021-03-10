@@ -41,14 +41,15 @@ import com.alibaba.fastjson.annotation.JSONField;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import pjq.weibo.openapi.constant.DateTimePattern;
-import pjq.weibo.openapi.support.EnhanceEnum.DefualtEnhanceEnum;
+import pjq.commons.annos.EnhanceEnum.DefualtEnhanceEnum;
+import pjq.commons.constant.DateTimePattern;
+import pjq.commons.utils.CheckUtils;
+import pjq.commons.utils.CommonTypeJudger;
+import pjq.commons.utils.DateTimeUtils;
+import pjq.commons.utils.DefaultValueGetter;
+import pjq.commons.utils.collection.CollectionUtils;
+import pjq.commons.utils.collection.CollectionUtils.Continue;
 import pjq.weibo.openapi.support.WeiboJsonName;
-import pjq.weibo.openapi.utils.CheckUtils;
-import pjq.weibo.openapi.utils.CommonTypeJudger;
-import pjq.weibo.openapi.utils.DateTimeUtils;
-import pjq.weibo.openapi.utils.collection.CollectionUtils;
-import pjq.weibo.openapi.utils.collection.CollectionUtils.Continue;
 import weibo4j.http.HTMLEntity;
 import weibo4j.http.Response;
 import weibo4j.org.json.JSONArray;
@@ -163,11 +164,11 @@ public abstract class WeiboResponse implements java.io.Serializable {
                     }
 
                     if (CommonTypeJudger.isStringType(type)) {
-                        field.set(_this, CheckUtils.getValue(null, json.getString(jsonName)));
+                        field.set(_this, DefaultValueGetter.getValue(null, json.getString(jsonName)));
                     } else if (CommonTypeJudger.isBooleanType(type)) {
                         field.set(_this, json.getBoolean(jsonName));
                     } else if (CommonTypeJudger.isBigIntegerType(type)) {
-                        field.set(_this, new BigInteger(CheckUtils.getValue("0", json.getString(jsonName))));
+                        field.set(_this, new BigInteger(DefaultValueGetter.getValue("0", json.getString(jsonName))));
                     } else if (CommonTypeJudger.isIntType(type)) {
                         field.set(_this, json.getInt(jsonName));
                     } else if (CommonTypeJudger.isDoubleType(type)) {
@@ -176,7 +177,7 @@ public abstract class WeiboResponse implements java.io.Serializable {
                         field.set(_this, json.getLong(jsonName));
                     } else if (type.isEnum()) {
                         field.set(_this, DefualtEnhanceEnum.valueOrNameOf(type.getName(),
-                            CheckUtils.getValue(null, json.getString(jsonName))));
+                            DefaultValueGetter.getValue(null, json.getString(jsonName))));
                     } else if (JSONObject.class.isAssignableFrom(type)) {
                         field.set(_this, json.getJSONObject(jsonName));
                     } else if (WeiboResponse.class.isAssignableFrom(type)) {
@@ -204,7 +205,7 @@ public abstract class WeiboResponse implements java.io.Serializable {
                         JSONArray ja = json.getJSONArray(jsonName);
                         for (int i = 0, size = ja.length(); i < size; i++) {
                             if (CommonTypeJudger.isStringType(objClass)) {
-                                list.add(CheckUtils.getValue(null, ja.getString(i)));
+                                list.add(DefaultValueGetter.getValue(null, ja.getString(i)));
                             } else if (WeiboResponse.class.isAssignableFrom(objClass)) {
                                 list.add(objClass.getConstructor(JSONObject.class).newInstance(ja.getJSONObject(i)));
                             } else if (JSONObject.class.isAssignableFrom(objClass)) {

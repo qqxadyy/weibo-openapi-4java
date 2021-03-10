@@ -45,7 +45,7 @@ import java.util.Enumeration;
 import javax.net.ssl.KeyManagerFactory;
 
 import lombok.extern.slf4j.Slf4j;
-import pjq.weibo.openapi.utils.DateTimeUtils;
+import pjq.commons.utils.DateTimeUtils;
 
 @Slf4j
 public class HttpCertFileUtils {

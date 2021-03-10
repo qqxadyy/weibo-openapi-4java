@@ -20,9 +20,9 @@ import java.util.Properties;
 
 import org.apache.commons.collections4.map.HashedMap;
 
+import pjq.commons.utils.CharsetUtils;
+import pjq.commons.utils.CheckUtils;
 import pjq.weibo.openapi.constant.WeiboConfigs;
-import pjq.weibo.openapi.utils.CharsetUtils;
-import pjq.weibo.openapi.utils.CheckUtils;
 import pjq.weibo.openapi.utils.ThreeDesUtils;
 import weibo4j.model.WeiboException;
 

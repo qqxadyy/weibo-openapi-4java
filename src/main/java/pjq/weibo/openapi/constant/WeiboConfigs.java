@@ -37,11 +37,12 @@ import java.util.Map;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import pjq.commons.utils.CheckUtils;
+import pjq.commons.utils.DefaultValueGetter;
+import pjq.commons.utils.collection.CollectionUtils;
+import pjq.commons.utils.collection.CollectionUtils.Continue;
 import pjq.weibo.openapi.support.WeiboApiAnnos.WeiboApi;
 import pjq.weibo.openapi.support.WeiboApiAnnos.WeiboPropName;
-import pjq.weibo.openapi.utils.CheckUtils;
-import pjq.weibo.openapi.utils.collection.CollectionUtils;
-import pjq.weibo.openapi.utils.collection.CollectionUtils.Continue;
 import weibo4j.util.WeiboConfig;
 
 /**
@@ -696,7 +697,8 @@ public final class WeiboConfigs {
                 if (CheckUtils.isEmpty(propName)) {
                     propName = oriFieldValue;
                 }
-                fieldValue = CheckUtils.getValue(oriFieldValue, WeiboConfig.getValue(CONFIG_API_PREFIX + propName));
+                fieldValue =
+                    DefaultValueGetter.getValue(oriFieldValue, WeiboConfig.getValue(CONFIG_API_PREFIX + propName));
                 apiMapInfos.put(oriFieldValue, fieldValue);
             } catch (Exception e) {
                 throw new Continue(e);

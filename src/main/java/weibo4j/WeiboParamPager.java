@@ -20,7 +20,7 @@ import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import pjq.weibo.openapi.utils.CheckUtils;
+import pjq.commons.utils.CheckUtils;
 import weibo4j.model.PostParameter;
 
 /**

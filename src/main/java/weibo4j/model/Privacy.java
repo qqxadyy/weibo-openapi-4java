@@ -17,7 +17,7 @@ package weibo4j.model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import pjq.weibo.openapi.constant.BizConstant.StatusType;
+import pjq.commons.constant.CommonEnumConstant.StatusType;
 import pjq.weibo.openapi.constant.ParamConstant.PrivacyUserType;
 import pjq.weibo.openapi.support.WeiboJsonName;
 import weibo4j.http.Response;

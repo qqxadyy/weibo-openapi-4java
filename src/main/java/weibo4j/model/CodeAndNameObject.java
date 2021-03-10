@@ -23,7 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import pjq.weibo.openapi.utils.CheckUtils;
+import pjq.commons.utils.CheckUtils;
 import weibo4j.org.json.JSONArray;
 import weibo4j.org.json.JSONObject;
 

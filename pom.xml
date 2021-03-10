@@ -2,9 +2,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.github.qqxadyy</groupId>
+	<parent>
+		<groupId>com.github.qqxadyy</groupId>
+		<artifactId>pjq-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+
 	<artifactId>weibo-openapi-4java</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>2.0.0-SNAPSHOT</version>
 	<name>微博开放平台API-JAVA SDK</name>
 	<description>基于微博开放平台官网的weibo4j-oauth2-beta3.1.1包及新版接口做二次开发</description>
 	<inceptionYear>2021</inceptionYear>
@@ -32,227 +37,57 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<skipTests>true</skipTests>
-
-		<!-- 这里定义的版本号可以覆盖传递依赖中有的版本号 -->
-		<lombok.version>1.18.18</lombok.version>
-		<apache.commons.lang3.version>3.11</apache.commons.lang3.version>
-		<apache.commons.collection4.version>4.4</apache.commons.collection4.version>
-		<apache.commons.codec.version>1.15</apache.commons.codec.version>
-		<apache.commons.logging.version>1.2</apache.commons.logging.version>
-		<apache.tika.version>2.0.0-ALPHA</apache.tika.version>
-		<alibaba.json.version>1.2.75</alibaba.json.version>
-		<caffeine.version>2.8.8</caffeine.version>
-		<slf4j.version>2.0.0-alpha1</slf4j.version>
-		<okhttp.version>4.10.0-RC1</okhttp.version>
-		<okio.version>2.9.0</okio.version>
-		<kotlin.stdlib.version>1.4.10</kotlin.stdlib.version>
-		<java.wsrs.api.version>2.1.1</java.wsrs.api.version>
 	</properties>
 
 	<dependencies>
-		<!-- lombok -->
 		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>${lombok.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- apache commons工具包 -->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>${apache.commons.lang3.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-collections4</artifactId>
-			<version>${apache.commons.collection4.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>${apache.commons.codec.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>${apache.commons.logging.version}</version>
+			<groupId>com.github.qqxadyy</groupId>
+			<artifactId>pjq-commons-utils</artifactId>
 		</dependency>
 
 		<!-- apache tika -->
 		<dependency>
 			<groupId>org.apache.tika</groupId>
 			<artifactId>tika-core</artifactId>
-			<version>${apache.tika.version}</version>
 		</dependency>
 
 		<!-- 阿里json包 -->
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
-			<version>${alibaba.json.version}</version>
 		</dependency>
 
 		<!-- caffeine缓存 -->
 		<dependency>
 			<groupId>com.github.ben-manes.caffeine</groupId>
 			<artifactId>caffeine</artifactId>
-			<version>${caffeine.version}</version>
-		</dependency>
-
-		<!-- 日志相关包 -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
-		<dependency>
-			<!-- 有log4j等具体的日志实现时，排除引入slf4j-simple -->
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<!-- okhttp相关包 -->
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
-			<version>${okhttp.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.squareup.okio</groupId>
 			<artifactId>okio</artifactId>
-			<version>${okio.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jetbrains.kotlin</groupId>
 			<artifactId>kotlin-stdlib</artifactId>
-			<version>${kotlin.stdlib.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>javax.ws.rs-api</artifactId>
-			<version>${java.wsrs.api.version}</version>
 		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-					<compilerArgs>
-						<arg>-parameters</arg>
-					</compilerArgs>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.2.0</version>
-				<configuration>
-					<excludes>
-						<!-- 清理resources下的文件 -->
-						<exclude>*.properties</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
-
-			<!-- maven-source-plugin和maven-javadoc-plugin的写法主要以sonatype官网的为主再修改，另外增加去掉doclint检查 -->
-			<plugin>
-				<!-- 打源码包 -->
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>3.2.1</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<excludes>
-						<!-- 清理resources下的文件 -->
-						<exclude>*.properties</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.2.0</version>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<encoding>${project.build.sourceEncoding}</encoding>
-					<aggregate>true</aggregate>
-					<charset>${project.build.sourceEncoding}</charset>
-					<docencoding>${project.build.sourceEncoding}</docencoding>
-					<!-- 禁用java8 的DocLint新特性，以确保当javadoc有编译错误时，也能正常生成javadoc jar包(取消对源码中的doc参数注释等检查) -->
-					<doclint>none</doclint>
-					<additionalparam>-Xdoclint:none</additionalparam>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<!-- 自动进行gpg验证 -->
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<version>1.6</version>
-				<executions>
-					<execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<!-- 自动提交到sonatype审批发布 -->
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.8</version>
-				<extensions>true</extensions>
-				<configuration>
-					<serverId>sonatype-nexus</serverId> <!-- 和settings.xml里面的server配置一致，还有distributionManagement也是 -->
-					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-					<autoReleaseAfterClose>true</autoReleaseAfterClose>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>3.0.0-M1</version>
-				<configuration>
-					<autoVersionSubmodules>true</autoVersionSubmodules>
-					<useReleaseProfile>false</useReleaseProfile>
-					<releaseProfiles>release</releaseProfiles>
-					<goals>deploy</goals>
-				</configuration>
-			</plugin>
-
-			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
-				<version>4.0.rc2</version>
 				<configuration>
 					<licenseSets>
 						<licenseSet>
@@ -311,17 +146,121 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<compilerArgs>
+						<arg>-parameters</arg>
+					</compilerArgs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<!-- 清理resources下的文件 -->
+						<exclude>*.properties</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+
+			<!-- maven-source-plugin和maven-javadoc-plugin的写法主要以sonatype官网的为主再修改，另外增加去掉doclint检查 -->
+			<plugin>
+				<!-- 打源码包 -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<excludes>
+						<!-- 清理resources下的文件 -->
+						<exclude>*.properties</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<aggregate>true</aggregate>
+					<charset>${project.build.sourceEncoding}</charset>
+					<docencoding>${project.build.sourceEncoding}</docencoding>
+					<!-- 禁用java8 的DocLint新特性，以确保当javadoc有编译错误时，也能正常生成javadoc jar包(取消对源码中的doc参数注释等检查) -->
+					<doclint>none</doclint>
+					<additionalparam>-Xdoclint:none</additionalparam>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<!-- 自动进行gpg验证 -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<!-- 自动提交到sonatype审批发布 -->
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>sonatype-nexus</serverId> <!-- 和settings.xml里面的server配置一致，还有distributionManagement也是 -->
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<useReleaseProfile>false</useReleaseProfile>
+					<releaseProfiles>release</releaseProfiles>
+					<goals>deploy</goals>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
 	<distributionManagement>
+		<!-- <snapshotRepository> <id>sonatype-nexus</id> <url>https://oss.sonatype.org/content/repositories/snapshots</url> </snapshotRepository> 
+			<repository> <id>sonatype-nexus</id> <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url> </repository> -->
+
 		<snapshotRepository>
-			<id>sonatype-nexus</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<id>gz-trs-nexus</id>
+			<url>http://maven.gztrs.cn:8081/repository/maven-snapshots/</url>
 		</snapshotRepository>
 		<repository>
-			<id>sonatype-nexus</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+			<id>gz-trs-nexus</id>
+			<url>http://maven.gztrs.cn:8081/repository/maven-relases/</url>
 		</repository>
 	</distributionManagement>
 </project>

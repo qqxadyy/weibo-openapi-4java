@@ -34,8 +34,8 @@ package pjq.weibo.openapi.constant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import pjq.weibo.openapi.support.EnhanceEnum;
-import pjq.weibo.openapi.support.EnhanceEnum.EnhanceEnumFieldDefine;
+import pjq.commons.annos.EnhanceEnum;
+import pjq.commons.annos.EnhanceEnum.EnhanceEnumFieldDefine;
 
 /**
  * 接口相关参数的枚举值常量类

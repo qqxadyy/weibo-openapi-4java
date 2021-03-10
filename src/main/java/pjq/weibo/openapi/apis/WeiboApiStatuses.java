@@ -40,7 +40,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import pjq.weibo.openapi.constant.BizConstant.StatusType;
+import pjq.commons.constant.CommonEnumConstant.StatusType;
+import pjq.commons.utils.CheckUtils;
+import pjq.commons.utils.DefaultValueGetter;
 import pjq.weibo.openapi.constant.ParamConstant.AuthorType;
 import pjq.weibo.openapi.constant.ParamConstant.FilterType;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
@@ -50,7 +52,6 @@ import pjq.weibo.openapi.constant.ParamConstant.SourceType;
 import pjq.weibo.openapi.constant.ParamConstant.StatusesFeature;
 import pjq.weibo.openapi.constant.ParamConstant.TrimUser;
 import pjq.weibo.openapi.constant.WeiboConfigs;
-import pjq.weibo.openapi.utils.CheckUtils;
 import pjq.weibo.openapi.utils.WeiboContentChecker;
 import pjq.weibo.openapi.utils.WeiboContentChecker.PicCheckResult;
 import pjq.weibo.openapi.utils.http.SimpleAsyncCallback;
@@ -459,7 +460,7 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
             try {
                 JSONObject eachJo = ja.getJSONObject(i);
                 String key = (String)eachJo.keys().next();
-                midMap.put(key, CheckUtils.getValue("", eachJo.getString(key)));
+                midMap.put(key, DefaultValueGetter.getValue("", eachJo.getString(key)));
             } catch (Exception e) {
                 continue;
             }

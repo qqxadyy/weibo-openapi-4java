@@ -42,6 +42,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import pjq.commons.utils.CharsetUtils;
+import pjq.commons.utils.CheckUtils;
 import pjq.weibo.openapi.support.WeiboHttpClient;
 import weibo4j.model.WeiboException;
 

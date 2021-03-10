@@ -44,7 +44,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import pjq.weibo.openapi.constant.BizConstant.TrueOrFalse;
+import pjq.commons.constant.CommonEnumConstant.TrueOrFalse;
+import pjq.commons.utils.CharsetUtils;
+import pjq.commons.utils.CheckUtils;
+import pjq.commons.utils.DateTimeUtils;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.ParamConstant.OAuth2Display;
 import pjq.weibo.openapi.constant.ParamConstant.OAuth2Language;
@@ -52,9 +55,6 @@ import pjq.weibo.openapi.constant.ParamConstant.OAuth2Scope;
 import pjq.weibo.openapi.constant.WeiboConfigs;
 import pjq.weibo.openapi.support.WeiboCacher;
 import pjq.weibo.openapi.support.WeiboHttpClient.MethodType;
-import pjq.weibo.openapi.utils.CharsetUtils;
-import pjq.weibo.openapi.utils.CheckUtils;
-import pjq.weibo.openapi.utils.DateTimeUtils;
 import weibo4j.Oauth;
 import weibo4j.Weibo;
 import weibo4j.model.AccessToken;
@@ -88,7 +88,7 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
      * 是否使用state参数，true：是，false：否。默认true，并生成随机state值
      */
     private TrueOrFalse useState;
-
+    
     /**
      * 授权页面的终端类型
      */

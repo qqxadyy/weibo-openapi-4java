@@ -22,9 +22,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.EqualsAndHashCode.Exclude;
 import lombok.NoArgsConstructor;
+import pjq.commons.utils.DateTimeUtils;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.support.WeiboJsonName;
-import pjq.weibo.openapi.utils.DateTimeUtils;
 import weibo4j.http.Response;
 import weibo4j.org.json.JSONObject;
 

@@ -15,7 +15,8 @@
 package weibo4j.model;
 
 import lombok.Getter;
-import pjq.weibo.openapi.utils.CheckUtils;
+import pjq.commons.utils.CheckUtils;
+import pjq.commons.utils.DefaultValueGetter;
 import weibo4j.org.json.JSONException;
 import weibo4j.org.json.JSONObject;
 
@@ -106,7 +107,7 @@ public class WeiboException extends RuntimeException {
             default:
                 break;
         }
-        return CheckUtils.getValue(oriMsg, chineseMsg);
+        return DefaultValueGetter.getValue(oriMsg, chineseMsg);
     }
 
     public static WeiboException ofParamCanNotNull(String paramName) {

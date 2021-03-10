@@ -42,7 +42,9 @@ import java.util.Set;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
-import pjq.weibo.openapi.utils.collection.CollectionUtils;
+import pjq.commons.utils.CheckUtils;
+import pjq.commons.utils.DefaultValueGetter;
+import pjq.commons.utils.collection.CollectionUtils;
 import weibo4j.model.WeiboException;
 
 /**
@@ -108,7 +110,7 @@ public final class PropertiesUtils {
                     } else if (CheckUtils.isNotEmpty(propsToAddOrUpdate) && propsToAddOrUpdate.containsKey(key)) {
                         // 更新key
                         newContent.append(key).append(equalSymbol)
-                            .append(CheckUtils.getValue("", propsToAddOrUpdate.get(key))).append(newLine);
+                            .append(DefaultValueGetter.getValue("", propsToAddOrUpdate.get(key))).append(newLine);
                         propsToAddOrUpdate.remove(key);
                     } else {
                         // 不处理
@@ -125,8 +127,8 @@ public final class PropertiesUtils {
                         String value = entry.getValue();
                         if (CheckUtils.isNotEmpty(keyToAdd)) {
                             newContent.append(deleteSymbol).append("added auto by program").append(newLine);
-                            newContent.append(keyToAdd).append(equalSymbol).append(CheckUtils.getValue("", value))
-                                .append(newLine);
+                            newContent.append(keyToAdd).append(equalSymbol)
+                                .append(DefaultValueGetter.getValue("", value)).append(newLine);
                         }
                     });
                 }
