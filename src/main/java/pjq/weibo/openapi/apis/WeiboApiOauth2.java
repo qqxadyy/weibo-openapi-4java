@@ -163,7 +163,7 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
             // 在传入的state基础上加上随机串，保证唯一
             String genState = DefaultValueGetter.getValue("", state) + UUID.randomUUID().toString().replaceAll("-", "");
             WeiboCacher.cacheStateInfoOfAuthorize(genState, clientId());
-            url.append("&state=").append(genState);
+            url.append("&").append(MoreUseParamNames.STATE).append("=").append(genState);
         }
 
         if (CheckUtils.isNotNull(display)) {
@@ -190,15 +190,23 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
      */
     public AccessToken apiGetAccessTokenByCode(String code, String state) throws WeiboException {
         if (CheckUtils.isEmpty(code)) {
-            throw WeiboException.ofParamCanNotNull("code");
+            throw WeiboException.ofParamCanNotNull(MoreUseParamNames.CODE);
         }
+
+        // 先从缓存获取
+        AccessToken tokenInfo = WeiboCacher.getAccessTokenByCode(code);
+        if (CheckUtils.isNotNull(tokenInfo)) {
+            return tokenInfo;
+        }
+
         if (CheckUtils.isNotEmpty(state)) {
             // 如果state不为空，则检查安全性
             WeiboCacher.existsStateOfAuthorize(state);
         }
-        AccessToken tokenInfo = ((Oauth)apiOld.weiboConfiguration(weiboConfiguration())).getAccessTokenByCode(code);
+        tokenInfo = ((Oauth)apiOld.weiboConfiguration(weiboConfiguration())).getAccessTokenByCode(code);
         tokenInfo.setClientId(clientId());
         tokenInfo.setCreateAt(DateTimeUtils.currentDateObj());
+        WeiboCacher.cacheAccessTokenOfCode(code, tokenInfo);
         return WeiboCacher.cacheAccessToken(tokenInfo);
     }
 

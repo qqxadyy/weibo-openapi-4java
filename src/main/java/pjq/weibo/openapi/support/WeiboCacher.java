@@ -73,6 +73,7 @@ public final class WeiboCacher {
     public static final String KEY_PREFIX_STATE = COMMON_PREFIX + "states:";
     public static final String KEY_PREFIX_USER = COMMON_PREFIX + "users:";
     public static final String KEY_PREFIX_EMOTIONS = COMMON_PREFIX + "emotions:";
+    public static final String KEY_PREFIX_CODES = COMMON_PREFIX + "codes:";
     public static final Duration EXPIRES_IN_STATE = Duration.ofSeconds(120L); // state缓存有效期为2分钟
 
     private static String getKey(String prefix, String suffix) {
@@ -116,7 +117,7 @@ public final class WeiboCacher {
     public static void existsStateOfAuthorize(String state) {
         try {
             if (CheckUtils.isNotEmpty(state)) {
-                String stateInfoStr = cacheHandler.popup(getKey(KEY_PREFIX_STATE, state)); // state的缓存读取成功后马上失效，防止被二次使用
+                String stateInfoStr = cacheHandler.get(getKey(KEY_PREFIX_STATE, state)); // state不马上失效
                 StateClientId stateInfo = JSON.parseObject(stateInfoStr, StateClientId.class);
                 if (state.equals(stateInfo.getState())) {
                     return;
@@ -391,6 +392,52 @@ public final class WeiboCacher {
             }
             return JSON.parseArray(cacheHandler.get(getKey(KEY_PREFIX_EMOTIONS + type.value(), type.value())),
                 Emotion.class);
+        } catch (Exception e) {
+            if (e instanceof WeiboException) {
+                throw (WeiboException)e;
+            } else {
+                throw new WeiboException(e);
+            }
+        }
+    }
+
+    /**
+     * 缓存code换取的token
+     * 
+     * @param code
+     * @param tokenInfo
+     * @creator pengjianqiang@2021年3月11日
+     */
+    public static void cacheAccessTokenOfCode(String code, AccessToken tokenInfo) {
+        try {
+            if (CheckUtils.isEmpty(code)) {
+                throw WeiboException.ofParamCanNotNull(MoreUseParamNames.CODE);
+            } else if (CheckUtils.isNull(tokenInfo)) {
+                throw WeiboException.ofParamCanNotNull("accessToken对象");
+            }
+            cacheHandler.cache(getKey(KEY_PREFIX_CODES, code), JSON.toJSONString(tokenInfo), EXPIRES_IN_STATE);
+        } catch (Exception e) {
+            if (e instanceof WeiboException) {
+                throw (WeiboException)e;
+            } else {
+                throw new WeiboException(e);
+            }
+        }
+    }
+
+    /**
+     * 从缓存中获取code换取的token
+     * 
+     * @param code
+     * @return
+     * @creator pengjianqiang@2021年3月11日
+     */
+    public static AccessToken getAccessTokenByCode(String code) {
+        try {
+            if (CheckUtils.isEmpty(code)) {
+                return null;
+            }
+            return JSON.parseObject(cacheHandler.get(getKey(KEY_PREFIX_CODES, code)), AccessToken.class);
         } catch (Exception e) {
             if (e instanceof WeiboException) {
                 throw (WeiboException)e;

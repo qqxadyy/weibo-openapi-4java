@@ -94,7 +94,7 @@ public class Oauth extends Weibo {
         return new AccessToken(client.post(WeiboConfigs.getAccessTokenURL(),
             new PostParameter[] {new PostParameter(MoreUseParamNames.CLIENT_ID, clientId()),
                 new PostParameter(MoreUseParamNames.CLIENT_SECRET, clientSecret()),
-                new PostParameter("grant_type", "authorization_code"), new PostParameter("code", code),
+                new PostParameter("grant_type", "authorization_code"), new PostParameter(MoreUseParamNames.CODE, code),
                 new PostParameter(MoreUseParamNames.REDIRECT_URI, redirectURI())},
             false, null));
     }

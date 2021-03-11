@@ -758,7 +758,6 @@ public abstract class OKHttpSenderBase {
         } catch (Exception e) {
             return "";
         }
-
     }
 
     private static class AnyHostnameVerifier implements HostnameVerifier {
