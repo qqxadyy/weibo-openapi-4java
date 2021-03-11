@@ -48,6 +48,7 @@ import pjq.commons.constant.CommonEnumConstant.TrueOrFalse;
 import pjq.commons.utils.CharsetUtils;
 import pjq.commons.utils.CheckUtils;
 import pjq.commons.utils.DateTimeUtils;
+import pjq.commons.utils.DefaultValueGetter;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.ParamConstant.OAuth2Display;
 import pjq.weibo.openapi.constant.ParamConstant.OAuth2Language;
@@ -88,7 +89,12 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
      * 是否使用state参数，true：是，false：否。默认true，并生成随机state值
      */
     private TrueOrFalse useState;
-    
+
+    /**
+     * 用于保持请求和回调的状态，在回调时，会在Query Parameter中回传该参数(useState为true时生效)
+     */
+    private String state;
+
     /**
      * 授权页面的终端类型
      */
@@ -154,9 +160,10 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
             useState = TrueOrFalse.TRUE;
         }
         if (TrueOrFalse.TRUE.equals(useState)) {
-            String state = UUID.randomUUID().toString().replaceAll("-", "");
-            WeiboCacher.cacheStateInfoOfAuthorize(state, clientId());
-            url.append("&state=").append(state);
+            // 在传入的state基础上加上随机串，保证唯一
+            String genState = DefaultValueGetter.getValue("", state) + UUID.randomUUID().toString().replaceAll("-", "");
+            WeiboCacher.cacheStateInfoOfAuthorize(genState, clientId());
+            url.append("&state=").append(genState);
         }
 
         if (CheckUtils.isNotNull(display)) {

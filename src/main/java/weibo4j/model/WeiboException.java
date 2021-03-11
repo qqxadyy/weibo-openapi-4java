@@ -104,6 +104,16 @@ public class WeiboException extends RuntimeException {
             case 20012:
                 chineseMsg = "文本内容长度不能超过130(包括空格、换行等，纯英文不超过260)";
                 break;
+            case 21314:
+                chineseMsg = "授权码已经被使用";
+                break;
+            case 21315:
+                chineseMsg = "授权码已过期";
+                break;
+            case 21316:
+            case 21317:
+                chineseMsg = "授权码不合法";
+                break;
             default:
                 break;
         }
