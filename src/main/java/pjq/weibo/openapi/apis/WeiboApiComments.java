@@ -38,16 +38,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import pjq.commons.constant.CommonEnumConstant.StatusType;
+import pjq.commons.constant.CommonEnumConstant.YesOrNoInt;
 import pjq.commons.utils.CheckUtils;
+import pjq.weibo.openapi.apis.base.WeiboParamPager;
 import pjq.weibo.openapi.constant.ParamConstant.AuthorType;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.ParamConstant.SourceType;
 import pjq.weibo.openapi.constant.ParamConstant.TrimUser;
 import pjq.weibo.openapi.constant.WeiboConfigs;
+import pjq.weibo.openapi.support.WeiboApiParamScope;
 import pjq.weibo.openapi.utils.WeiboContentChecker;
 import weibo4j.Comments;
-import weibo4j.WeiboParamPager;
 import weibo4j.model.Comment;
 import weibo4j.model.CommentPager;
 import weibo4j.model.PostParameter;
@@ -55,14 +56,13 @@ import weibo4j.model.WeiboException;
 
 /**
  * Comments相关接口<br>
- * 使用{@code Weibo.of(WeiboApiComment.class,accessToken)}生成对象
+ * 使用<code>Weibo.of({@link WeiboApiComments}.class,accessToken)</code>生成对象
  * 
  * @author pengjianqiang
  * @date 2021年1月21日
  */
 @SuppressWarnings("serial")
 @Getter
-@Setter
 @Accessors(fluent = true)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WeiboApiComments extends WeiboParamPager<WeiboApiComments> {
@@ -71,31 +71,37 @@ public class WeiboApiComments extends WeiboParamPager<WeiboApiComments> {
     /**
      * 作者筛选类型，0：全部、1：我关注的人、2：陌生人，默认为0
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.COMMENTS_QUERY)})
     private AuthorType filterByAuthor;
 
     /**
      * 来源筛选类型，0：全部、1：来自微博的评论、2：来自微群的评论，默认为0
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.COMMENTS_QUERY)})
     private SourceType filterBySource;
 
     /**
      * 返回值中user字段开关，0：返回完整user字段、1：user字段仅返回user_id，默认为0
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.COMMENTS_QUERY)})
     private TrimUser trimUser;
 
     /**
      * 回复中是否自动加入"回复@用户名"，0：是、1：否，默认为0
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.COMMENTS_WRITE)})
     private Integer withoutMention;
 
     /**
      * 当评论转发微博时，是否评论给原微博，0：否、1：是，默认为0
      */
-    private StatusType commentOri;
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.COMMENTS_WRITE)})
+    private YesOrNoInt commentOri;
 
     /**
      * 开发者上报的操作用户真实IP
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.COMMENTS_WRITE)})
     private String rip;
 
     @Override
@@ -181,7 +187,7 @@ public class WeiboApiComments extends WeiboParamPager<WeiboApiComments> {
         if (CheckUtils.isEmpty(commentIds)) {
             throw WeiboException.ofParamCanNotNull("cids");
         } else if (commentIds.length > 20) {
-            throw new WeiboException("cid的数量不能超过20");
+            WeiboException.ofParamIdsOutOfLimit("cid", 20);
         }
         return apiOld.getCommentShowBatch(joinArrayParam(commentIds));
     }
@@ -192,7 +198,7 @@ public class WeiboApiComments extends WeiboParamPager<WeiboApiComments> {
      * @param statusId
      *            需要评论的微博ID
      * @param commentText
-     *            评论内容，内容不超过140个汉字(可以带表情，例如[微笑]、[吃瓜]，不过需要先知道表情对应的转义符)
+     *            评论内容，内容不超过130个汉字(可以带表情，例如[微笑]、[吃瓜]，不过需要先知道表情对应的转义符)
      * @return
      * @throws WeiboException
      */
@@ -202,7 +208,7 @@ public class WeiboApiComments extends WeiboParamPager<WeiboApiComments> {
         paramList.add(new PostParameter(MoreUseParamNames.ID, statusId));
         paramList.add(new PostParameter("comment", trueCommentText));
         return new Comment(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.COMMENTS_CREATE),
-            paramListToArray(paramList), accessToken));
+            paramListToArray(paramList), accessToken()));
     }
 
     /**
@@ -213,7 +219,7 @@ public class WeiboApiComments extends WeiboParamPager<WeiboApiComments> {
      * @param statusId
      *            需要评论的微博ID
      * @param commentText
-     *            评论内容，内容不超过140个汉字(可以带表情，例如[微笑]、[吃瓜]，不过需要先知道表情对应的转义符)
+     *            评论内容，内容不超过130个汉字(可以带表情，例如[微笑]、[吃瓜]，不过需要先知道表情对应的转义符)
      * @return
      * @throws WeiboException
      */
@@ -226,8 +232,8 @@ public class WeiboApiComments extends WeiboParamPager<WeiboApiComments> {
         paramList.add(new PostParameter("cid", commentId));
         paramList.add(new PostParameter(MoreUseParamNames.ID, statusId));
         paramList.add(new PostParameter("comment", trueCommentText));
-        return new Comment(
-            client.post(WeiboConfigs.getApiUrl(WeiboConfigs.COMMENTS_REPLY), paramListToArray(paramList), accessToken));
+        return new Comment(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.COMMENTS_REPLY), paramListToArray(paramList),
+            accessToken()));
     }
 
     /**
@@ -257,7 +263,7 @@ public class WeiboApiComments extends WeiboParamPager<WeiboApiComments> {
         if (CheckUtils.isEmpty(commentIds)) {
             throw WeiboException.ofParamCanNotNull("cids");
         } else if (commentIds.length > 20) {
-            throw new WeiboException("cid的数量不能超过20");
+            WeiboException.ofParamIdsOutOfLimit("cid", 20);
         }
         return apiOld.destoryCommentBatch(joinArrayParam(commentIds));
     }
@@ -273,7 +279,8 @@ public class WeiboApiComments extends WeiboParamPager<WeiboApiComments> {
     }
 
     private CommentPager commonCommentPager(List<PostParameter> paramList, String apiName) throws WeiboException {
-        return new CommentPager(client.get(WeiboConfigs.getApiUrl(apiName), paramListToArray(paramList), accessToken));
+        return new CommentPager(
+            client.get(WeiboConfigs.getApiUrl(apiName), paramListToArray(paramList), accessToken()));
     }
 
     /**

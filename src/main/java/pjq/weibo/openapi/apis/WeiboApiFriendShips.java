@@ -42,6 +42,7 @@ import pjq.commons.utils.CheckUtils;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.ParamConstant.TrimStatus;
 import pjq.weibo.openapi.constant.WeiboConfigs;
+import pjq.weibo.openapi.support.WeiboApiParamScope;
 import weibo4j.Weibo;
 import weibo4j.http.Response;
 import weibo4j.model.PostParameter;
@@ -54,7 +55,7 @@ import weibo4j.org.json.JSONObject;
 
 /**
  * FriendShips相关接口<br>
- * 使用{@code Weibo.of(WeiboApiFriendShips.class,accessToken)}生成对象<br>
+ * 使用<code>Weibo.of({@link WeiboApiFriendShips}.class,accessToken)</code>生成对象<br>
  * 1.相关接口好像有如下问题：即使实际有多个对象也只能返回一个对象信息，page、count等参数也控制不了<br>
  * 
  * @author pengjianqiang
@@ -62,33 +63,37 @@ import weibo4j.org.json.JSONObject;
  */
 @SuppressWarnings("serial")
 @Getter
-@Setter
 @Accessors(fluent = true)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WeiboApiFriendShips extends Weibo<WeiboApiFriendShips> {
     /**
      * 单页返回的记录条数，默认为5，最大不超过5
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.PAGER)})
     private Integer count;
 
     /**
      * 返回结果的页码，默认为1
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.PAGER)})
     private Integer page;
 
     /**
      * 返回结果的游标，下一页用返回值里的next_cursor，上一页用previous_cursor，默认为0
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.PAGER)})
     private String cursor;
 
     /**
      * 返回值中user字段中的status字段开关，0：返回完整status字段、1：status字段仅返回status_id，默认为1
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.FRIENDSHIPS_QUEYR_USER)})
     private TrimStatus trimStatus;
 
     /**
      * 开发者上报的操作用户真实IP
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.FRIENDSHIPS_QUEYR_USER)})
     private String rip;
 
     /**
@@ -209,7 +214,7 @@ public class WeiboApiFriendShips extends Weibo<WeiboApiFriendShips> {
         }
         List<PostParameter> paramList = commonParam();
         paramList.add(new PostParameter(uidOrScreenName, val));
-        return client.get(WeiboConfigs.getApiUrl(apiName), paramListToArray(paramList), accessToken);
+        return client.get(WeiboConfigs.getApiUrl(apiName), paramListToArray(paramList), accessToken());
     }
 
     /**
@@ -250,7 +255,7 @@ public class WeiboApiFriendShips extends Weibo<WeiboApiFriendShips> {
         paramList.add(new PostParameter(sourceUidOrScreenName, sourceVal));
         paramList.add(new PostParameter(targetUidOrScreenName, targetVal));
         return client
-            .get(WeiboConfigs.getApiUrl(WeiboConfigs.FRIENDSHIPS_SHOW), paramListToArray(paramList), accessToken)
+            .get(WeiboConfigs.getApiUrl(WeiboConfigs.FRIENDSHIPS_SHOW), paramListToArray(paramList), accessToken())
             .asJSONObject();
     }
 
@@ -269,7 +274,7 @@ public class WeiboApiFriendShips extends Weibo<WeiboApiFriendShips> {
         List<PostParameter> paramList = commonParam();
         paramList.add(new PostParameter(MoreUseParamNames.UID, uid));
         return WeiboResponse.buildList(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.FRIENDSHIPS_FOLLOWERS_ACTIVE),
-            paramListToArray(paramList), accessToken), User.class);
+            paramListToArray(paramList), accessToken()), User.class);
     }
 
     private List<PostParameter> commonParam() {
@@ -326,7 +331,7 @@ public class WeiboApiFriendShips extends Weibo<WeiboApiFriendShips> {
             paramList.add(new PostParameter(MoreUseParamNames.REAL_IP, rip));
         }
         return new User(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.FRIENDSHIPS_CREATE),
-            paramListToArray(paramList), accessToken));
+            paramListToArray(paramList), accessToken()));
     }
 
     /**
@@ -360,6 +365,6 @@ public class WeiboApiFriendShips extends Weibo<WeiboApiFriendShips> {
         List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter(uidOrScreenName, val));
         return new User(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.FRIENDSHIPS_DESTROY),
-            paramListToArray(paramList), accessToken));
+            paramListToArray(paramList), accessToken()));
     }
 }

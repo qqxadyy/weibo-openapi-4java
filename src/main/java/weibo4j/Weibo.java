@@ -32,6 +32,7 @@ import pjq.weibo.openapi.WeiboConfiguration;
 import pjq.weibo.openapi.apis.WeiboApiOauth2;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.WeiboConfigs;
+import pjq.weibo.openapi.support.WeiboApiParamScope;
 import pjq.weibo.openapi.support.WeiboCacher;
 import weibo4j.http.HttpClientNew;
 import weibo4j.model.PostParameter;
@@ -52,6 +53,7 @@ import weibo4j.model.WeiboException;
 @Accessors(fluent = true)
 public abstract class Weibo<T> implements java.io.Serializable {
     private static final long serialVersionUID = 4282616848978535016L;
+    private static final String TOKEN_AND_CLIENTID_SEPERATOR = "withClientId:";
 
     protected static HttpClientNew client = new HttpClientNew();
 
@@ -67,20 +69,15 @@ public abstract class Weibo<T> implements java.io.Serializable {
     /**
      * 授权后的token
      */
+    @WeiboApiParamScope(WeiboApiParamScope.ALL)
     protected String accessToken;
 
     /**
-     * 用于{@link #of}方法生成对象后，单独改变accessToken
-     * 
-     * @param accessToken
-     *            授权后的token
-     * @return
+     * 采用OAuth授权方式不需要此参数，其他授权方式为必填参数，数值为应用的clientId/AppKey<br>
+     * 默认为false，为true时直接从{@link #clientId()}获取值参数值
      */
-    @SuppressWarnings("unchecked")
-    public T accessToken(String accessToken) {
-        this.accessToken = accessToken;
-        return (T)this;
-    }
+    @WeiboApiParamScope(WeiboApiParamScope.SOURCE)
+    protected boolean useSource;
 
     /**
      * 用于{@link #of}方法生成对象后，单独改变weiboConfiguration
@@ -92,6 +89,42 @@ public abstract class Weibo<T> implements java.io.Serializable {
     @SuppressWarnings("unchecked")
     public T weiboConfiguration(WeiboConfiguration weiboConfiguration) {
         this.weiboConfiguration = weiboConfiguration;
+        return (T)this;
+    }
+
+    /**
+     * 用于{@link #of}方法生成对象后，单独改变accessToken
+     * 
+     * @param accessToken
+     *            授权后的token
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    @WeiboApiParamScope(WeiboApiParamScope.ALL)
+    public T accessToken(String accessToken) {
+        this.accessToken = accessToken;
+        return (T)this;
+    }
+
+    /**
+     * 获取accessToken值<br>
+     * 为适应部分接口要传source参数，而不改动{@link HttpClientNew}的post等方法中只传入token的情况，在这里获取token值时做特殊处理
+     * 
+     * @return
+     * @creator pengjianqiang@2021年3月14日
+     */
+    protected String accessToken() {
+        String result = accessToken;
+        if (useSource) {
+            result += TOKEN_AND_CLIENTID_SEPERATOR + clientId();
+        }
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    @WeiboApiParamScope(WeiboApiParamScope.SOURCE)
+    public T useSource(boolean useSource) {
+        this.useSource = useSource;
         return (T)this;
     }
 
@@ -314,5 +347,34 @@ public abstract class Weibo<T> implements java.io.Serializable {
         } catch (IOException e) {
             throw new WeiboException("微博API接口网络[" + apiBase + "]不可用，请检查网络或稍后再试");
         }
+    }
+
+    /**
+     * 获取特殊处理的token+clientId中的token值
+     * 
+     * @param accessToken
+     * @return
+     * @creator pengjianqiang@2021年3月14日
+     */
+    public static String splitAccessTokenToToken(String accessToken) {
+        if (CheckUtils.isEmpty(accessToken)) {
+            return accessToken;
+        }
+        return accessToken.split(TOKEN_AND_CLIENTID_SEPERATOR)[0];
+    }
+
+    /**
+     * 获取特殊处理的token+clientId中的clientId值
+     * 
+     * @param accessToken
+     * @return
+     * @creator pengjianqiang@2021年3月14日
+     */
+    public static String splitAccessTokenToClientId(String accessToken) {
+        if (CheckUtils.isEmpty(accessToken)) {
+            return "";
+        }
+        String[] info = accessToken.split(TOKEN_AND_CLIENTID_SEPERATOR);
+        return info.length > 1 ? info[1] : "";
     }
 }

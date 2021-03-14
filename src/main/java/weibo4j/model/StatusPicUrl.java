@@ -32,7 +32,7 @@ import weibo4j.org.json.JSONObject;
 @WeiboJsonName
 @SuppressWarnings("serial")
 public class StatusPicUrl extends WeiboResponse {
-    private @WeiboJsonName(value = "thumbnail_pic", isNewAndNoDesc = true) String thumbnailPic;
+    private @WeiboJsonName(value = "thumbnail_pic") String thumbnailPic; // 缩略图
 
     public StatusPicUrl(JSONObject json) {
         super(json);

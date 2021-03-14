@@ -29,11 +29,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pjq.weibo.openapi.apis;
+package pjq.weibo.openapi.apis.capis;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -43,6 +48,7 @@ import lombok.experimental.Accessors;
 import pjq.commons.constant.CommonEnumConstant.YesOrNoInt;
 import pjq.commons.utils.CheckUtils;
 import pjq.commons.utils.DefaultValueGetter;
+import pjq.weibo.openapi.apis.WeiboApiStatuses;
 import pjq.weibo.openapi.apis.base.WeiboParamPager;
 import pjq.weibo.openapi.constant.ParamConstant.AuthorType;
 import pjq.weibo.openapi.constant.ParamConstant.FilterType;
@@ -51,26 +57,29 @@ import pjq.weibo.openapi.constant.ParamConstant.QueryIdInbox;
 import pjq.weibo.openapi.constant.ParamConstant.QueryIdType;
 import pjq.weibo.openapi.constant.ParamConstant.SourceType;
 import pjq.weibo.openapi.constant.ParamConstant.StatusesFeature;
+import pjq.weibo.openapi.constant.ParamConstant.StatusesPopularizeFlag;
+import pjq.weibo.openapi.constant.ParamConstant.StatusesVisible;
 import pjq.weibo.openapi.constant.ParamConstant.TrimUser;
 import pjq.weibo.openapi.constant.WeiboConfigs;
 import pjq.weibo.openapi.support.WeiboApiParamScope;
 import pjq.weibo.openapi.utils.WeiboContentChecker;
-import pjq.weibo.openapi.utils.WeiboContentChecker.PicCheckResult;
+import pjq.weibo.openapi.utils.WeiboContentChecker.PicCheckResults;
 import pjq.weibo.openapi.utils.http.SimpleAsyncCallback;
-import weibo4j.Timeline;
 import weibo4j.http.Response;
 import weibo4j.model.PostParameter;
+import weibo4j.model.SimpleGeo;
 import weibo4j.model.Status;
-import weibo4j.model.StatusIdsPager;
 import weibo4j.model.StatusPager;
 import weibo4j.model.StatusesCounts;
+import weibo4j.model.UploadedPic;
 import weibo4j.model.WeiboException;
 import weibo4j.model.WeiboResponse;
 import weibo4j.org.json.JSONArray;
 
 /**
- * Statuses相关接口<br>
- * 使用<code>Weibo.of({@link WeiboApiStatuses}.class,accessToken)</code>生成对象
+ * Statuses相关商业接口<br>
+ * 使用<code>Weibo.of({@link WeiboCApiStatuses}.class,accessToken)</code>生成对象<br>
+ * 部分方法是直接从{@link WeiboApiStatuses}复制然后只改了url部分的，要调整的话要同时调整
  * 
  * @author pengjianqiang
  * @date 2021年1月21日
@@ -79,8 +88,12 @@ import weibo4j.org.json.JSONArray;
 @Getter
 @Accessors(fluent = true)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
-    private Timeline apiOld;
+public class WeiboCApiStatuses extends WeiboParamPager<WeiboCApiStatuses> {
+    /**
+     * 用于筛选推广微博。0：返回推广微博和普通微博；1：返回推广微博；2：返回普通微博；默认为0
+     */
+    @Setter(onMethod_ = {@WeiboApiParamScope("仅'获取授权用户发布的最新微博接口'可用")})
+    private StatusesPopularizeFlag flag;
 
     /**
      * 是否只获取当前应用的数据。0为否（所有数据），1为是（仅当前应用），默认为0
@@ -99,6 +112,12 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
      */
     @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.STATUSES_TIMELINE)})
     private TrimUser trimUser;
+
+    /**
+     * 是否排除评论赞计数，0:表示不排除，1:表示排除，默认为0
+     */
+    @Setter(onMethod_ = {@WeiboApiParamScope("仅'获取授权用户发布的最新微博接口'及'获取微博的评论数接口'可用")})
+    private YesOrNoInt excludeCommentLike;
 
     /**
      * 作者筛选类型，0：全部、1：我关注的人、2：陌生人，默认为0
@@ -131,10 +150,46 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
     private YesOrNoInt isBase62;
 
     /**
-     * 开发者上报的操作用户真实IP
+     * 是否仅屏蔽当前微博。0：仅屏蔽当前@提到我的微博；1：屏蔽当前@提到我的微博，以及后续对其转发而引起的@提到我的微博。默认1
+     */
+    @Setter(onMethod_ = {@WeiboApiParamScope("仅'屏蔽某个@我的微博及后续由其转发引起的@提及接口'可用")})
+    private YesOrNoInt followUp;
+
+    /**
+     * 针对字数大于140字微博，是否返回完整内容的开关，0：只返回140以内的微博内容、1：返回值中增加longText字段返回完整微博内容，默认为0
+     */
+    @Setter(onMethod_ = {@WeiboApiParamScope("仅'根据微博ID批量获取微博信息接口'可用")})
+    private YesOrNoInt isGetLongText;
+
+    /**
+     * 微博的可见性，0：所有人能看，1：仅自己可见，2：密友可见，3：指定分组可见，默认为0
      */
     @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.STATUSES_PUBLISH)})
-    private String rip;
+    private StatusesVisible visible;
+
+    /**
+     * 微博的保护投递指定分组ID，只有当visible参数为3时生效且必选
+     */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.STATUSES_PUBLISH)})
+    private String listId;
+
+    /**
+     * 经纬度信息
+     */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.STATUSES_PUBLISH)})
+    private SimpleGeo simpleGeo;
+
+    /**
+     * 元数据，主要是为了方便第三方应用记录一些适合于自己使用的信息，每条微博可以包含一个或者多个元数据，必须以json字串的形式提交，字串长度不超过512个字符
+     */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.STATUSES_PUBLISH)})
+    private List<JSONObject> annotations;
+
+    /**
+     * 是否发送超过140字微博，0：不超过140字，1：超过140字但在2000字以内，默认为0。操作用户需满足发送超过140字微博资格
+     */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.STATUSES_PUBLISH)})
+    private YesOrNoInt isLongtext;
 
     @Override
     protected String checkClientId() {
@@ -142,9 +197,7 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
     }
 
     @Override
-    protected void afterOfInit(String accessToken, String clientId) {
-        apiOld = new Timeline(accessToken);
-    }
+    protected void afterOfInit(String accessToken, String clientId) {}
 
     /**
      * 获取当前授权用户及其所关注用户的最新微博
@@ -155,29 +208,12 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
     public StatusPager apiGetFriendsLatestStatuses() throws WeiboException {
         List<PostParameter> paramList = pageParam();
         paramList.addAll(timelineCommonParam());
-        return new StatusPager(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_HOME_TIMELINE),
-            paramListToArray(paramList), accessToken()));
-    }
-
-    /**
-     * 获取当前授权用户及其所关注用户的最新微博的ID列表
-     * 
-     * @param statusId
-     *            微博ID
-     * @return
-     * @throws WeiboException
-     */
-    public StatusIdsPager apiGetFriendsLatestStatusIds() throws WeiboException {
-        List<PostParameter> paramList = pageParam();
-        paramList.addAll(timelineCommonParam());
-        return new StatusIdsPager(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_FRIENDS_TIMELINE_IDS),
+        return new StatusPager(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_FRIENDS_TIMELINE),
             paramListToArray(paramList), accessToken()));
     }
 
     /**
      * 获取授权用户发布的最新微博<br>
-     * 官网中已说明新版下，该接口只能获取授权用户的微博，uid和access_token都可以不传<br>
-     * 此接口最多只返回最新的5条数据，官方移动SDK调用可返回10条<br>
      * 因为只查询授权用户的最新微博，该方法默认不返回该用户的详细字段，要返回该用户的详细字段需要调用{@link #apiGetMyLatestStatusesWithTrimUserParam()}
      * 
      * @return
@@ -190,8 +226,6 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
 
     /**
      * 获取授权用户发布的最新微博<br>
-     * 官网中已说明新版下，该接口只能获取授权用户的微博，uid和access_token都可以不传<br>
-     * 此接口最多只返回最新的5条数据，官方移动SDK调用可返回10条<br>
      * 该方法根据传入的trim_user参数判断是否返回用户的详细字段
      * 
      * @return
@@ -200,48 +234,14 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
     public StatusPager apiGetMyLatestStatusesWithTrimUserParam() throws WeiboException {
         List<PostParameter> paramList = pageParam();
         paramList.addAll(timelineCommonParam());
-        return new StatusPager(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_USER_TIMELINE),
+        if (CheckUtils.isNotNull(flag)) {
+            paramList.add(new PostParameter("flag", flag.value()));
+        }
+        if (CheckUtils.isNotNull(excludeCommentLike)) {
+            paramList.add(new PostParameter("exclude_comment_like", excludeCommentLike.value()));
+        }
+        return new StatusPager(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_USER_TIMELINE),
             paramListToArray(paramList), accessToken()));
-    }
-
-    /**
-     * 获取授权用户发布的最新微博的ID列表<br>
-     * 官网中已说明新版下，该接口只能获取授权用户的微博，uid和access_token都可以不传<br>
-     * 
-     * @return
-     * @throws WeiboException
-     */
-    public StatusIdsPager apiGetMyLatestStatusIds() throws WeiboException {
-        List<PostParameter> paramList = pageParam();
-        paramList.addAll(timelineCommonParam());
-        return new StatusIdsPager(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_USER_TIMELINE_IDS),
-            paramListToArray(paramList), accessToken()));
-    }
-
-    /**
-     * 获取当前授权用户及与其双向关注用户的微博
-     * 
-     * @return
-     * @throws WeiboException
-     */
-    public StatusPager apiGetFriendsEachOtherStatuses() throws WeiboException {
-        List<PostParameter> paramList = pageParam();
-        paramList.addAll(timelineCommonParam());
-        return new StatusPager(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_BILATERAL_TIMELINE),
-            paramListToArray(paramList), accessToken()));
-    }
-
-    /**
-     * 获取授权用户关注人转发过指定微博的微博列表
-     * 
-     * @param statusId
-     *            微博ID
-     * @return
-     * @throws WeiboException
-     */
-    public StatusPager apiGetFriendsStatusesWhichRepostedThis(String statusId) throws WeiboException {
-        filterByAuthor(AuthorType.FRIEND);
-        return apiGetStatusesWhichRepostedThis(statusId);
     }
 
     /**
@@ -259,26 +259,7 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
         List<PostParameter> paramList = pageParam();
         paramList.addAll(filterCommonParam());
         paramList.add(new PostParameter(MoreUseParamNames.ID, statusId));
-        return new StatusPager(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_REPOST_TIMELINE),
-            paramListToArray(paramList), accessToken()));
-    }
-
-    /**
-     * 获取指定微博的最新转发微博的ID列表
-     * 
-     * @param statusId
-     *            微博ID
-     * @return
-     * @throws WeiboException
-     */
-    public StatusIdsPager apiGetStatusIdsWhichRepostedThis(String statusId) throws WeiboException {
-        if (CheckUtils.isEmpty(statusId)) {
-            throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ID);
-        }
-        List<PostParameter> paramList = pageParam();
-        paramList.addAll(filterCommonParam());
-        paramList.add(new PostParameter(MoreUseParamNames.ID, statusId));
-        return new StatusIdsPager(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_REPOST_TIMELINE_IDS),
+        return new StatusPager(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_REPOST_TIMELINE),
             paramListToArray(paramList), accessToken()));
     }
 
@@ -291,22 +272,34 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
     public StatusPager apiGetStatusesAtMe() throws WeiboException {
         List<PostParameter> paramList = pageParam();
         paramList.addAll(filterCommonParam());
-        return new StatusPager(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_MENTIONS),
+        return new StatusPager(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_MENTIONS),
             paramListToArray(paramList), accessToken()));
     }
 
     /**
-     * 获取@当前授权用户的最新微博的ID列表<br>
-     * 官网没有注明是废弃，但是调用后total_number有数量而id列表没返回，可能实际已废弃
+     * 根据微博ID批量获取微博信息
      * 
+     * @param statusIds
+     *            微博ID数组
      * @return
      * @throws WeiboException
+     * @creator pengjianqiang@2021年3月14日
      */
-    @SuppressWarnings("deprecation")
-    public StatusIdsPager apiGetStatusIdsAtMe() throws WeiboException {
-        List<PostParameter> paramList = pageParam();
-        paramList.addAll(filterCommonParam());
-        return new StatusIdsPager(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_MENTIONS_IDS),
+    public StatusPager apiGetStatusesByIds(String... statusIds) throws WeiboException {
+        if (CheckUtils.isEmpty(statusIds)) {
+            throw WeiboException.ofParamCanNotNull(MoreUseParamNames.IDS);
+        } else if (statusIds.length > 50) {
+            throw WeiboException.ofParamIdsOutOfLimit(MoreUseParamNames.ID, 50);
+        }
+        List<PostParameter> paramList = newParamList();
+        paramList.addAll(timelineCommonParam());
+        if (CheckUtils.isNotEmpty(statusIds)) {
+            paramList.add(new PostParameter(MoreUseParamNames.IDS, joinArrayParam(statusIds)));
+        }
+        if (CheckUtils.isNotNull(isGetLongText)) {
+            paramList.add(new PostParameter("isGetLongText", isGetLongText.value()));
+        }
+        return new StatusPager(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_SHOW_BATCH),
             paramListToArray(paramList), accessToken()));
     }
 
@@ -349,24 +342,6 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
     }
 
     /**
-     * 根据微博ID获取单条微博信息
-     * 
-     * @param statusId
-     *            微博ID
-     * @return
-     * @throws WeiboException
-     */
-    public Status apiGetStatus(String statusId) throws WeiboException {
-        if (CheckUtils.isEmpty(statusId)) {
-            throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ID);
-        }
-        List<PostParameter> paramList = newParamList();
-        paramList.add(new PostParameter(MoreUseParamNames.ID, statusId));
-        return new Status(
-            client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_SHOW), paramListToArray(paramList), accessToken()));
-    }
-
-    /**
      * 批量获取指定微博的转发数评论数
      * 
      * @param statusIds
@@ -378,37 +353,15 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
         if (CheckUtils.isEmpty(statusIds)) {
             throw WeiboException.ofParamCanNotNull(MoreUseParamNames.IDS);
         } else if (statusIds.length > 100) {
-            WeiboException.ofParamIdsOutOfLimit("id", 100);
+            WeiboException.ofParamIdsOutOfLimit(MoreUseParamNames.ID, 100);
         }
         List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter(MoreUseParamNames.IDS, joinArrayParam(statusIds)));
-        return WeiboResponse.buildList(
-            client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_COUNT), paramListToArray(paramList), accessToken()),
-            StatusesCounts.class);
-    }
-
-    /**
-     * 根据ID跳转到单条微博页(使用access_token参数)
-     * 
-     * @param uid
-     *            要跳转的用户ID
-     * @param statusId
-     *            微博ID
-     * @return 返回目标微博的地址url地址
-     * @throws WeiboException
-     */
-    public String apiStatusGo(String uid, String statusId) throws WeiboException {
-        if (CheckUtils.isEmpty(uid)) {
-            throw WeiboException.ofParamCanNotNull(MoreUseParamNames.UID);
+        if (CheckUtils.isNotNull(excludeCommentLike)) {
+            paramList.add(new PostParameter("exclude_comment_like", excludeCommentLike.value()));
         }
-        if (CheckUtils.isEmpty(statusId)) {
-            throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ID);
-        }
-        List<PostParameter> paramList = newParamList();
-        paramList.add(new PostParameter(MoreUseParamNames.UID, uid));
-        paramList.add(new PostParameter(MoreUseParamNames.ID, statusId));
-        return client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_GO), paramListToArray(paramList), accessToken())
-            .asString();
+        return WeiboResponse.buildList(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_COUNT),
+            paramListToArray(paramList), accessToken()), StatusesCounts.class);
     }
 
     /**
@@ -453,7 +406,7 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
         } else if (ids.length > 20) {
             throw WeiboException.ofParamIdsOutOfLimit(idParamName, 20);
         }
-        String apiName = !queryId ? WeiboConfigs.STATUSES_QUERY_MID : WeiboConfigs.STATUSES_QUERY_ID;
+        String apiName = !queryId ? WeiboConfigs.STATUSES_CAPI_QUERY_MID : WeiboConfigs.STATUSES_CAPI_QUERY_ID;
 
         List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter(idParamName, joinArrayParam(ids)));
@@ -509,11 +462,8 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
         if (CheckUtils.isNotEmpty(repostText)) {
             paramList.add(new PostParameter("status", WeiboContentChecker.checkPostTextAndReturn(repostText[0])));
         }
-        if (CheckUtils.isNotEmpty(rip)) {
-            paramList.add(new PostParameter(MoreUseParamNames.REAL_IP, rip));
-        }
-        return new Status(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_REPOST), paramListToArray(paramList),
-            accessToken()));
+        return new Status(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_REPOST),
+            paramListToArray(paramList), accessToken()));
     }
 
     /**
@@ -528,26 +478,83 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
         if (CheckUtils.isEmpty(statusId)) {
             throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ID);
         }
-        return apiOld.destroy(statusId);
+        List<PostParameter> paramList = newParamList();
+        paramList.add(new PostParameter(MoreUseParamNames.ID, statusId));
+        return new Status(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_DESTROY),
+            paramListToArray(paramList), accessToken()));
+    }
+
+    /**
+     * 过滤某条微博
+     * 
+     * @param statusId
+     *            微博ID
+     * @return
+     * @throws WeiboException
+     * @creator pengjianqiang@2021年3月14日
+     */
+    public Status apiFilterOneStatus(String statusId) throws WeiboException {
+        if (CheckUtils.isEmpty(statusId)) {
+            throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ID);
+        }
+        List<PostParameter> paramList = newParamList();
+        paramList.add(new PostParameter(MoreUseParamNames.ID, statusId));
+        return new Status(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_FILTER_CREATE),
+            paramListToArray(paramList), accessToken()));
+    }
+
+    /**
+     * 屏蔽某个@我的微博及后续由其转发引起的@提及
+     * 
+     * @param statusId
+     *            微博ID
+     * @return
+     * @throws WeiboException
+     * @creator pengjianqiang@2021年3月14日
+     */
+    public Status apiFilterMentionsAndShield(String statusId) throws WeiboException {
+        if (CheckUtils.isEmpty(statusId)) {
+            throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ID);
+        }
+        List<PostParameter> paramList = newParamList();
+        paramList.add(new PostParameter(MoreUseParamNames.ID, statusId));
+        if (CheckUtils.isNotNull(followUp)) {
+            paramList.add(new PostParameter("follow_up", followUp.value()));
+        }
+        return new Status(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_MENTIONS_SHIELD),
+            paramListToArray(paramList), accessToken()));
     }
 
     /**
      * (同步)第三方分享一条链接到微博
      * 
      * @param statusText
-     *            用户分享到微博的文本内容，内容不超过130个汉字(可包含表情转义符，但是好像只有"普通表情"类才可以正确显示)<br>
-     *            文本中不能包含"#话题词#"(经测试加了也不报错，只是会被微博自动过滤掉)<br>
-     *            同时文本中必须包含至少一个第三方分享到微博的网页URL，且该URL只能是该第三方（调用方）绑定域下的URL链接<br>
-     *            绑定域在"我的应用-应用信息-基本应用信息编辑-安全域名"里设置<br>
-     *            链接地址中如含有中文等字符，需要做URLEncode<br>
-     *            正文例子："这是一个测试微博http://安全域名{详细地址}"，里面的第三方地址是必须的，可以只到域名那段，例如http://www.myapp.com
+     *            用户分享到微博的文本内容，内容不超过130或1900个汉字(可包含表情转义符，所有类别的表情可以正确显示)<br>
+     *            如果要上传图片，则文本内容不超过130个汉字<br>
+     *            文本中可以包含"#话题词#"<br>
      * @param picPath
-     *            用户想要分享到微博的图片地址，仅支持JPEG、GIF、PNG图片，上传图片大小限制为<5M(只能传一个图片)
+     *            用户想要分享到微博的图片地址，仅支持JPEG、GIF、PNG图片，上传图片大小限制为<5M
      * @return
      * @throws WeiboException
      */
     public Status apiShareStatus(String statusText, String picPath) throws WeiboException {
-        return new Status(apiShareStatusAsync(statusText, picPath, null));
+        return new Status(apiShareStatusAsync(statusText, Arrays.asList(picPath).toArray(new String[] {}), null));
+    }
+
+    /**
+     * (同步)第三方分享一条链接到微博
+     * 
+     * @param statusText
+     *            用户分享到微博的文本内容，内容不超过130或1900个汉字(可包含表情转义符，所有类别的表情可以正确显示)<br>
+     *            如果要上传图片，则文本内容不超过130个汉字<br>
+     *            文本中可以包含"#话题词#"<br>
+     * @param picPaths
+     *            用户想要分享到微博的图片地址，仅支持JPEG、GIF、PNG图片，上传图片大小限制为<5M
+     * @return
+     * @throws WeiboException
+     */
+    public Status apiShareStatus(String statusText, String[] picPaths) throws WeiboException {
+        return new Status(apiShareStatusAsync(statusText, picPaths, null));
     }
 
     /**
@@ -563,21 +570,97 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
      */
     public Response apiShareStatusAsync(String statusText, String picPath, SimpleAsyncCallback callback)
         throws WeiboException {
+        return apiShareStatusAsync(statusText, Arrays.asList(picPath).toArray(new String[] {}), callback);
+    }
+
+    /**
+     * (异步)第三方分享一条链接到微博<br>
+     * callback为空时会转成同步请求，且不会返回具体的业务对象，所以如果不需要异步请求，直接使用{@link #apiShareStatus(String, String)}
+     * 
+     * @param statusText
+     * @param picPaths
+     * @param callback
+     *            异步请求时的回调对象
+     * @return
+     * @throws WeiboException
+     */
+    public Response apiShareStatusAsync(String statusText, String[] picPaths, SimpleAsyncCallback callback)
+        throws WeiboException {
         if (CheckUtils.isEmpty(statusText)) {
+            // 网上接口显示发多图时文本内容可为空，实际是不能为空
             throw WeiboException.ofParamCanNotNull(MoreUseParamNames.STATUS_TEXT);
         }
-        statusText = WeiboContentChecker.checkPostTextAndReturn(statusText);
-        WeiboContentChecker.checkIfHasSafeLink(statusText, safeDomains());
-        PicCheckResult picCheckResult = WeiboContentChecker.checkIfPicValid(picPath);
-        boolean needUploadPic = picCheckResult.isValid();
+        if (StatusesVisible.SPECIFY_GROUP.equals(visible) && CheckUtils.isEmpty(listId)) {
+            throw WeiboException.ofParamCanNotNull("list_id");
+        }
+        if (CheckUtils.isNotNull(simpleGeo)) {
+            simpleGeo.check();
+        }
+
+        int textLengthLimit = 140;
+        if (YesOrNoInt.YES.equals(isLongtext)) {
+            textLengthLimit = 2000;
+        }
+        statusText = WeiboContentChecker.checkPostTextAndReturn4CApi(statusText, textLengthLimit);
+        WeiboContentChecker.checkAnnotationsLength(annotations);
+
+        PicCheckResults picCheckResults = WeiboContentChecker.checkIfPicsValid(picPaths);
+        boolean needUploadPic = picCheckResults.isValid();
+        int picNums = picCheckResults.picNums();
+
+        String picids = null;
+        if (needUploadPic) {
+            statusText = WeiboContentChecker.checkPostTextAndReturn4CApi(statusText, 140); // 发送图片时文本内容只能小于140
+
+            if (picNums > 1) {
+                // 如果是上传多图，则先使用上传图片的接口上传图片后获取图片id，再用pic_id参数，而不使用url参数
+                if (picNums > 12) {
+                    // 微博实际可以发超过15张，最多可发数没测过，但是避免过程中网络等因素影响导致出错，限定只能发12张
+                    throw new WeiboException("最多只能发布12张图片");
+                }
+                try {
+                    List<UploadedPic> uploadedPics = apiGetStatusesUploadPic(picCheckResults.picPaths());
+                    picids = UploadedPic.toPicIds(uploadedPics);
+                } catch (Exception e) {
+                    // 如果报错则先删除临时文件
+                    picCheckResults.deleteTempFiles();
+
+                    if (e instanceof WeiboException) {
+                        throw e;
+                    } else {
+                        throw new WeiboException(e);
+                    }
+                }
+            }
+        }
 
         List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter(MoreUseParamNames.STATUS_TEXT, statusText));
-        if (CheckUtils.isNotEmpty(rip)) {
-            paramList.add(new PostParameter(MoreUseParamNames.REAL_IP, rip));
+        if (CheckUtils.isNotNull(simpleGeo)) {
+            paramList.add(new PostParameter("long", simpleGeo.getLongitude()));
+            paramList.add(new PostParameter("lat", simpleGeo.getLatitude()));
+        }
+        if (CheckUtils.isNotEmpty(annotations)) {
+            paramList.add(new PostParameter("annotations", JSON.toJSONString(annotations)));
+        }
+        if (CheckUtils.isNotNull(isLongtext)) {
+            paramList.add(new PostParameter("is_longtext", isLongtext.value()));
+        }
+        if (CheckUtils.isNotEmpty(picids)) {
+            paramList.add(new PostParameter("pic_id", picids));
         }
 
-        String url = WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_SHARE);
+        // 根据不同情况选择接口
+        String url = WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_UPDATE);
+        if (needUploadPic) {
+            // 根据发送的图片数选择接口
+            if (picNums <= 1) {
+                url = WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_UPLOAD);
+            } else {
+                url = WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_UPLOAD_URL_TEXT);
+            }
+        }
+
         Response response = null;
         if (!needUploadPic) {
             response = client.post(url, paramListToArray(paramList), accessToken(), callback);
@@ -586,20 +669,48 @@ public class WeiboApiStatuses extends WeiboParamPager<WeiboApiStatuses> {
             if (CheckUtils.isNotNull(callback)) {
                 actualCallback = (isSuccess, statusCode, responseStr) -> {
                     // 上传完先删除临时文件
-                    picCheckResult.deleteTempFile();
+                    picCheckResults.deleteTempFiles();
                     callback.onResponse(isSuccess, statusCode, responseStr);
                 };
             }
 
-            // 开始调发微博的请求(pic为上传图片的参数名)
-            response = client.postMultipartForm(url, paramListToArray(paramList), accessToken(), MoreUseParamNames.PIC,
-                actualCallback, picCheckResult.getFilePath());
+            if (picNums <= 1) {
+                // 开始调发微博的请求(pic为上传图片的参数名)
+                response = client.postMultipartForm(url, paramListToArray(paramList), accessToken(),
+                    MoreUseParamNames.PIC, actualCallback, picCheckResults.getPicCheckResults().get(0).getFilePath());
+            } else {
+                // 上传多个图片的接口按一般post调用即可
+                response = client.post(url, paramListToArray(paramList), accessToken(), callback);
+            }
 
             if (CheckUtils.isNull(callback)) {
                 // 同步上传时在这里删除临时文件
-                picCheckResult.deleteTempFile();
+                picCheckResults.deleteTempFiles();
             }
         }
         return response;
+    }
+
+    /**
+     * 上传图片并获取其上传后的信息
+     * 
+     * @param picPaths
+     * @return
+     * @throws WeiboException
+     * @creator pengjianqiang@2021年3月12日
+     */
+    private List<UploadedPic> apiGetStatusesUploadPic(List<String> picPaths) throws WeiboException {
+        if (CheckUtils.isEmpty(picPaths)) {
+            throw WeiboException.ofParamCanNotNull(MoreUseParamNames.PIC);
+        }
+
+        List<UploadedPic> uploadedPics = new ArrayList<>();
+        for (String picPath : picPaths) {
+            List<PostParameter> paramList = newParamList();
+            uploadedPics.add(
+                new UploadedPic(client.postMultipartForm(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_UPLOAD_PIC),
+                    paramListToArray(paramList), accessToken(), MoreUseParamNames.PIC, null, picPath)));
+        }
+        return uploadedPics;
     }
 }

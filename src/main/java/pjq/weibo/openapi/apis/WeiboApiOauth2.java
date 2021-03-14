@@ -54,6 +54,7 @@ import pjq.weibo.openapi.constant.ParamConstant.OAuth2Display;
 import pjq.weibo.openapi.constant.ParamConstant.OAuth2Language;
 import pjq.weibo.openapi.constant.ParamConstant.OAuth2Scope;
 import pjq.weibo.openapi.constant.WeiboConfigs;
+import pjq.weibo.openapi.support.WeiboApiParamScope;
 import pjq.weibo.openapi.support.WeiboCacher;
 import pjq.weibo.openapi.support.WeiboHttpClient.MethodType;
 import weibo4j.Oauth;
@@ -66,14 +67,13 @@ import weibo4j.model.WeiboException;
 
 /**
  * oauth2相关接口<br>
- * 使用{@code Weibo.of(WeiboApiOauth2.class)}生成对象
+ * 使用<code>Weibo.of({@link WeiboApiOauth2}.class)</code>生成对象
  * 
  * @author pengjianqiang
  * @date 2021年1月20日
  */
 @SuppressWarnings("serial")
 @Getter
-@Setter
 @Accessors(fluent = true)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
@@ -83,32 +83,38 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
     /**
      * 申请scope权限所需参数，可一次申请多个scope权限，用逗号分隔
      */
+    @WeiboApiParamScope(WeiboApiParamScope.OAUTH_BUILD_AUTHORIZE_URL)
     private OAuth2Scope[] scopes;
 
     /**
      * 是否使用state参数，true：是，false：否。默认true，并生成随机state值
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.OAUTH_BUILD_AUTHORIZE_URL)})
     private TrueOrFalse useState;
 
     /**
      * 用于保持请求和回调的状态，在回调时，会在Query Parameter中回传该参数(useState为true时生效)
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.OAUTH_BUILD_AUTHORIZE_URL)})
     private String state;
 
     /**
      * 授权页面的终端类型
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.OAUTH_BUILD_AUTHORIZE_URL)})
     private OAuth2Display display;
 
     /**
      * 是否强制用户重新登录，true：是，false：否。默认false
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.OAUTH_BUILD_AUTHORIZE_URL)})
     private TrueOrFalse forcelogin;
 
     /**
      * 授权页语言，缺省为中文简体版，en为英文版<br>
      * 英文版好像有问题，账号密码正确对会提示用扫码登录，建议不传该参数，默认用中文版
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.OAUTH_BUILD_AUTHORIZE_URL)})
     private OAuth2Language language;
 
     @Override
@@ -122,6 +128,7 @@ public class WeiboApiOauth2 extends Weibo<WeiboApiOauth2> {
      * @param scopes
      * @return
      */
+    @WeiboApiParamScope(WeiboApiParamScope.OAUTH_BUILD_AUTHORIZE_URL)
     public WeiboApiOauth2 scopes(OAuth2Scope... scopes) {
         this.scopes = scopes;
         return this;

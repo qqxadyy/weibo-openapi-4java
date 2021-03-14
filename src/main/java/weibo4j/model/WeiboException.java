@@ -114,6 +114,9 @@ public class WeiboException extends RuntimeException {
             case 21317:
                 chineseMsg = "授权码不合法";
                 break;
+            case 20101:
+                chineseMsg = "目标微博不存在";
+                break;
             default:
                 break;
         }
@@ -122,5 +125,9 @@ public class WeiboException extends RuntimeException {
 
     public static WeiboException ofParamCanNotNull(String paramName) {
         throw new WeiboException("参数" + paramName + "不能为空");
+    }
+
+    public static WeiboException ofParamIdsOutOfLimit(String paramName, int limitNum) {
+        throw new WeiboException(paramName + "的数量不能超过" + limitNum);
     }
 }

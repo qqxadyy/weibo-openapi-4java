@@ -43,6 +43,7 @@ public class StatusPager extends WeiboResponsePager {
     private @WeiboJsonName(isNewAndNoDesc = true) List<JSONObject> ad;
     private @WeiboJsonName(value = "uve_blank", isNewAndNoDesc = true) Integer uveBlank;
     private @WeiboJsonName(value = "has_unread", isNewAndNoDesc = true) Integer hasUnread;
+    private @WeiboJsonName(isNewAndNoDesc = true) List<StatusState> states;
 
     public StatusPager(JSONObject json) {
         super(json);

@@ -29,39 +29,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pjq.weibo.openapi.examplesnew;
+package pjq.weibo.openapi.examplesnew.capis;
 
 import java.io.IOException;
+import java.util.Arrays;
 
-import pjq.weibo.openapi.apis.WeiboApiStatuses;
+import com.alibaba.fastjson.JSON;
+
+import pjq.commons.constant.CommonEnumConstant.YesOrNoInt;
+import pjq.weibo.openapi.apis.capis.WeiboCApiStatuses;
+import pjq.weibo.openapi.constant.ParamConstant.QueryIdType;
 import weibo4j.Weibo;
+import weibo4j.model.SimpleGeo;
 import weibo4j.model.WeiboException;
 import weibo4j.org.json.JSONException;
 
-public class WeiboApiStatusesExample {
+public class WeiboCApiStatusesExample {
     public static void main(String[] args) throws WeiboException, IOException, JSONException {
         try {
-            String accessToken = "2.0035IE5CHIqjUE13813114a4fklWmC";
+            String accessToken = "2.0035IE5CBBIyKD5d5233a353GSQCmD";
 
-            WeiboApiStatuses apiObj = Weibo.of(WeiboApiStatuses.class, accessToken);
+            WeiboCApiStatuses apiObj = Weibo.of(WeiboCApiStatuses.class, accessToken);
 
-            // System.out.println(apiObj.count(5).apiGetFriendsLatestStatuses());
-            // System.out.println(apiObj.apiGetFriendsLatestStatusIds());
-            // System.out.println(apiObj.feature(StatusesFeature.REPOST).apiGetMyLatestStatuses());
-            // System.out.println(apiObj.apiGetMyLatestStatusIds());
-            // System.out.println(apiObj.apiGetFriendsEachOtherStatuses());
+            // System.out.println(apiObj.apiGetFriendsLatestStatuses());
+            // System.out.println(apiObj.isGetLongText(YesOrNoInt.YES).count(1).apiGetMyLatestStatuses());
             // System.out.println(apiObj.apiGetStatusesWhichRepostedThis(""));
-            // System.out.println(apiObj.apiGetStatusIdsWhichRepostedThis(""));
             // System.out.println(apiObj.apiGetStatusesAtMe());
-            // System.out.println(apiObj.apiGetStatusIdsAtMe());
-            // System.out.println(apiObj.apiStatusGo("", ""));
-            // System.out.println(apiObj.apiGetStatus(""));
-            // System.out.println(apiObj.apiGetStatusesCounts("", ""));
+            // System.out.println(apiObj.apiGetStatusesByIds());
+            // System.out.println(apiObj.apiGetStatusesCounts());
             // System.out.println(apiObj.apiQueryMidById(QueryIdType.STATUS, ""));
             // System.out.println(apiObj.isBase62(YesOrNoInt.YES).apiQueryIdByMid(QueryIdType.STATUS, ""));
-            // System.out.println(apiObj.apiShareStatus("http://pjq.mynatapp.cc/ ss", "d://work/1.png"));
+            // System.out.println(apiObj.apiRepostStatus("", ""));
+            // System.out.println(apiObj.apiDestroy(""));
+            // System.out.println(apiObj.apiFilterOneStatus(""));
+            // System.out.println(apiObj.apiFilterMentionsAndShield(""));
 
-            // System.out.println(apiObj.apiShareStatusAsync("http://pjq.mynatapp.cc/ ,sss#", "",
+            // System.out.println(apiObj.isLongtext(YesOrNoInt.YES).simpleGeo(new SimpleGeo("113.27324", "23.15792"))
+            // .annotations(Arrays.asList(JSON.parseObject("{\"testAnno\":\"sss\"}")))
+            // .apiShareStatus("是是是", new String[] {"d://work/2.png"}));
+
+            // System.out.println(apiObj.apiShareStatusAsync("ss", new String[] {"d://work/2.png"},
             // (isSuccess, statusCode, responseStr) -> {
             // Response res = new Response();
             // res.setResponseAsString(responseStr);

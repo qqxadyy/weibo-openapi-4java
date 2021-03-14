@@ -29,6 +29,7 @@ import pjq.weibo.openapi.support.WeiboHttpClient;
 import pjq.weibo.openapi.support.WeiboHttpClient.MethodType;
 import pjq.weibo.openapi.utils.http.HttpException;
 import pjq.weibo.openapi.utils.http.SimpleAsyncCallback;
+import weibo4j.Weibo;
 import weibo4j.model.Configuration;
 import weibo4j.model.Paging;
 import weibo4j.model.PostParameter;
@@ -259,20 +260,27 @@ public class HttpClientNew implements java.io.Serializable {
         Boolean WithTokenHeader, String token, String fileParamName, SimpleAsyncCallback callback, String... filePaths)
         throws WeiboException {
         try {
+            String trueToken = Weibo.splitAccessTokenToToken(token);
+            String trueClientId = Weibo.splitAccessTokenToClientId(token);
             Map<String, String> extraHeaders = new HashMap<>();
             if (WithTokenHeader) {
                 // 这里应该是旧版接口的处理，保留
-                if (CheckUtils.isEmpty(token)) {
+                if (CheckUtils.isEmpty(trueToken)) {
                     throw new IllegalStateException("Oauth2 token is not set!");
                 }
-                extraHeaders.put("Authorization", "OAuth2 " + token);
+                extraHeaders.put("Authorization", "OAuth2 " + trueToken);
                 extraHeaders.put("API-RemoteIP", InetAddress.getLocalHost().getHostAddress());
 
                 // 2021-01-22增加处理
                 if (CheckUtils.isEmpty(paramMap)) {
                     paramMap = new HashMap<>();
                 }
-                paramMap.put(MoreUseParamNames.ACCESS_TOKEN, token);
+                paramMap.put(MoreUseParamNames.ACCESS_TOKEN, trueToken);
+
+                // 如果特殊处理的clientId参数不为空，则增加该传参(主要用于适应部分接口可能需要传source参数而不想调整太多本类中post的方法参数的情况)
+                if (CheckUtils.isNotEmpty(trueClientId)) {
+                    paramMap.put(MoreUseParamNames.CLIENT_ID_USE_SOURCE, trueClientId);
+                }
             }
 
             String responseStr = null;
@@ -348,32 +356,6 @@ public class HttpClientNew implements java.io.Serializable {
         }
         return buf.toString();
     }
-
-    // private static class ByteArrayPart extends PartBase {
-    // private byte[] mData;
-    // private String mName;
-    //
-    // public ByteArrayPart(byte[] data, String name, String type) throws IOException {
-    // super(name, type, "UTF-8", "binary");
-    // mName = name;
-    // mData = data;
-    // }
-    //
-    // protected void sendData(OutputStream out) throws IOException {
-    // out.write(mData);
-    // }
-    //
-    // protected long lengthOfData() throws IOException {
-    // return mData.length;
-    // }
-    //
-    // protected void sendDispositionHeader(OutputStream out) throws IOException {
-    // super.sendDispositionHeader(out);
-    // StringBuilder buf = new StringBuilder();
-    // buf.append("; filename=\"").append(mName).append("\"");
-    // out.write(buf.toString().getBytes());
-    // }
-    // }
 
     private static String getCause(int statusCode) {
         String cause = null;

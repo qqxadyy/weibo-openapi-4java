@@ -42,6 +42,7 @@ import pjq.commons.constant.CommonEnumConstant.StatusType;
 import pjq.commons.utils.CheckUtils;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.WeiboConfigs;
+import pjq.weibo.openapi.support.WeiboApiParamScope;
 import weibo4j.Weibo;
 import weibo4j.model.PostParameter;
 import weibo4j.model.UnreadCount;
@@ -49,25 +50,26 @@ import weibo4j.model.WeiboException;
 
 /**
  * Remind相关接口<br>
- * 使用{@code Weibo.of(WeiboApiRemind.class,accessToken)}生成对象
+ * 使用<code>Weibo.of({@link WeiboApiRemind}.class,accessToken)</code>生成对象
  * 
  * @author pengjianqiang
  * @date 2021年1月21日
  */
 @SuppressWarnings("serial")
 @Getter
-@Setter
 @Accessors(fluent = true)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WeiboApiRemind extends Weibo<WeiboApiRemind> {
     /**
      * JSONP回调函数，用于前端调用返回JS格式的信息
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope("仅'获取某个用户的各种消息未读数接口'可用")})
     private String callback;
 
     /**
      * 未读数版本。0：原版未读数，1：新版未读数。默认为0
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope("仅'获取某个用户的各种消息未读数接口'可用")})
     private StatusType unreadMessage;
 
     /**
@@ -91,6 +93,6 @@ public class WeiboApiRemind extends Weibo<WeiboApiRemind> {
             paramList.add(new PostParameter("unread_message", StatusType.VALID.value()));
         }
         return new UnreadCount(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.REMIND_UNREAD_COUNT),
-            paramListToArray(paramList), accessToken));
+            paramListToArray(paramList), accessToken()));
     }
 }

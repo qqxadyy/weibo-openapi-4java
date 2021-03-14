@@ -32,6 +32,7 @@ import weibo4j.org.json.JSONObject;
 @WeiboJsonName
 @SuppressWarnings("serial")
 public class StatusCommentManageInfo extends WeiboResponse {
+    private @WeiboJsonName(value = "comment_manage_button", isNewAndNoDesc = true) Integer commentManageButton;
     private @WeiboJsonName(value = "comment_permission_type", isNewAndNoDesc = true) Integer commentPermissionType;
     private @WeiboJsonName(value = "approval_comment_type", isNewAndNoDesc = true) Integer approvalCommentType;
 

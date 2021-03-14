@@ -14,32 +14,36 @@
  */
 package weibo4j.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import pjq.weibo.openapi.support.WeiboJsonName;
-import weibo4j.org.json.JSONObject;
 
 /**
- * 微博评论数等
+ * 简单的经纬度对象，主要用作参数
  * 
  * @author pengjianqiang
- * @date 2021年1月26日
+ * @date 2021年3月12日
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
+@AllArgsConstructor
 @NoArgsConstructor
-@WeiboJsonName
-@SuppressWarnings("serial")
-public class StatusesCounts extends WeiboResponse {
-    private String id; // 微博ID
-    private Long comments; // 评论数
-    private Long reposts; // 转发数
-    private Long attitudes; // 表态数(赞数)
-    private @WeiboJsonName(value = "number_display_strategy",
-        isNewAndNoDesc = true) StatusNumberDisplayStrategy statusNumberDisplayStrategy;
+public class SimpleGeo {
+    private String longitude; // 经度坐标
+    private String latitude; // 维度坐标
 
-    public StatusesCounts(JSONObject json) {
-        super(json);
+    public void check() {
+        SimpleGeo.check(getLongitude(), getLatitude());
+    }
+
+    public static void check(String longitude, String latitude) {
+        try {
+            Double longDouble = Double.parseDouble(longitude);
+            Double latDouble = Double.parseDouble(latitude);
+            if (latDouble < -90D || latDouble > 90D || longDouble < -180D || longDouble > 180D) {
+                throw new Exception();
+            }
+        } catch (Exception e) {
+            throw new WeiboException("坐标[" + longitude + "," + latitude + "]不合法");
+        }
     }
 }

@@ -42,6 +42,7 @@ import pjq.commons.utils.CheckUtils;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.ParamConstant.TrimStatus;
 import pjq.weibo.openapi.constant.WeiboConfigs;
+import pjq.weibo.openapi.support.WeiboApiParamScope;
 import weibo4j.Weibo;
 import weibo4j.model.PostParameter;
 import weibo4j.model.User;
@@ -59,7 +60,6 @@ import weibo4j.model.WeiboResponse;
  */
 @SuppressWarnings("serial")
 @Getter
-@Setter
 @Accessors(fluent = true)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WeiboApiUsers extends Weibo<WeiboApiUsers> {
@@ -67,6 +67,7 @@ public class WeiboApiUsers extends Weibo<WeiboApiUsers> {
      * 返回值中user字段中的status字段开关，0：返回完整status字段、1：status字段仅返回status_id，默认为1<br>
      * 官网接口中没有写该参数
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.USERS_QUERY)})
     private TrimStatus trimStatus;
 
     @Override
@@ -171,6 +172,8 @@ public class WeiboApiUsers extends Weibo<WeiboApiUsers> {
     public List<UserCounts> apiGetUserCounts(String... uids) throws WeiboException {
         if (CheckUtils.isEmpty(uids)) {
             throw WeiboException.ofParamCanNotNull("uids");
+        } else if (uids.length > 100) {
+            WeiboException.ofParamIdsOutOfLimit("uid", 100);
         }
         List<PostParameter> paramList = newParamList();
         paramList.add(new PostParameter("uids", joinArrayParam(uids)));

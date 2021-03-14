@@ -18,28 +18,30 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import pjq.weibo.openapi.support.WeiboJsonName;
+import weibo4j.http.Response;
 import weibo4j.org.json.JSONObject;
 
 /**
- * 微博评论数等
+ * 批量查微博信息时返回的state
  * 
  * @author pengjianqiang
- * @date 2021年1月26日
+ * @date 2021年3月14日
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @WeiboJsonName
 @SuppressWarnings("serial")
-public class StatusesCounts extends WeiboResponse {
-    private String id; // 微博ID
-    private Long comments; // 评论数
-    private Long reposts; // 转发数
-    private Long attitudes; // 表态数(赞数)
-    private @WeiboJsonName(value = "number_display_strategy",
-        isNewAndNoDesc = true) StatusNumberDisplayStrategy statusNumberDisplayStrategy;
+public class StatusState extends WeiboResponse {
+    private String id; // 微博id
+    private @WeiboJsonName(isNewAndNoDesc = true) Integer state;
+    private @WeiboJsonName(isNewAndNoDesc = true) Integer delThreeYearsStatus;
 
-    public StatusesCounts(JSONObject json) {
+    public StatusState(Response res) {
+        super(res);
+    }
+
+    public StatusState(JSONObject json) {
         super(json);
     }
 }

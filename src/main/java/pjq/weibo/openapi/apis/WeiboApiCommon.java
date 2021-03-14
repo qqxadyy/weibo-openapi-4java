@@ -42,6 +42,7 @@ import pjq.commons.utils.CheckUtils;
 import pjq.weibo.openapi.constant.ParamConstant.CommonLanguage;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.WeiboConfigs;
+import pjq.weibo.openapi.support.WeiboApiParamScope;
 import weibo4j.Weibo;
 import weibo4j.model.CodeAndNameObject;
 import weibo4j.model.PostParameter;
@@ -49,25 +50,26 @@ import weibo4j.model.WeiboException;
 
 /**
  * Common相关接口<br>
- * 使用{@code Weibo.of(WeiboApiCommon.class,accessToken)}生成对象
+ * 使用<code>Weibo.of({@link WeiboApiCommon}.class,accessToken)</code>生成对象
  * 
  * @author pengjianqiang
  * @date 2021年1月21日
  */
 @SuppressWarnings("serial")
 @Getter
-@Setter
 @Accessors(fluent = true)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WeiboApiCommon extends Weibo<WeiboApiCommon> {
     /**
      * 国家的首字母，a-z或A-Z，可为空代表返回全部，默认为全部，只能传一个
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.COMMON_LOCATION)})
     private String capital;
 
     /**
      * 返回的语言版本，默认为简体中文
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.COMMON_COMMON)})
     private CommonLanguage language;
 
     /**
@@ -79,7 +81,7 @@ public class WeiboApiCommon extends Weibo<WeiboApiCommon> {
     public List<CodeAndNameObject> apiGetCountry() throws WeiboException {
         List<PostParameter> paramList = commonParam();
         return CodeAndNameObject.builList(client
-            .get(WeiboConfigs.getApiUrl(WeiboConfigs.COMMON_GET_COUNTRY), paramListToArray(paramList), accessToken)
+            .get(WeiboConfigs.getApiUrl(WeiboConfigs.COMMON_GET_COUNTRY), paramListToArray(paramList), accessToken())
             .asJSONArray());
     }
 
@@ -98,7 +100,7 @@ public class WeiboApiCommon extends Weibo<WeiboApiCommon> {
         List<PostParameter> paramList = commonParam();
         paramList.add(new PostParameter("country", country));
         return CodeAndNameObject.builList(client
-            .get(WeiboConfigs.getApiUrl(WeiboConfigs.COMMON_GET_PROVINCE), paramListToArray(paramList), accessToken)
+            .get(WeiboConfigs.getApiUrl(WeiboConfigs.COMMON_GET_PROVINCE), paramListToArray(paramList), accessToken())
             .asJSONArray());
     }
 
@@ -117,7 +119,7 @@ public class WeiboApiCommon extends Weibo<WeiboApiCommon> {
         List<PostParameter> paramList = commonParam();
         paramList.add(new PostParameter("province", province));
         return CodeAndNameObject.builList(
-            client.get(WeiboConfigs.getApiUrl(WeiboConfigs.COMMON_GET_CITY), paramListToArray(paramList), accessToken)
+            client.get(WeiboConfigs.getApiUrl(WeiboConfigs.COMMON_GET_CITY), paramListToArray(paramList), accessToken())
                 .asJSONArray());
     }
 
@@ -135,9 +137,8 @@ public class WeiboApiCommon extends Weibo<WeiboApiCommon> {
         }
         List<PostParameter> paramList = commonParam();
         paramList.add(new PostParameter("codes", joinArrayParam(codes)));
-        return CodeAndNameObject.builList(client
-            .get(WeiboConfigs.getApiUrl(WeiboConfigs.COMMON_CODE_TO_LOCATION), paramListToArray(paramList), accessToken)
-            .asJSONArray());
+        return CodeAndNameObject.builList(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.COMMON_CODE_TO_LOCATION),
+            paramListToArray(paramList), accessToken()).asJSONArray());
     }
 
     /**
@@ -149,7 +150,7 @@ public class WeiboApiCommon extends Weibo<WeiboApiCommon> {
     public List<CodeAndNameObject> apiGetTimeZone() throws WeiboException {
         List<PostParameter> paramList = commonParam();
         return CodeAndNameObject.builListForTimeZone(client
-            .get(WeiboConfigs.getApiUrl(WeiboConfigs.COMMON_GET_TIMEZONE), paramListToArray(paramList), accessToken)
+            .get(WeiboConfigs.getApiUrl(WeiboConfigs.COMMON_GET_TIMEZONE), paramListToArray(paramList), accessToken())
             .asJSONObject());
     }
 

@@ -60,10 +60,13 @@ public final class ParamConstant {
         public static final String UID = "uid";
         public static final String SCREEN_NAME = "screen_name";
         public static final String ID = "id";
+        public static final String IDS = "ids";
         public static final String LANGUAGE = "language";
         public static final String TYPE = "type";
         public static final String CLIENT_ID = "client_id";
         public static final String REAL_IP = "rip";
+        public static final String STATUS_TEXT = "status";
+        public static final String PIC = "pic";
 
         /**
          * 部分接口要传的source参数，实际上也是要传client_id值
@@ -386,31 +389,45 @@ public final class ParamConstant {
     /**
      * statuses接口-feature参数枚举(过滤类型)
      */
+    @AllArgsConstructor
     public static enum StatusesFeature implements EnhanceEnum {
         /**
          * 全部
          */
-        ALL,
+        ALL("0"),
 
         /**
          * 原创
          */
-        ORIGNAL,
+        ORIGNAL("1"),
 
         /**
          * 图片
          */
-        PICTURE,
+        PICTURE("2"),
 
         /**
          * 视频
          */
-        VIDEO,
+        VIDEO("3"),
 
         /**
          * 音乐
          */
-        MUSIC;
+        MUSIC("4"),
+
+        /**
+         * 纯文本
+         */
+        PLAIN_TEXT("7"),
+
+        /**
+         * 转发
+         */
+        REPOST("8");
+
+        @SuppressWarnings("unused")
+        private String value;
     }
 
     /**
@@ -450,5 +467,50 @@ public final class ParamConstant {
          * 收件箱
          */
         RECEIVE_BOX;
+    }
+
+    /**
+     * statuses-商业API-update接口-visible参数枚举(微博可见性)
+     */
+    public static enum StatusesVisible implements EnhanceEnum {
+        /**
+         * 所有人可见
+         */
+        ALL,
+
+        /**
+         * 仅自己可见
+         */
+        ONLY_SELF,
+
+        /**
+         * 密友可见
+         */
+        CLOSE_FRIEND,
+
+        /**
+         * 指定分组
+         */
+        SPECIFY_GROUP;
+    }
+
+    /**
+     * statuses-商业API-flag参数枚举(用于筛选推广微博)
+     */
+    public static enum StatusesPopularizeFlag implements EnhanceEnum {
+        /**
+         * 返回推广微博和普通微博
+         */
+        ALL,
+
+        /**
+         * 返回推广微博
+         */
+        ONLY_POPULAR,
+
+        /**
+         * 返回普通微博
+         */
+        ONLY_COMMON,;
     }
 }

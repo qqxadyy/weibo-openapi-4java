@@ -96,6 +96,12 @@ public final class WeiboConfigs {
     public static final String URL_SUFFIX_JSON = ".json";
 
     /**
+     * URL中的后缀的前缀，例如biz.json中的biz
+     */
+    @WeiboPropName("prefix_of_suffix_biz")
+    public static final String URL_PREFIX_OF_SUFFIX = "biz";
+
+    /**
      * 带版本2的接口URL前段(主要使用)
      */
     @WeiboPropName("base_url")
@@ -233,6 +239,12 @@ public final class WeiboConfigs {
      */
     @WeiboPropName("third_prefix_followers")
     public static final String THIRD_PREFIX_FOLLOWERS = "followers/";
+
+    /**
+     * 接口URL中三级前缀-filter
+     */
+    @WeiboPropName("third_prefix_filter")
+    public static final String THIRD_PREFIX_FILTER = "filter/";
     // ----------------------------end:URL二级前缀------------------------------------
 
     // ----------------------------begin:oauth2接口------------------------------------
@@ -405,7 +417,7 @@ public final class WeiboConfigs {
     public static final String STATUSES_SHOW = "statuses_show";
 
     /**
-     * statuses-批量获取指定微博的转发数评论数
+     * statuses-批量获取指定微博的转发数评论数等
      */
     @WeiboPropName
     @WeiboApi(prefixes = SECOND_PREFIX_STATUSES, suffix = URL_SUFFIX_JSON)
@@ -460,6 +472,120 @@ public final class WeiboConfigs {
     @WeiboPropName
     @WeiboApi(prefixes = SECOND_PREFIX_STATUSES, suffix = URL_SUFFIX_JSON)
     public static final String STATUSES_DESTROY = "statuses_destroy";
+
+    /**
+     * statuses-商业API-获取当前授权用户及其所关注用户的最新微博
+     */
+    @WeiboPropName
+    @WeiboApi(baseUrl = BASE_URL_COMMERCE, prefixes = SECOND_PREFIX_STATUSES, suffix = URL_SUFFIX_JSON)
+    public static final String STATUSES_CAPI_FRIENDS_TIMELINE = THIRD_PREFIX_FRIENDS_TIMELINE + URL_PREFIX_OF_SUFFIX;
+
+    /**
+     * statuses-商业API-获取授权用户发布的最新微博
+     */
+    @WeiboPropName
+    @WeiboApi(baseUrl = BASE_URL_COMMERCE, prefixes = SECOND_PREFIX_STATUSES, suffix = URL_SUFFIX_JSON)
+    public static final String STATUSES_CAPI_USER_TIMELINE = THIRD_PREFIX_USER_TIMELINE + URL_PREFIX_OF_SUFFIX;
+
+    /**
+     * statuses-商业API-获取转发过指定微博的微博列表
+     */
+    @WeiboPropName
+    @WeiboApi(baseUrl = BASE_URL_COMMERCE, prefixes = SECOND_PREFIX_STATUSES, suffix = URL_SUFFIX_JSON)
+    public static final String STATUSES_CAPI_REPOST_TIMELINE = THIRD_PREFIX_REPOST_TIMELINE + URL_PREFIX_OF_SUFFIX;
+
+    /**
+     * statuses-商业API-获取@当前授权用户的最新微博
+     */
+    @WeiboPropName
+    @WeiboApi(baseUrl = BASE_URL_COMMERCE, prefixes = SECOND_PREFIX_STATUSES, suffix = URL_SUFFIX_JSON)
+    public static final String STATUSES_CAPI_MENTIONS = THIRD_PREFIX_MENTIONS + URL_PREFIX_OF_SUFFIX;
+
+    /**
+     * statuses-商业API-根据微博ID批量获取微博信息
+     */
+    @WeiboPropName
+    @WeiboApi(baseUrl = BASE_URL_COMMERCE, prefixes = SECOND_PREFIX_STATUSES, suffix = URL_SUFFIX_JSON)
+    public static final String STATUSES_CAPI_SHOW_BATCH = "show_batch/" + URL_PREFIX_OF_SUFFIX;
+
+    /**
+     * statuses-商业API-批量获取指定微博的转发数评论数等
+     */
+    @WeiboPropName
+    @WeiboApi(baseUrl = BASE_URL_COMMERCE, prefixes = SECOND_PREFIX_STATUSES, suffix = URL_SUFFIX_JSON)
+    public static final String STATUSES_CAPI_COUNT = STATUSES_COUNT + "/" + URL_PREFIX_OF_SUFFIX;
+
+    /**
+     * statuses-商业API-转发一条微博
+     */
+    @WeiboPropName
+    @WeiboApi(baseUrl = BASE_URL_COMMERCE, prefixes = SECOND_PREFIX_STATUSES, suffix = URL_SUFFIX_JSON)
+    public static final String STATUSES_CAPI_REPOST = STATUSES_REPOST + "/" + URL_PREFIX_OF_SUFFIX;
+
+    /**
+     * statuses-商业API-删除一条微博
+     */
+    @WeiboPropName
+    @WeiboApi(baseUrl = BASE_URL_COMMERCE, prefixes = SECOND_PREFIX_STATUSES, suffix = URL_SUFFIX_JSON)
+    public static final String STATUSES_CAPI_DESTROY = "destroy/" + URL_PREFIX_OF_SUFFIX;
+
+    /**
+     * statuses-商业API-发布一条微博信息
+     */
+    @WeiboPropName
+    @WeiboApi(baseUrl = BASE_URL_COMMERCE, prefixes = SECOND_PREFIX_STATUSES, suffix = URL_SUFFIX_JSON)
+    public static final String STATUSES_CAPI_UPDATE = "update/" + URL_PREFIX_OF_SUFFIX;
+
+    /**
+     * statuses-商业API-上传图片并发布一条微博
+     */
+    @WeiboPropName
+    @WeiboApi(baseUrl = BASE_URL_COMMERCE, prefixes = SECOND_PREFIX_STATUSES, suffix = URL_SUFFIX_JSON)
+    public static final String STATUSES_CAPI_UPLOAD = "upload/" + URL_PREFIX_OF_SUFFIX;
+
+    /**
+     * statuses-商业API-发布一条微博同时指定上传的图片或图片url
+     */
+    @WeiboPropName
+    @WeiboApi(baseUrl = BASE_URL_COMMERCE, prefixes = SECOND_PREFIX_STATUSES, suffix = URL_SUFFIX_JSON)
+    public static final String STATUSES_CAPI_UPLOAD_URL_TEXT = "upload_url_text/" + URL_PREFIX_OF_SUFFIX;
+
+    /**
+     * statuses-商业API-上传图片，返回图片picid及对应的3个urls(该接口一次只能上传一个图片)
+     */
+    @WeiboPropName
+    @WeiboApi(baseUrl = BASE_URL_COMMERCE, prefixes = SECOND_PREFIX_STATUSES, suffix = URL_SUFFIX_JSON)
+    public static final String STATUSES_CAPI_UPLOAD_PIC = "upload_pic/" + URL_PREFIX_OF_SUFFIX;
+
+    /**
+     * statuses-商业API-屏蔽某条微博
+     */
+    @WeiboPropName
+    @WeiboApi(baseUrl = BASE_URL_COMMERCE, prefixes = {SECOND_PREFIX_STATUSES, THIRD_PREFIX_FILTER},
+        suffix = URL_SUFFIX_JSON)
+    public static final String STATUSES_CAPI_FILTER_CREATE = "create/" + URL_PREFIX_OF_SUFFIX;
+
+    /**
+     * statuses-商业API-屏蔽某个@我的微博及后续由其转发引起的@提及
+     */
+    @WeiboPropName
+    @WeiboApi(baseUrl = BASE_URL_COMMERCE, prefixes = {SECOND_PREFIX_STATUSES, THIRD_PREFIX_MENTIONS},
+        suffix = URL_SUFFIX_JSON)
+    public static final String STATUSES_CAPI_MENTIONS_SHIELD = "shield/" + URL_PREFIX_OF_SUFFIX;
+
+    /**
+     * statuses-商业API-通过微博/评论/私信/MID获取其ID
+     */
+    @WeiboPropName
+    @WeiboApi(baseUrl = BASE_URL_COMMERCE, prefixes = SECOND_PREFIX_STATUSES, suffix = URL_SUFFIX_JSON)
+    public static final String STATUSES_CAPI_QUERY_ID = STATUSES_QUERY_ID + "/" + URL_PREFIX_OF_SUFFIX;
+
+    /**
+     * statuses-商业API-通过微博/评论/私信/ID获取其MID
+     */
+    @WeiboPropName
+    @WeiboApi(baseUrl = BASE_URL_COMMERCE, prefixes = SECOND_PREFIX_STATUSES, suffix = URL_SUFFIX_JSON)
+    public static final String STATUSES_CAPI_QUERY_MID = STATUSES_QUERY_MID + "/" + URL_PREFIX_OF_SUFFIX;
     // ----------------------------end:statuses接口------------------------------------
 
     // ----------------------------begin:emotions接口------------------------------------

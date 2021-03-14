@@ -14,32 +14,35 @@
  */
 package weibo4j.model;
 
+import java.util.List;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import pjq.weibo.openapi.support.WeiboJsonName;
+import weibo4j.http.Response;
 import weibo4j.org.json.JSONObject;
 
 /**
- * 微博评论数等
+ * 长文微博时的完整文本内容对象
  * 
  * @author pengjianqiang
- * @date 2021年1月26日
+ * @date 2021年3月14日
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @WeiboJsonName
 @SuppressWarnings("serial")
-public class StatusesCounts extends WeiboResponse {
-    private String id; // 微博ID
-    private Long comments; // 评论数
-    private Long reposts; // 转发数
-    private Long attitudes; // 表态数(赞数)
-    private @WeiboJsonName(value = "number_display_strategy",
-        isNewAndNoDesc = true) StatusNumberDisplayStrategy statusNumberDisplayStrategy;
+public class StatusLongText extends WeiboResponse {
+    private @WeiboJsonName(isNewAndNoDesc = true) String longTextContent; // 长文内容
+    private @WeiboJsonName(value = "url_objects", isNewAndNoDesc = true) List<StatusUrlObject> urlOjects;
 
-    public StatusesCounts(JSONObject json) {
+    public StatusLongText(Response res) {
+        super(res);
+    }
+
+    public StatusLongText(JSONObject json) {
         super(json);
     }
 }

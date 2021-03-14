@@ -45,6 +45,7 @@ import pjq.weibo.openapi.constant.ParamConstant.EmotionsLanguage;
 import pjq.weibo.openapi.constant.ParamConstant.EmotionsType;
 import pjq.weibo.openapi.constant.ParamConstant.MoreUseParamNames;
 import pjq.weibo.openapi.constant.WeiboConfigs;
+import pjq.weibo.openapi.support.WeiboApiParamScope;
 import pjq.weibo.openapi.support.WeiboCacher;
 import weibo4j.Weibo;
 import weibo4j.model.Emotion;
@@ -54,25 +55,26 @@ import weibo4j.model.WeiboResponse;
 
 /**
  * Emotions相关接口<br>
- * 使用{@code Weibo.of(WeiboApiEmotions.class,accessToken)}生成对象
+ * 使用<code>Weibo.of({@link WeiboApiEmotions}.class,accessToken)</code>生成对象
  * 
  * @author pengjianqiang
  * @date 2021年1月21日
  */
 @SuppressWarnings("serial")
 @Getter
-@Setter
 @Accessors(fluent = true)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WeiboApiEmotions extends Weibo<WeiboApiEmotions> {
     /**
      * 表情类别，face：普通表情、ani：魔法表情、cartoon：动漫表情，默认为face
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.EMOTIONS)})
     private EmotionsType type;
 
     /**
      * 语言类别，cnname：简体、twname：繁体，默认为cnname
      */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.EMOTIONS)})
     private EmotionsLanguage language;
 
     @Override
@@ -106,7 +108,7 @@ public class WeiboApiEmotions extends Weibo<WeiboApiEmotions> {
         }
         paramList.add(new PostParameter(MoreUseParamNames.CLIENT_ID_USE_APPKEY, clientId()));
         emotions = WeiboResponse.buildList(
-            client.get(WeiboConfigs.getApiUrl(WeiboConfigs.EMOTIONS), paramListToArray(paramList), accessToken),
+            client.get(WeiboConfigs.getApiUrl(WeiboConfigs.EMOTIONS), paramListToArray(paramList), accessToken()),
             Emotion.class);
         WeiboCacher.cacheEmotions(type, emotions);
         return emotions;

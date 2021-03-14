@@ -67,9 +67,10 @@ public class Status extends WeiboResponse {
     private List<JSONObject> annotations; // 元数据，该字段返回的内容不固定，用JSONObject
     private @WeiboJsonName("reposts_count") Long repostsCount; // 转发数
     private @WeiboJsonName("comments_count") Long commentsCount; // 评论数
-    private @WeiboJsonName(value = "attitudes_count", isNew = true) Long attitudesCount; // 表态数
+    private @WeiboJsonName(value = "attitudes_count", isNew = true) Long attitudesCount; // 表态数(赞数)
     private @WeiboJsonName(value = "pending_approval_count", isNewAndNoDesc = true) Long pendingApprovalCount;
-    private @WeiboJsonName(isNewAndNoDesc = true) Boolean isLongText;
+    private @WeiboJsonName(isNewAndNoDesc = true) Boolean isLongText; // 微博文本长度是否超过140
+    private @WeiboJsonName(isNewAndNoDesc = true) StatusLongText longText;
     private @WeiboJsonName(value = "reward_exhibition_type", isNewAndNoDesc = true) Integer rewardExhibitionType;
     private @WeiboJsonName(value = "reward_scheme", isNewAndNoDesc = true) String rewardScheme;
     private @WeiboJsonName(value = "hide_flag", isNewAndNoDesc = true) Integer hideFlag;
@@ -94,7 +95,7 @@ public class Status extends WeiboResponse {
         isNewAndNoDesc = true) StatusCommentManageInfo commentManageInfo;
     private @WeiboJsonName(value = "pic_num", isNewAndNoDesc = true) Integer picNum;
     private @WeiboJsonName(value = "alchemy_params", isNewAndNoDesc = true) StatusAlchemyParams alchemyParams;
-    private @WeiboJsonName(value = "pic_ids") List<JSONObject> picIds; // 微博配图ID
+    private @WeiboJsonName(value = "pic_ids") List<String> picIds; // 微博配图ID
     private @WeiboJsonName(value = "pic_types") String picTypes;
     private @WeiboJsonName List<JSONObject> ad; // 微博流内的推广微博ID
     private @WeiboJsonName("ad") String adOld; // 旧版本是String类型，新版本好像用对象数组代替了，这里先做保留
@@ -110,6 +111,8 @@ public class Status extends WeiboResponse {
     private @WeiboJsonName(isNewAndNoDesc = true) String uid;
     private @WeiboJsonName(isNewAndNoDesc = true) String pid;
     private @WeiboJsonName(value = "repost_type", isNewAndNoDesc = true) Integer repostType;
+    private @WeiboJsonName(isNewAndNoDesc = true) Integer state;
+    private @WeiboJsonName(isNewAndNoDesc = true) Integer deleted;
 
     public Status(Response res) {
         super(res);

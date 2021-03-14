@@ -14,14 +14,20 @@
  */
 package weibo4j.model;
 
+import java.util.List;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import pjq.commons.utils.CheckUtils;
+import pjq.commons.utils.StreamUtils;
+import pjq.commons.utils.collection.CollectionUtils;
 import pjq.weibo.openapi.support.WeiboJsonName;
+import weibo4j.http.Response;
 import weibo4j.org.json.JSONObject;
 
 /**
- * 微博评论数等
+ * 上传图片后的图片信息
  * 
  * @author pengjianqiang
  * @date 2021年1月26日
@@ -31,15 +37,25 @@ import weibo4j.org.json.JSONObject;
 @NoArgsConstructor
 @WeiboJsonName
 @SuppressWarnings("serial")
-public class StatusesCounts extends WeiboResponse {
-    private String id; // 微博ID
-    private Long comments; // 评论数
-    private Long reposts; // 转发数
-    private Long attitudes; // 表态数(赞数)
-    private @WeiboJsonName(value = "number_display_strategy",
-        isNewAndNoDesc = true) StatusNumberDisplayStrategy statusNumberDisplayStrategy;
+public class UploadedPic extends WeiboResponse {
+    private @WeiboJsonName("pic_id") String picid; // 图片ID
+    private @WeiboJsonName("thumbnail_pic") String thumbnailPic; // 微博内容中的图片的缩略地址
+    private @WeiboJsonName("bmiddle_pic") String bmiddlePic; // 中型图片
+    private @WeiboJsonName("original_pic") String originalPic; // 原始图片
 
-    public StatusesCounts(JSONObject json) {
+    public UploadedPic(Response res) {
+        super(res);
+    }
+
+    public UploadedPic(JSONObject json) {
         super(json);
+    }
+
+    public static String toPicIds(List<UploadedPic> list) {
+        if (CheckUtils.isEmpty(list)) {
+            return "";
+        }
+        return StreamUtils
+            .joinString(CollectionUtils.transformList(list, uploadedPic -> uploadedPic.getPicid()).stream(), ",");
     }
 }

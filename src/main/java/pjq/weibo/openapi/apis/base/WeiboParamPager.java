@@ -8,11 +8,28 @@
  *
  * ======================================================================
  *
- * src/main/java/weibo4j下的文件是从weibo4j-oauth2-beta3.1.1.zip中复制出来的
- * 本项目对这个目录下的部分源码做了重新改造
- * 但是许可信息和"https://github.com/sunxiaowei2014/weibo4j-oauth2-beta3.1.1"或源码中已存在的保持一致
+ * The MIT License
+ * Copyright © 2021 pengjianqiang
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
-package weibo4j;
+package pjq.weibo.openapi.apis.base;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +38,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import pjq.commons.utils.CheckUtils;
+import pjq.weibo.openapi.support.WeiboApiParamScope;
+import weibo4j.Weibo;
 import weibo4j.model.PostParameter;
 
 /**
@@ -37,21 +56,25 @@ public abstract class WeiboParamPager<T> extends Weibo<T> {
     /**
      * 若指定此参数，则返回ID比since_id大的记录（即比since_id时间晚的记录），默认为0
      */
+    @WeiboApiParamScope(WeiboApiParamScope.PAGER)
     private String sinceId;
 
     /**
      * 若指定此参数，则返回ID小于或等于max_id的记录，默认为0
      */
+    @WeiboApiParamScope(WeiboApiParamScope.PAGER)
     private String maxId;
 
     /**
      * 单页返回的记录条数，默认为50
      */
+    @WeiboApiParamScope(WeiboApiParamScope.PAGER)
     private Integer count;
 
     /**
      * 返回结果的页码，默认为1
      */
+    @WeiboApiParamScope(WeiboApiParamScope.PAGER)
     private Integer page;
 
     /**
@@ -61,6 +84,7 @@ public abstract class WeiboParamPager<T> extends Weibo<T> {
      * @return
      */
     @SuppressWarnings("unchecked")
+    @WeiboApiParamScope(WeiboApiParamScope.PAGER)
     public T sinceId(String sinceId) {
         this.sinceId = sinceId;
         return (T)this;
@@ -73,6 +97,7 @@ public abstract class WeiboParamPager<T> extends Weibo<T> {
      * @return
      */
     @SuppressWarnings("unchecked")
+    @WeiboApiParamScope(WeiboApiParamScope.PAGER)
     public T maxId(String maxId) {
         this.maxId = maxId;
         return (T)this;
@@ -85,6 +110,7 @@ public abstract class WeiboParamPager<T> extends Weibo<T> {
      * @return
      */
     @SuppressWarnings("unchecked")
+    @WeiboApiParamScope(WeiboApiParamScope.PAGER)
     public T count(Integer count) {
         this.count = count;
         return (T)this;
@@ -97,6 +123,7 @@ public abstract class WeiboParamPager<T> extends Weibo<T> {
      * @return
      */
     @SuppressWarnings("unchecked")
+    @WeiboApiParamScope(WeiboApiParamScope.PAGER)
     public T page(Integer page) {
         this.page = page;
         return (T)this;

@@ -49,7 +49,7 @@ import weibo4j.model.WeiboResponse;
 
 /**
  * Account相关接口<br>
- * 使用{@code Weibo.of(WeiboApiAccount.class,accessToken)}生成对象
+ * 使用<code>Weibo.of({@link WeiboApiAccount}.class,accessToken)</code>生成对象
  * 
  * @author pengjianqiang
  * @date 2021年1月21日
@@ -99,6 +99,6 @@ public class WeiboApiAccount extends Weibo<WeiboApiAccount> {
      */
     public List<UserEmails> apiGetUserEmails() throws WeiboException {
         return WeiboResponse.buildList(
-            client.get(WeiboConfigs.getApiUrl(WeiboConfigs.ACCOUNT_PROFILE_EMAIL), accessToken), UserEmails.class);
+            client.get(WeiboConfigs.getApiUrl(WeiboConfigs.ACCOUNT_PROFILE_EMAIL), accessToken()), UserEmails.class);
     }
 }
