@@ -596,40 +596,33 @@ public class WeiboCApiStatuses extends WeiboParamPager<WeiboCApiStatuses> {
         if (CheckUtils.isNotNull(simpleGeo)) {
             simpleGeo.check();
         }
-
-        int textLengthLimit = 140;
-        if (YesOrNoInt.YES.equals(isLongtext)) {
-            textLengthLimit = 2000;
-        }
-        statusText = WeiboContentChecker.checkPostTextAndReturn4CApi(statusText, textLengthLimit);
         WeiboContentChecker.checkAnnotationsLength(annotations);
+
+        statusText = WeiboContentChecker.checkPostTextAndReturn4CApi(statusText,
+            CheckUtils.isEmpty(picPaths) ? 0 : picPaths.length, isLongtext);
 
         PicCheckResults picCheckResults = WeiboContentChecker.checkIfPicsValid(picPaths);
         boolean needUploadPic = picCheckResults.isValid();
         int picNums = picCheckResults.picNums();
 
         String picids = null;
-        if (needUploadPic) {
-            statusText = WeiboContentChecker.checkPostTextAndReturn4CApi(statusText, 140); // 发送图片时文本内容只能小于140
+        if (needUploadPic && picNums > 1) {
+            // 如果是上传多图，则先使用上传图片的接口上传图片后获取图片id，再用pic_id参数，而不使用url参数
+            if (picNums > 12) {
+                // 微博实际可以发超过15张，最多可发数没测过，但是避免过程中网络等因素影响导致出错，限定只能发12张
+                throw new WeiboException("最多只能发布12张图片");
+            }
+            try {
+                List<UploadedPic> uploadedPics = apiGetStatusesUploadPic(picCheckResults.picPaths());
+                picids = UploadedPic.toPicIds(uploadedPics);
+            } catch (Exception e) {
+                // 如果报错则先删除临时文件
+                picCheckResults.deleteTempFiles();
 
-            if (picNums > 1) {
-                // 如果是上传多图，则先使用上传图片的接口上传图片后获取图片id，再用pic_id参数，而不使用url参数
-                if (picNums > 12) {
-                    // 微博实际可以发超过15张，最多可发数没测过，但是避免过程中网络等因素影响导致出错，限定只能发12张
-                    throw new WeiboException("最多只能发布12张图片");
-                }
-                try {
-                    List<UploadedPic> uploadedPics = apiGetStatusesUploadPic(picCheckResults.picPaths());
-                    picids = UploadedPic.toPicIds(uploadedPics);
-                } catch (Exception e) {
-                    // 如果报错则先删除临时文件
-                    picCheckResults.deleteTempFiles();
-
-                    if (e instanceof WeiboException) {
-                        throw e;
-                    } else {
-                        throw new WeiboException(e);
-                    }
+                if (e instanceof WeiboException) {
+                    throw e;
+                } else {
+                    throw new WeiboException(e);
                 }
             }
         }

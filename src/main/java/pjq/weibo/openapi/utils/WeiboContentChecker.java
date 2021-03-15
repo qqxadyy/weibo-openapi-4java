@@ -47,6 +47,7 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import pjq.commons.constant.CommonEnumConstant.YesOrNoInt;
 import pjq.commons.utils.CharsetUtils;
 import pjq.commons.utils.CheckUtils;
 import pjq.commons.utils.collection.CollectionUtils;
@@ -146,6 +147,33 @@ public final class WeiboContentChecker {
         } catch (Exception e) {
             throw new WeiboException(e);
         }
+    }
+
+    /**
+     * 检查推送的微博/评论文本内容是否超过字数限制(商业接口用)
+     * 
+     * @param text
+     *            要检查的文本内容
+     * @param picsNum
+     *            待发送的图片数量
+     * @param isLongtext
+     *            文本内容是否超140个汉字
+     * @return
+     * @throws WeiboException
+     * @creator pengjianqiang@2021年3月14日
+     */
+    public static String checkPostTextAndReturn4CApi(String text, int picsNum, YesOrNoInt isLongtext)
+        throws WeiboException {
+        if (CheckUtils.isEmpty(text)) {
+            return text;
+        }
+        int textLengthLimit = 140;
+        if (picsNum > 0) {
+            // 发图片时强制字数限制位140
+        } else if (YesOrNoInt.YES.equals(isLongtext)) {
+            textLengthLimit = 2000;
+        }
+        return checkPostTextAndReturn4CApi(text, textLengthLimit);
     }
 
     /**
