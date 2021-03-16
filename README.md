@@ -28,7 +28,9 @@
 
  + 具体新版接口的使用可参考pjq.weibo.openapi.exxamplesnew包下每个类的写法  
 
- + 服务器需要连通以下域名
+ + 服务器需要连通以下域名(除了api.weibo.com和XXX.sinaimg.cn，其它都是根据实际使用到的业务判断是否需要连通)
 	+ api.weibo.com  
+	+ c.api.weibo.com  
 	+ rm.api.weibo.com  
-	+ XXX.sinaimg.cn(有多个，XXX不固定)
+	+ m.api.weibo.com  
+	+ XXX.sinaimg.cn(XXX不固定)
