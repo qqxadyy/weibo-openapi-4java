@@ -155,12 +155,15 @@ public class User extends WeiboResponse {
      */
     public AccessToken filterToken(String accessToken) {
         AccessToken targetToken = null;
-        for (AccessToken tokenInfo : this.accessTokens) {
-            if (tokenInfo.getAccessToken().equals(accessToken)) {
-                targetToken = tokenInfo;
-                break;
+        if (CheckUtils.isNotEmpty(this.accessTokens)) {
+            for (AccessToken tokenInfo : this.accessTokens) {
+                if (tokenInfo.getAccessToken().equals(accessToken)) {
+                    targetToken = tokenInfo;
+                    break;
+                }
             }
         }
+
         if (CheckUtils.isNull(targetToken)) {
             // 创建一个不存在的token信息
             targetToken = new AccessToken();
