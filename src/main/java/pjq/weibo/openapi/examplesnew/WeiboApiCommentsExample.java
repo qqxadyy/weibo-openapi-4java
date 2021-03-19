@@ -41,9 +41,14 @@ import weibo4j.org.json.JSONException;
 public class WeiboApiCommentsExample {
     public static void main(String[] args) throws WeiboException, IOException, JSONException {
         try {
-            String accessToken = "2.0035IE5CHIqjUEadcfc3fe8b0fdTHu";
+            String accessToken = "2.0035IE5CBBIyKD5d5233a353GSQCmD";
 
             WeiboApiComments apiObj = Weibo.of(WeiboApiComments.class, accessToken);
+
+            StringBuffer sb = new StringBuffer("");
+            for (int i = 0; i < 280; i++) {
+                sb.append("s");
+            }
 
             // System.out.println(apiObj.count(2).apiShowStatusComments(""));
             // System.out.println(apiObj.apiShowCommentsAtMe());

@@ -38,7 +38,6 @@ import com.alibaba.fastjson.JSON;
 
 import pjq.commons.constant.CommonEnumConstant.YesOrNoInt;
 import pjq.weibo.openapi.apis.capis.WeiboCApiStatuses;
-import pjq.weibo.openapi.constant.ParamConstant.QueryIdType;
 import weibo4j.Weibo;
 import weibo4j.model.SimpleGeo;
 import weibo4j.model.WeiboException;
@@ -64,9 +63,13 @@ public class WeiboCApiStatusesExample {
             // System.out.println(apiObj.apiFilterOneStatus(""));
             // System.out.println(apiObj.apiFilterMentionsAndShield(""));
 
-            // System.out.println(apiObj.isLongtext(YesOrNoInt.YES).simpleGeo(new SimpleGeo("113.27324", "23.15792"))
-            // .annotations(Arrays.asList(JSON.parseObject("{\"testAnno\":\"sss\"}")))
-            // .apiShareStatus("是是是", new String[] {"d://work/2.png"}));
+            StringBuffer sb = new StringBuffer("");
+            for (int i = 0; i < 4900; i++) {
+                sb.append("是");
+            }
+            System.out.println(apiObj.isLongtext(YesOrNoInt.YES).simpleGeo(new SimpleGeo("113.27324", "23.15792"))
+                .annotations(Arrays.asList(JSON.parseObject("{\"testAnno\":\"sss\"}")))
+                .apiShareStatus(sb.toString(), new String[] {"d://work/2.png", "d://work/2.png"}));
 
             // System.out.println(apiObj.apiShareStatusAsync("ss", new String[] {"d://work/2.png"},
             // (isSuccess, statusCode, responseStr) -> {

@@ -70,21 +70,23 @@ public final class WeiboContentChecker {
      * 检查文本长度
      * 
      * @param text
-     * @param length
+     * @param limitLength
      *            限制长度
      * @throws WeiboException
      * @creator pengjianqiang@2021年3月12日
      */
-    public static void checkPostTextLength(String text, int length) throws WeiboException {
+    public static void checkPostTextLength(String text, int limitLength) throws WeiboException {
         // 用GBK编码判断中英文、特殊符号混合的字符串长度(每个中文的UTF-8比GBK多一位，要用GBK)
-        String textErrMsg = "文本内容长度不能超过" + length + "(包括空格、换行等，纯英文不超过" + (length * 2) + ")";
+        int actualLimitLength = limitLength < 1000 ? (limitLength - 10) : (limitLength - 100);
+        String textErrMsg = "文本内容长度不能超过" + actualLimitLength + "(包括空格、换行等，纯英文不超过" + (actualLimitLength * 2) + ")";
         boolean isContainChinese = isContainChinese(text);
         int textLength = text.getBytes(CharsetUtils.gbk()).length;
-        if (isContainChinese && textLength > length) {
-            // 微博接口要求是长度不大于length+10，这里限制为length，避免这里长度检查通过而微博接口不通过的情况
+        if (isContainChinese && textLength > (actualLimitLength * 2)) {
+            // 2021-03-19:微博好像改成了中文的不按之前的一个汉字两个长度的算法，直接是字符串长度了，所以要重新用actualLimitLength*2比较
+            // 微博接口要求是长度limitLength，这里限制为actualLimitLength，避免这里长度检查通过而微博接口不通过的情况
             throw new WeiboException(textErrMsg);
-        } else if (!isContainChinese && textLength > (length * 2)) {
-            // 无中文的字符串实际长度限为length*2
+        } else if (!isContainChinese && textLength > (actualLimitLength * 2)) {
+            // 无中文的字符串实际长度限为actualLimitLength*2
             throw new WeiboException(textErrMsg);
         }
     }
@@ -131,16 +133,16 @@ public final class WeiboContentChecker {
      * 检查推送的微博/评论文本内容是否超过字数限制(商业接口用)
      * 
      * @param text
-     * @param length
+     * @param limitLength
      * @return
      * @throws WeiboException
      * @creator pengjianqiang@2021年3月12日
      */
-    public static String checkPostTextAndReturn4CApi(String text, int length) throws WeiboException {
+    public static String checkPostTextAndReturn4CApi(String text, int limitLength) throws WeiboException {
         if (CheckUtils.isEmpty(text)) {
             return text;
         }
-        checkPostTextLength(text, length - 10); // 比微博限制的少10
+        checkPostTextLength(text, limitLength);
         try {
             // return URLEncoder.encode(text, CharsetUtils.UTF_8); // 官网上说需要做URLEncode，但实际做了返回会乱码，所以去掉(应该是新版有改动)
             return text;
@@ -154,7 +156,7 @@ public final class WeiboContentChecker {
      * 
      * @param text
      *            要检查的文本内容
-     * @param picsNum
+     * @param picNums
      *            待发送的图片数量
      * @param isLongtext
      *            文本内容是否超140个汉字
@@ -162,18 +164,22 @@ public final class WeiboContentChecker {
      * @throws WeiboException
      * @creator pengjianqiang@2021年3月14日
      */
-    public static String checkPostTextAndReturn4CApi(String text, int picsNum, YesOrNoInt isLongtext)
+    public static String checkPostTextAndReturn4CApi(String text, int picNums, YesOrNoInt isLongtext)
         throws WeiboException {
         if (CheckUtils.isEmpty(text)) {
             return text;
         }
-        int textLengthLimit = 140;
-        if (picsNum > 0) {
-            // 发图片时强制字数限制位140
+
+        // 2021-03-19:微博好像把长文字数限制改成5000，然后发布多图的接口也可以根据isLongtext限制位140或5000
+        boolean isShareOnePicWithShortText = (picNums == 1 && YesOrNoInt.NO.equals(isLongtext)); // 是否发带单个图片的短文微博
+        int limitLength = 140;
+        if (isShareOnePicWithShortText) {
+            // 发单个图片的短文微博时，强制字数限制为140
         } else if (YesOrNoInt.YES.equals(isLongtext)) {
-            textLengthLimit = 2000;
+            // 其它情况根据isLongtext判断
+            limitLength = 5000;
         }
-        return checkPostTextAndReturn4CApi(text, textLengthLimit);
+        return checkPostTextAndReturn4CApi(text, limitLength);
     }
 
     /**
@@ -187,7 +193,7 @@ public final class WeiboContentChecker {
         if (CheckUtils.isEmpty(annotations)) {
             return;
         }
-        checkPostTextLength(JSON.toJSONString(annotations), 512 - 10); // 比微博限制的少10
+        checkPostTextLength(JSON.toJSONString(annotations), 510);
     }
 
     /**
@@ -276,6 +282,9 @@ public final class WeiboContentChecker {
         if (CheckUtils.isEmpty(picPaths)) {
             picCheckResults.addResult(new PicCheckResult(false, "", false));
             return picCheckResults;
+        } else if (picPaths.length > 12) {
+            // 微博实际可以发超过15张，最多可发数没测过，但是避免过程中网络等因素影响导致出错，限定只能发12张
+            throw new WeiboException("最多只能发布12张图片");
         }
 
         for (String picPath : picPaths) {

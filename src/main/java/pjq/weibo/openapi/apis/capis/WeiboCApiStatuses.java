@@ -604,14 +604,11 @@ public class WeiboCApiStatuses extends WeiboParamPager<WeiboCApiStatuses> {
         PicCheckResults picCheckResults = WeiboContentChecker.checkIfPicsValid(picPaths);
         boolean needUploadPic = picCheckResults.isValid();
         int picNums = picCheckResults.picNums();
+        boolean isShareOnePicWithShortText = needUploadPic && (picNums == 1) && YesOrNoInt.NO.equals(isLongtext); // 是否发带单个图片的短文微博
 
         String picids = null;
-        if (needUploadPic && picNums > 1) {
-            // 如果是上传多图，则先使用上传图片的接口上传图片后获取图片id，再用pic_id参数，而不使用url参数
-            if (picNums > 12) {
-                // 微博实际可以发超过15张，最多可发数没测过，但是避免过程中网络等因素影响导致出错，限定只能发12张
-                throw new WeiboException("最多只能发布12张图片");
-            }
+        if (needUploadPic && !isShareOnePicWithShortText) {
+            // 如果是发带图片的长文微博，则先使用上传图片的接口上传图片后获取图片id，再用pic_id参数，而不使用url参数
             try {
                 List<UploadedPic> uploadedPics = apiGetStatusesUploadPic(picCheckResults.picPaths());
                 picids = UploadedPic.toPicIds(uploadedPics);
@@ -647,9 +644,11 @@ public class WeiboCApiStatuses extends WeiboParamPager<WeiboCApiStatuses> {
         String url = WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_UPDATE);
         if (needUploadPic) {
             // 根据发送的图片数选择接口
-            if (picNums <= 1) {
+            if (isShareOnePicWithShortText) {
+                // 发单个图片的短文微博时
                 url = WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_UPLOAD);
             } else {
+                // 发带图片的长文微博时
                 url = WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_UPLOAD_URL_TEXT);
             }
         }
@@ -667,7 +666,7 @@ public class WeiboCApiStatuses extends WeiboParamPager<WeiboCApiStatuses> {
                 };
             }
 
-            if (picNums <= 1) {
+            if (isShareOnePicWithShortText) {
                 // 开始调发微博的请求(pic为上传图片的参数名)
                 response = client.postMultipartForm(url, paramListToArray(paramList), accessToken(),
                     MoreUseParamNames.PIC, actualCallback, picCheckResults.getPicCheckResults().get(0).getFilePath());
