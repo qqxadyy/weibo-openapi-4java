@@ -161,7 +161,7 @@ public abstract class WeiboCacheHandler {
     public abstract String popup(String key) throws WeiboException;
 
     private static class DefaultWeiboCacheHandler extends WeiboCacheHandler {
-        private static final Duration NO_EXPIRES = Duration.ofDays(300L);
+        private static final Duration NO_EXPIRES = Duration.ofNanos(Long.MAX_VALUE);
         private static final Map<String, Long> expiresMap = new ConcurrentHashMap<>();
 
         private static Cache<String, String> cache =
@@ -172,10 +172,10 @@ public abstract class WeiboCacheHandler {
                         expiresMap.containsKey(key) ? Duration.ofSeconds(expiresMap.get(key)) : NO_EXPIRES;
                     if (expireDuration.compareTo(Duration.ofSeconds(0L)) <= 0
                         || expireDuration.compareTo(NO_EXPIRES) > 0) {
-                        expireDuration = NO_EXPIRES; // 如果过期时间超过300天，则按300天设置，避免缓存太久(开发者获取到的授权有效期是5年)
+                        expireDuration = NO_EXPIRES;
                     }
                     expiresMap.remove(key);
-                    return expireDuration.toNanos(); // 注意方法要求返回的时nanoseconds(微毫秒)单位
+                    return expireDuration.toNanos(); // 注意方法要求返回的是nanoseconds(微毫秒)单位
                 }
 
                 @Override
