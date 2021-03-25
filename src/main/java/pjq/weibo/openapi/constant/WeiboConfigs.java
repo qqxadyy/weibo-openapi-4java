@@ -495,11 +495,25 @@ public final class WeiboConfigs {
     public static final String STATUSES_CAPI_REPOST_TIMELINE = THIRD_PREFIX_REPOST_TIMELINE + URL_PREFIX_OF_SUFFIX;
 
     /**
+     * statuses-商业API-返回一条微博的全部转发微博列表(收费接口)
+     */
+    @WeiboPropName
+    @WeiboApi(baseUrl = BASE_URL_COMMERCE, prefixes = SECOND_PREFIX_STATUSES, suffix = URL_SUFFIX_JSON)
+    public static final String STATUSES_CAPI_REPOST_TIMELINE_ALL = THIRD_PREFIX_REPOST_TIMELINE + "all";
+
+    /**
      * statuses-商业API-获取@当前授权用户的最新微博
      */
     @WeiboPropName
     @WeiboApi(baseUrl = BASE_URL_COMMERCE, prefixes = SECOND_PREFIX_STATUSES, suffix = URL_SUFFIX_JSON)
     public static final String STATUSES_CAPI_MENTIONS = THIRD_PREFIX_MENTIONS + URL_PREFIX_OF_SUFFIX;
+
+    /**
+     * statuses-商业API-获取@某用户的最新微博(收费接口)
+     */
+    @WeiboPropName
+    @WeiboApi(baseUrl = BASE_URL_COMMERCE, prefixes = SECOND_PREFIX_STATUSES, suffix = URL_SUFFIX_JSON)
+    public static final String STATUSES_CAPI_MENTIONS_OHTER = THIRD_PREFIX_MENTIONS + "other";
 
     /**
      * statuses-商业API-根据微博ID批量获取微博信息

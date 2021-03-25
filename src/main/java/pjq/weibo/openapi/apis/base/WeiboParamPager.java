@@ -66,7 +66,7 @@ public abstract class WeiboParamPager<T> extends Weibo<T> {
     private String maxId;
 
     /**
-     * 单页返回的记录条数，默认为50
+     * 单页返回的记录条数，默认为根据不同接口有不同的最大值限制
      */
     @WeiboApiParamScope(WeiboApiParamScope.PAGER)
     private Integer count;

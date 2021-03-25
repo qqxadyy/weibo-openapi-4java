@@ -120,6 +120,9 @@ public class WeiboException extends RuntimeException {
             case 20101:
                 chineseMsg = "目标微博不存在";
                 break;
+            case 20019:
+                chineseMsg = "短时间内不能发布重复内容的微博";
+                break;
             default:
                 break;
         }

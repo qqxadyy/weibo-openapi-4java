@@ -32,21 +32,17 @@
 package pjq.weibo.openapi.examplesnew.capis;
 
 import java.io.IOException;
-import java.util.Arrays;
 
-import com.alibaba.fastjson.JSON;
-
-import pjq.commons.constant.CommonEnumConstant.YesOrNoInt;
 import pjq.weibo.openapi.apis.capis.WeiboCApiStatuses;
 import weibo4j.Weibo;
-import weibo4j.model.SimpleGeo;
 import weibo4j.model.WeiboException;
 import weibo4j.org.json.JSONException;
 
 public class WeiboCApiStatusesExample {
     public static void main(String[] args) throws WeiboException, IOException, JSONException {
         try {
-            String accessToken = "2.0035IE5CBBIyKD5d5233a353GSQCmD";
+            // String accessToken = "2.0035IE5CBBIyKD5d5233a353GSQCmD";
+            String accessToken = "2.0035IE5C01ognya98c29b946CZWR2E";
 
             WeiboCApiStatuses apiObj = Weibo.of(WeiboCApiStatuses.class, accessToken);
 
@@ -63,13 +59,16 @@ public class WeiboCApiStatusesExample {
             // System.out.println(apiObj.apiFilterOneStatus(""));
             // System.out.println(apiObj.apiFilterMentionsAndShield(""));
 
-            StringBuffer sb = new StringBuffer("");
-            for (int i = 0; i < 4900; i++) {
-                sb.append("是");
-            }
-            System.out.println(apiObj.isLongtext(YesOrNoInt.YES).simpleGeo(new SimpleGeo("113.27324", "23.15792"))
-                .annotations(Arrays.asList(JSON.parseObject("{\"testAnno\":\"sss\"}")))
-                .apiShareStatus(sb.toString(), new String[] {"d://work/2.png", "d://work/2.png"}));
+            // System.out.println(apiObj.apiGetAllStatusesWhichRepostedThis(""));
+            System.out.println(apiObj.apiGetStatusesAtSomeone(""));
+
+            // StringBuffer sb = new StringBuffer("");
+            // for (int i = 0; i < 1; i++) {
+            // sb.append("是");
+            // }
+            // System.out.println(apiObj.isLongtext(YesOrNoInt.YES).simpleGeo(new SimpleGeo("113.27324", "23.15792"))
+            // .annotations(Arrays.asList(JSON.parseObject("{\"testAnno\":\"sss\"}")))
+            // .apiShareStatus(sb.toString(), new String[] {""}));
 
             // System.out.println(apiObj.apiShareStatusAsync("ss", new String[] {"d://work/2.png"},
             // (isSuccess, statusCode, responseStr) -> {

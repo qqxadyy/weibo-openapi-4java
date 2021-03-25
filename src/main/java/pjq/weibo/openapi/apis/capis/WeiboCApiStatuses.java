@@ -191,6 +191,12 @@ public class WeiboCApiStatuses extends WeiboParamPager<WeiboCApiStatuses> {
     @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.STATUSES_PUBLISH)})
     private YesOrNoInt isLongtext;
 
+    /**
+     * 开发者上报的操作用户真实IP
+     */
+    @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.STATUSES_PUBLISH)})
+    private String rip;
+
     @Override
     protected String checkClientId() {
         return MoreUseParamNames.CLIENT_ID_USE_SOURCE;
@@ -245,6 +251,19 @@ public class WeiboCApiStatuses extends WeiboParamPager<WeiboCApiStatuses> {
     }
 
     /**
+     * 获取授权用户关注人转发过指定微博的微博列表
+     * 
+     * @param statusId
+     *            微博ID
+     * @return
+     * @throws WeiboException
+     */
+    public StatusPager apiGetFriendsStatusesWhichRepostedThis(String statusId) throws WeiboException {
+        filterByAuthor(AuthorType.FRIEND);
+        return apiGetStatusesWhichRepostedThis(statusId);
+    }
+
+    /**
      * 获取转发过指定微博的微博列表
      * 
      * @param statusId
@@ -264,6 +283,38 @@ public class WeiboCApiStatuses extends WeiboParamPager<WeiboCApiStatuses> {
     }
 
     /**
+     * 获取授权用户关注人转发过指定微博的微博列表(收费接口)
+     * 
+     * @param statusId
+     *            微博ID
+     * @return
+     * @throws WeiboException
+     */
+    public StatusPager apiGetFriendsAllStatusesWhichRepostedThis(String statusId) throws WeiboException {
+        filterByAuthor(AuthorType.FRIEND);
+        return apiGetAllStatusesWhichRepostedThis(statusId);
+    }
+
+    /**
+     * 获取转发过指定微博的微博列表(收费接口)
+     * 
+     * @param statusId
+     *            微博ID
+     * @return
+     * @throws WeiboException
+     */
+    public StatusPager apiGetAllStatusesWhichRepostedThis(String statusId) throws WeiboException {
+        if (CheckUtils.isEmpty(statusId)) {
+            throw WeiboException.ofParamCanNotNull(MoreUseParamNames.ID);
+        }
+        List<PostParameter> paramList = pageParam();
+        paramList.addAll(filterCommonParam());
+        paramList.add(new PostParameter(MoreUseParamNames.ID, statusId));
+        return new StatusPager(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_REPOST_TIMELINE_ALL),
+            paramListToArray(paramList), accessToken()));
+    }
+
+    /**
      * 获取@当前授权用户的最新微博
      * 
      * @return
@@ -273,6 +324,25 @@ public class WeiboCApiStatuses extends WeiboParamPager<WeiboCApiStatuses> {
         List<PostParameter> paramList = pageParam();
         paramList.addAll(filterCommonParam());
         return new StatusPager(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_MENTIONS),
+            paramListToArray(paramList), accessToken()));
+    }
+
+    /**
+     * 获取@当前某个用户的最新微博(收费接口)
+     * 
+     * @return
+     * @throws WeiboException
+     */
+    public StatusPager apiGetStatusesAtSomeone(String uid) throws WeiboException {
+        if (CheckUtils.isEmpty(uid)) {
+            throw WeiboException.ofParamCanNotNull(MoreUseParamNames.UID);
+        }
+        List<PostParameter> paramList = pageParam();
+        paramList.addAll(filterCommonParam());
+        if (CheckUtils.isNotEmpty(uid)) {
+            paramList.add(new PostParameter(MoreUseParamNames.UID, uid));
+        }
+        return new StatusPager(client.get(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_MENTIONS_OHTER),
             paramListToArray(paramList), accessToken()));
     }
 
@@ -462,6 +532,9 @@ public class WeiboCApiStatuses extends WeiboParamPager<WeiboCApiStatuses> {
         if (CheckUtils.isNotEmpty(repostText)) {
             paramList.add(new PostParameter("status", WeiboContentChecker.checkPostTextAndReturn(repostText[0])));
         }
+        if (CheckUtils.isNotEmpty(rip)) {
+            paramList.add(new PostParameter(MoreUseParamNames.REAL_IP, rip));
+        }
         return new Status(client.post(WeiboConfigs.getApiUrl(WeiboConfigs.STATUSES_CAPI_REPOST),
             paramListToArray(paramList), accessToken()));
     }
@@ -635,6 +708,9 @@ public class WeiboCApiStatuses extends WeiboParamPager<WeiboCApiStatuses> {
         }
         if (CheckUtils.isNotNull(isLongtext)) {
             paramList.add(new PostParameter("is_longtext", isLongtext.value()));
+        }
+        if (CheckUtils.isNotEmpty(rip)) {
+            paramList.add(new PostParameter(MoreUseParamNames.REAL_IP, rip));
         }
         if (CheckUtils.isNotEmpty(picids)) {
             paramList.add(new PostParameter("pic_id", picids));
