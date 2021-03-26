@@ -65,6 +65,21 @@ public final class WeiboContentChecker {
     private WeiboContentChecker() {}
 
     private static final String ANY_CHAR = "[\\s\\S]*";
+    private static final int TEXT_LIMIT_LENGTH_SHORT = 140;
+    private static final int TEXT_LIMIT_LENGTH_LONG = 5000;
+
+    private static int calActualLimitLength(int limitLength) {
+        return limitLength < 1000 ? (limitLength - 10) : (limitLength - 100);
+    }
+
+    private static String transformOutOfTextLimitErrMsg(int actualLimitLength) {
+        return "文本内容长度不能超过" + actualLimitLength + "(包括空格、换行等，纯英文不超过" + (actualLimitLength * 2) + ")";
+    }
+
+    public static String transformOutOfTextLimitErrMsg(boolean isLongText) {
+        return transformOutOfTextLimitErrMsg(
+            calActualLimitLength(isLongText ? TEXT_LIMIT_LENGTH_LONG : TEXT_LIMIT_LENGTH_SHORT));
+    }
 
     /**
      * 检查文本长度
@@ -77,8 +92,8 @@ public final class WeiboContentChecker {
      */
     public static void checkPostTextLength(String text, int limitLength) throws WeiboException {
         // 用GBK编码判断中英文、特殊符号混合的字符串长度(每个中文的UTF-8比GBK多一位，要用GBK)
-        int actualLimitLength = limitLength < 1000 ? (limitLength - 10) : (limitLength - 100);
-        String textErrMsg = "文本内容长度不能超过" + actualLimitLength + "(包括空格、换行等，纯英文不超过" + (actualLimitLength * 2) + ")";
+        int actualLimitLength = calActualLimitLength(limitLength);
+        String textErrMsg = transformOutOfTextLimitErrMsg(actualLimitLength);
         boolean isContainChinese = isContainChinese(text);
         int textLength = text.getBytes(CharsetUtils.gbk()).length;
         if (isContainChinese && textLength > (actualLimitLength * 2)) {
@@ -117,7 +132,7 @@ public final class WeiboContentChecker {
         if (CheckUtils.isEmpty(text)) {
             return text;
         }
-        checkPostTextLength(text, 130);
+        checkPostTextLength(text, TEXT_LIMIT_LENGTH_SHORT);
         if (Pattern.matches("^" + ANY_CHAR + "#" + ANY_CHAR + "#" + ANY_CHAR + "$", text)) {
             throw new WeiboException("文本内容不能包含 #话题词#");
         }
@@ -159,7 +174,7 @@ public final class WeiboContentChecker {
      * @param picNums
      *            待发送的图片数量
      * @param isLongtext
-     *            文本内容是否超140个汉字
+     *            文本内容是否超{@link #TEXT_LIMIT_LENGTH_SHORT}个汉字
      * @return
      * @throws WeiboException
      * @creator pengjianqiang@2021年3月14日
@@ -170,14 +185,15 @@ public final class WeiboContentChecker {
             return text;
         }
 
-        // 2021-03-19:微博好像把长文字数限制改成5000，然后发布多图的接口也可以根据isLongtext限制位140或5000
+        // 2021-03-19:微博好像把长文字数限制改成TEXT_LIMIT_LENGTH_LONG了
+        // 发布多图的接口可以根据isLongtext限制为TEXT_LIMIT_LENGTH_SHORT或TEXT_LIMIT_LENGTH_LONG
         boolean isShareOnePicWithShortText = (picNums == 1 && YesOrNoInt.NO.equals(isLongtext)); // 是否发带单个图片的短文微博
-        int limitLength = 140;
+        int limitLength = TEXT_LIMIT_LENGTH_SHORT;
         if (isShareOnePicWithShortText) {
-            // 发单个图片的短文微博时，强制字数限制为140
+            // 发单个图片的短文微博时，强制字数限制为TEXT_LIMIT_LENGTH_SHORT
         } else if (YesOrNoInt.YES.equals(isLongtext)) {
             // 其它情况根据isLongtext判断
-            limitLength = 5000;
+            limitLength = TEXT_LIMIT_LENGTH_LONG;
         }
         return checkPostTextAndReturn4CApi(text, limitLength);
     }

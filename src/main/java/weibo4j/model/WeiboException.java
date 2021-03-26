@@ -17,6 +17,7 @@ package weibo4j.model;
 import lombok.Getter;
 import pjq.commons.utils.CheckUtils;
 import pjq.commons.utils.DefaultValueGetter;
+import pjq.weibo.openapi.utils.WeiboContentChecker;
 import weibo4j.org.json.JSONException;
 import weibo4j.org.json.JSONObject;
 
@@ -102,10 +103,10 @@ public class WeiboException extends RuntimeException {
                 chineseMsg = "授权码不存在";
                 break;
             case 20012:
-                chineseMsg = "文本内容长度不能超过130(包括空格、换行等，纯英文不超过260)";
+                chineseMsg = WeiboContentChecker.transformOutOfTextLimitErrMsg(false);
                 break;
             case 20049:
-                chineseMsg = "文本内容长度不能超过4900(包括空格、换行等，纯英文不超过9800)";
+                chineseMsg = WeiboContentChecker.transformOutOfTextLimitErrMsg(true);
                 break;
             case 21314:
                 chineseMsg = "授权码已经被使用";
