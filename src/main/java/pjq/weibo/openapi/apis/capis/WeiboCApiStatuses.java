@@ -202,7 +202,7 @@ public class WeiboCApiStatuses extends WeiboParamPager<WeiboCApiStatuses> {
      * 这个参数不是微博接口本身的参数
      */
     @Setter(onMethod_ = {@WeiboApiParamScope(WeiboApiParamScope.STATUSES_PUBLISH)})
-    private Integer picNumLimit;
+    private Integer picNumsLimit;
 
     @Override
     protected String checkClientId() {
@@ -681,7 +681,7 @@ public class WeiboCApiStatuses extends WeiboParamPager<WeiboCApiStatuses> {
         statusText = WeiboContentChecker.checkPostTextAndReturn4CApi(statusText,
             CheckUtils.isEmpty(picPaths) ? 0 : picPaths.length, isLongtext);
 
-        PicCheckResults picCheckResults = WeiboContentChecker.checkIfPicsValid(picPaths, picNumLimit);
+        PicCheckResults picCheckResults = WeiboContentChecker.checkIfPicsValid(picPaths, picNumsLimit);
         boolean needUploadPic = picCheckResults.isValid();
         int picNums = picCheckResults.picNums();
         boolean isShareOnePicWithShortText = needUploadPic && (picNums == 1) && YesOrNoInt.NO.equals(isLongtext); // 是否发带单个图片的短文微博
