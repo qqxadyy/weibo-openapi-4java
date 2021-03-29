@@ -67,6 +67,7 @@ public final class WeiboContentChecker {
     private static final String ANY_CHAR = "[\\s\\S]*";
     private static final int TEXT_LIMIT_LENGTH_SHORT = 140;
     private static final int TEXT_LIMIT_LENGTH_LONG = 5000;
+    private static final int MAX_PIC_NUM = 15; // 微博实际可以发超过15张，最多可发数没测过，但是避免过程中网络等因素影响导致出错，限定最多只能发15张
 
     private static int calActualLimitLength(int limitLength) {
         return limitLength < 1000 ? (limitLength - 10) : (limitLength - 100);
@@ -291,16 +292,21 @@ public final class WeiboContentChecker {
      * 
      * @param picPaths
      *            本地图片路径或http资源路径
+     * @param picNumLimit
+     *            图片数量限制，最大{@link #MAX_PIC_NUM}
      * @return
      */
-    public static PicCheckResults checkIfPicsValid(String[] picPaths) {
+    public static PicCheckResults checkIfPicsValid(String[] picPaths, Integer picNumLimit) {
+        if (CheckUtils.isNull(picNumLimit) || picNumLimit <= 0 || picNumLimit > MAX_PIC_NUM) {
+            picNumLimit = MAX_PIC_NUM;
+        }
+
         PicCheckResults picCheckResults = new PicCheckResults();
         if (CheckUtils.isEmpty(picPaths)) {
             picCheckResults.addResult(new PicCheckResult(false, "", false));
             return picCheckResults;
-        } else if (picPaths.length > 12) {
-            // 微博实际可以发超过15张，最多可发数没测过，但是避免过程中网络等因素影响导致出错，限定只能发12张
-            throw new WeiboException("最多只能发布12张图片");
+        } else if (picPaths.length > picNumLimit) {
+            throw new WeiboException("最多只能发布" + picNumLimit + "张图片");
         }
 
         for (String picPath : picPaths) {
