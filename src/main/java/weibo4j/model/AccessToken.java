@@ -65,8 +65,12 @@ public class AccessToken extends WeiboResponse implements Serializable {
      */
     public int expiresInDays() {
         try {
-            int expiresInDays = Integer.parseInt(this.expiresIn) / (60 * 60 * 24);
-            return Double.valueOf(Math.floor(Math.min(300, expiresInDays))).intValue(); // 最长不超过300天(开发者获取到的授权有效期是5年)
+            // expiresIn-(token创建时间到当前时间)即为token实际的剩余有效天数
+            long createdToNowSeconds = DateTimeUtils.durationSeconds(DateTimeUtils.dateToLocalDateTime(this.createAt),
+                DateTimeUtils.currentDateTime());
+            int expiresInDays =
+                (Integer.parseInt(this.expiresIn) - Long.valueOf(createdToNowSeconds).intValue()) / (60 * 60 * 24);
+            return Double.valueOf(Math.floor(expiresInDays)).intValue();
         } catch (Exception e) {
             return 0;
         }
