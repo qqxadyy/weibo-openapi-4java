@@ -22,8 +22,8 @@ import org.apache.commons.collections4.map.HashedMap;
 
 import pjq.commons.utils.CharsetUtils;
 import pjq.commons.utils.CheckUtils;
+import pjq.commons.utils.codec.ThreeDesUtils;
 import pjq.weibo.openapi.constant.WeiboConfigs;
-import pjq.weibo.openapi.utils.ThreeDesUtils;
 import weibo4j.model.WeiboException;
 
 /**

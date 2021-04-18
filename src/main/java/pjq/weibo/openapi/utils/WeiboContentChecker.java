@@ -50,6 +50,7 @@ import lombok.NoArgsConstructor;
 import pjq.commons.constant.CommonEnumConstant.YesOrNoInt;
 import pjq.commons.utils.CharsetUtils;
 import pjq.commons.utils.CheckUtils;
+import pjq.commons.utils.ImageTypeJudger;
 import pjq.commons.utils.collection.CollectionUtils;
 import pjq.weibo.openapi.support.WeiboHttpClient;
 import weibo4j.model.WeiboException;

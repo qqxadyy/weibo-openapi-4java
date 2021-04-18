@@ -34,12 +34,12 @@ package pjq.weibo.openapi.support;
 import java.util.Map;
 
 import pjq.commons.utils.CheckUtils;
-import pjq.weibo.openapi.utils.http.HttpException;
-import pjq.weibo.openapi.utils.http.OKHttpSender;
-import pjq.weibo.openapi.utils.http.OKHttpSender4Async;
-import pjq.weibo.openapi.utils.http.OKHttpSenderBase;
-import pjq.weibo.openapi.utils.http.OKHttpSenderBase.ParamDataType;
-import pjq.weibo.openapi.utils.http.SimpleAsyncCallback;
+import pjq.commons.utils.http.HttpException;
+import pjq.commons.utils.http.okhttp.OKHttpSender;
+import pjq.commons.utils.http.okhttp.OKHttpSender4Async;
+import pjq.commons.utils.http.okhttp.OKHttpSenderBase;
+import pjq.commons.utils.http.okhttp.OKHttpSenderBase.ParamDataType;
+import pjq.commons.utils.http.okhttp.SimpleAsyncCallback;
 
 /**
  * 发送微博相关请求的父类<br>
