@@ -372,7 +372,7 @@ public final class WeiboContentChecker {
 
         public List<String> picPaths() {
             return CheckUtils.isEmpty(picCheckResults) ? new ArrayList<>()
-                : CollectionUtils.transformList(picCheckResults, picCheckResult -> picCheckResult.getFilePath());
+                : CollectionUtils.transformToList(picCheckResults, picCheckResult -> picCheckResult.getFilePath());
         }
     }
 }

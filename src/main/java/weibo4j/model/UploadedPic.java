@@ -56,6 +56,6 @@ public class UploadedPic extends WeiboResponse {
             return "";
         }
         return StreamUtils
-            .joinString(CollectionUtils.transformList(list, uploadedPic -> uploadedPic.getPicid()).stream(), ",");
+            .joinString(CollectionUtils.transformToList(list, uploadedPic -> uploadedPic.getPicid()).stream(), ",");
     }
 }
