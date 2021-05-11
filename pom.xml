@@ -214,16 +214,13 @@
 	</build>
 
 	<distributionManagement>
-		<!-- <snapshotRepository> <id>sonatype-nexus</id> <url>https://oss.sonatype.org/content/repositories/snapshots</url> </snapshotRepository> 
-			<repository> <id>sonatype-nexus</id> <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url> </repository> -->
-
 		<snapshotRepository>
-			<id>gz-trs-nexus</id>
-			<url>http://maven.gztrs.cn:8081/repository/maven-snapshots/</url>
+			<id>sonatype-nexus</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
 		<repository>
-			<id>gz-trs-nexus</id>
-			<url>http://maven.gztrs.cn:8081/repository/maven-relases/</url>
+			<id>sonatype-nexus</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
 		</repository>
 	</distributionManagement>
 </project>
