@@ -8,7 +8,7 @@
 	</parent>
 
 	<artifactId>weibo-openapi-4java</artifactId>
-	<version>2.1.1</version>
+	<version>2.1.2-SNAPSHOT</version>
 	<name>微博开放平台API-JAVA SDK</name>
 	<description>基于微博开放平台官网的weibo4j-oauth2-beta3.1.1包及新版接口做二次开发</description>
 	<inceptionYear>2021</inceptionYear>
@@ -28,7 +28,7 @@
 		<connection>scm:git:https://gitee.com/qqxadyy/weibo-openapi-4java.git</connection>
 		<developerConnection>scm:git:https://gitee.com/qqxadyy/weibo-openapi-4java.git</developerConnection>
 		<url>https://github.com/qqxadyy/weibo-openapi-4java</url>
-		<tag>weibo-openapi-4java-2.1.1</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<properties>
