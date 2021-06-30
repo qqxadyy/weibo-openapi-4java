@@ -264,10 +264,14 @@ public final class WeiboContentChecker {
         if (picPath.startsWith("http")) {
             try {
                 isTempFile = true;
-                filePath = System.getProperty("java.io.tmpdir") + UUID.randomUUID().toString().replaceAll("-", "")
-                    + DigestUtils.md5Hex(picPath);
+                String tempDir = System.getProperty("java.io.tmpdir");
+                if (!tempDir.endsWith(File.separator)) {
+                    tempDir += File.separator;
+                }
+                filePath = tempDir + UUID.randomUUID().toString().replaceAll("-", "") + DigestUtils.md5Hex(picPath);
                 WeiboHttpClient.getInstance().httpGetOriginalUrlFile(picPath, filePath);
             } catch (Exception e) {
+                e.printStackTrace();
                 throw new WeiboException("获取图片资源失败[" + picPath + "]");
             }
         } else {

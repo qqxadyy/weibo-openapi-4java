@@ -41,7 +41,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import pjq.commons.annos.EnhanceEnum.DefualtEnhanceEnum;
+import pjq.commons.annos.EnhanceEnum.DefaultEnhanceEnum;
 import pjq.commons.constant.DateTimePattern;
 import pjq.commons.utils.CheckUtils;
 import pjq.commons.utils.CommonTypeJudger;
@@ -176,7 +176,7 @@ public abstract class WeiboResponse implements java.io.Serializable {
                     } else if (CommonTypeJudger.isLongType(type)) {
                         field.set(_this, json.getLong(jsonName));
                     } else if (type.isEnum()) {
-                        field.set(_this, DefualtEnhanceEnum.valueOrNameOf(type.getName(),
+                        field.set(_this, DefaultEnhanceEnum.valueOrNameOf(type.getName(),
                             DefaultValueGetter.getValue(null, json.getString(jsonName))));
                     } else if (JSONObject.class.isAssignableFrom(type)) {
                         field.set(_this, json.getJSONObject(jsonName));
